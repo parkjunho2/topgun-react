@@ -607,7 +607,6 @@ const MyPage = () => {
                                 />
                                 <label htmlFor="floatingPassword">비밀번호</label>
                             </div>
-                            {/* {errorMessage && <p className="text-danger">{errorMessage}</p>} 오류 메시지 표시 */}
                         </div>
                         <div className="modal-footer d-flex">
                             <button
@@ -615,7 +614,6 @@ const MyPage = () => {
                                 className="btn btn-secondary flex-fill me-1" // 오른쪽 여백 추가
                                 data-bs-dismiss="modal"
                                 onClick={e => setCheckPw('')}
-                            // 데이터 리셋
                             >
                                 Cancel
                             </button>
