@@ -26,6 +26,8 @@ import NoticeDetail from './components/notice/noticeDetail.js'; // 공지사항 
 import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
+import FlightDetail from './components/FlightDetail.js';
+import AdminFlightDetail from './components/AdminFlightDetail.js';
 
 
 
@@ -119,7 +121,10 @@ const App = () => {
         {/* 멤버만 못보는 페이지 -> ADMIN, AIRLINE만 가능 */}
         <Route element={<NotMemberRoute />}>
           <Route path="/airline" element={<AirLine />} />
-          <Route path="/flight" element={<Flight />} />
+        <Route path="/flight" element={<Flight />} />
+        <Route path="/flight/detail/:flightId" element={<FlightDetail />} />
+        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
+        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
         </Route>
 
 
