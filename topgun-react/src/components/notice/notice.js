@@ -49,7 +49,7 @@ const NoticeBoard = () => {
         setInput(prevInput => ({
             ...prevInput,
             [name]: value
-        }));
+        }));//
     }, []);
 
     const handleContentChange = useCallback(value => {
