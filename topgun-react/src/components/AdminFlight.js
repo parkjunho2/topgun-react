@@ -17,6 +17,13 @@ const AdminFlight = () => {
     }, []);
 
     const updateFlight = useCallback(async (flightId, status) => {
+
+         // 승인 시 알림창
+         if (status === "승인" && !window.confirm("승인 처리하시겠습니까?")) return;
+
+          // 반려 시 알림창
+        if (status === "거절" && !window.confirm("거절 처리하시겠습니까?")) return;
+
         const updatedFlight = {
             ...flightList.find(flight => flight.flightId === flightId),
             flightStatus: status,
@@ -64,7 +71,7 @@ const AdminFlight = () => {
                                 <th>ID</th>
                                 <th>총 좌석 수</th>
                                 <th>상태</th>
-                                <th>승인 및 반려</th>
+                                <th>승인 및 거절</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -81,7 +88,7 @@ const AdminFlight = () => {
                                     <td>{flight.flightStatus}</td>
                                     <td>
                                         <button className="btn btn-success" onClick={() => updateFlight(flight.flightId, "승인")}>승인</button>
-                                        <button className="btn btn-danger" onClick={() => updateFlight(flight.flightId, "반려")}>반려</button>
+                                        <button className="btn btn-danger" onClick={() => updateFlight(flight.flightId, "거절")}>거절</button>
                                     </td>
                                 </tr>
                             ))}

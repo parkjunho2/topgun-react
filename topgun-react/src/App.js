@@ -25,6 +25,7 @@ import Notice from './components/notice.js'; // Notice 컴포넌트 임포트
 import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
+import FlightDetail from './components/FlightDetail.js';
 
 
 
@@ -119,6 +120,7 @@ const App = () => {
         <Route element={<NotMemberRoute />}>
           <Route path="/airline" element={<AirLine />} />
         <Route path="/flight" element={<Flight />} />
+        <Route path="/flight/detail/:flightId" element={<FlightDetail />} />
         </Route>
 
         {/* 공지사항 페이지 추가 */}

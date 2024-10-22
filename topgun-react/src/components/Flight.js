@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { Modal } from "bootstrap";
 import { FaMagnifyingGlass } from "react-icons/fa6";
+import { NavLink } from "react-router-dom";
 
 const Flight = () => {
     const [flightList, setFlightList] = useState([]);
@@ -54,7 +55,12 @@ const Flight = () => {
     }, [loadList]);
 
     const updateFlight = useCallback(async ()=>{
-        await axios.put("http://localhost:8080/flight/", input);
+        const updatedInput = {
+            ...input,
+            flightStatus: input.flightStatus === "거절" ? "대기" : input.flightStatus
+        };
+    
+        await axios.put("http://localhost:8080/flight/", updatedInput);
         loadList();
         closeModal();
     }, [input]);
@@ -268,7 +274,11 @@ const Flight = () => {
                         <tfoot>
                             {flightList.map((flight) => (
                                 <tr key={flight.flightId}>
-                                    <td>{flight.flightNumber}</td>
+                                    <td>
+                                    <NavLink to={"/flight/detail/"+flight.flightId}>
+                                    {flight.flightNumber}
+                                    </NavLink>
+                                    </td>
                                     <td>{new Date(flight.departureTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
                                     <td>{new Date(flight.arrivalTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</td>
                                     <td>{flight.flightTime}</td>
