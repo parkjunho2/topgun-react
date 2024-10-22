@@ -26,6 +26,8 @@ import NoticeDetail from './components/notice/noticeDetail.js'; // 공지사항 
 import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 
 
@@ -88,7 +90,15 @@ const App = () => {
   const noHeaderRoutes = ['/login', '/join'];
 
   return (
-    <>
+    <>{/* ToastContainer 추가 */}
+      <ToastContainer
+        position="top-right" // 토스트 위치
+        autoClose={5000} // 자동 닫힘 시간
+        hideProgressBar={false} // 진행 바 표시 여부
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
       {!noHeaderRoutes.includes(location.pathname) && <Header />}
       <Routes>
         <Route exact path="/" element={<MainPage />} />

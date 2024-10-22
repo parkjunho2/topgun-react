@@ -411,6 +411,7 @@ const Login = () => {
                                         airlineNameValid: null,
                                     });
                                     setCurrentPage(0); // 변경 사항: 유저 타입 변경 시 페이지 초기화
+                                    setPwCheck('');
                                     setEmailId('');
                                     setDomain('');
                                 }}
@@ -800,7 +801,7 @@ const Login = () => {
                                                 maxDate={new Date()}
                                                 className={`form-control ${validation.memberBirthValid ? 'is-valid' : validation.memberBirthValid === false ? 'is-invalid' : ''}`}
                                                 placeholderText="생일을 선택하세요"
-                                                wrapperClassName="date-picker" // 스타일링을 위해 wrapperClassName 추가
+                                                wrapperClassName="datepicker-wrapper" // CSS를 사용하기 위한 클래스명
                                             />
                                             <div className="valid-feedback"></div>
                                             <div className="invalid-feedback">
