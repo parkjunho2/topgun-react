@@ -28,6 +28,7 @@ import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
 import FlightDetail from './components/FlightDetail.js';
 import AdminFlightDetail from './components/AdminFlightDetail.js';
+import BookingList from './components/booking/BookingList.js';
 
 
 
@@ -98,6 +99,7 @@ const App = () => {
 
         {/* 예약페이지 */}
         <Route path="/booking" element={<Booking />} />
+        <Route path="/bookingList" element={<BookingList/>} />
 
         {/* 로그인 되어야지만 볼 수 있는 페이지 */}
         <Route element={<PrivateRoute />}>
