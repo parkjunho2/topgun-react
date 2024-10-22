@@ -1,0 +1,18 @@
+/* GLOBAL STYLES
+-------------------------------------------------- */
+/* Padding below the footer and lighter body text */
+
+html, body {
+  height: 100%; /* 전체 높이를 100%로 설정 */
+  margin: 0; /* 기본 마진 제거 */
+}
+
+#ALL {
+  display: flex;
+  flex-direction: column; /* 수직 방향으로 배치 */
+  min-height: 100vh; /* 최소 높이를 100vh로 설정 */
+}
+
+main {
+  flex: 1; /* 나머지 공간을 차지하도록 설정 */
+}

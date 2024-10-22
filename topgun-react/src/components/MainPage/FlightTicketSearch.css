@@ -1,0 +1,67 @@
+.list_airport {
+    min-height: 250px !important; 
+    max-height: 250px !important; 
+    overflow-y: auto; /* 도시 목록이 많아지면 스크롤 가능하게 설정 */
+}
+
+.city_group-box > li, 
+.nation-group-box > li {
+    display: flex !important;
+    justify-content: space-between !important; 
+}
+
+.lightpick__month, /*달력 사이즈*/
+.lightpick__days, /*일수 사이즈 */
+.lightpick__days-of-the-week /*주 사이즈 */ {
+    width: 450px !important;
+}
+
+/* 상단 툴바 */
+.lightpick__toolbar  {
+ margin-top: 5px !important;
+}
+/* 달력의 위치 조정 */
+.lightpick--2-columns {
+    left: 435px !important;
+    top: 190px !important;
+}
+/* 하단부 버튼(Reset , Apply) */
+.lightpick__reset-action, 
+.lightpick__apply-action {
+    font-size:  14px !important;
+    padding: 0.3em !important;
+}
+/* 일자(숫자 공간) */
+.lightpick__day {
+    height: 60px !important;
+}
+/* 달력 이동 버튼(화살표) */
+.lightpick__previous-action, 
+.lightpick__next-action, 
+.lightpick__close-action {
+    width : 40px !important;
+    height:40 !important;
+    padding : 0.3em !important;
+}
+/* 월/연 */
+.lightpick__month-title > .lightpick__select,
+.lightpick__month-title > .lightpick__select-months {
+    font-size : 17px !important;
+}
+/* 좌석 */
+.select-seat{
+    width: 300px !important;
+}
+
+
+/* 비활성화된 버튼의 스타일 */
+button:disabled {
+    cursor: not-allowed !important; /* 비활성화된 버튼에 커서 스타일 */
+    pointer-events: auto !important; /* 클릭 이벤트를 무시하여 비활성화된 버튼의 클릭을 방지 */
+}
+/* 부트스트랩에 있는 색상을 지정하고 싶을때.. */
+.btn-primary {
+    --bs-btn-active-bg: #78c2ad !important;  /* 버튼 배경 색상 변경 */
+    --bs-btn-active-border-color: #78c2ad !important; /* 버튼 글자 색상 변경 */
+}
+
