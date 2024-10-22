@@ -403,7 +403,7 @@ const MainPage = () => {
             </div> */}
             {/* 가는편 오는편 기능 구현 */}
             <div className="flight-all-div mt-3" style={{        
-                            marginLeft: isSmallScreen ? "0" : "15%"
+                            marginLeft: isSmallScreen ? "0" : "20%"
                         }}>   {/* 전체 기능에 대한 div */}
                 <div className="row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
                     <h5>항공권 조회 구현중..</h5>
