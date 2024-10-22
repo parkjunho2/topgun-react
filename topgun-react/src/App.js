@@ -21,7 +21,8 @@ import NotMemberRoute from './components/Route/NotMemberRoute';
 import AirLine from './components/AirLine.js';
 import AdminFlight from './components/AdminFlight.js';
 import Chat from './components/chat/Chat';
-import Notice from './components/notice.js'; // Notice 컴포넌트 임포트
+import Notice from './components/notice/notice.js'; // Notice 컴포넌트 임포트
+import NoticeDetail from './components/notice/noticeDetail.js'; // 공지사항 상세 페이지 컴포넌트 임포트
 import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
@@ -90,31 +91,31 @@ const App = () => {
 
   return (
     <>
-      { !noHeaderRoutes.includes(location.pathname) && <Header /> }
-      <Routes>  
+      {!noHeaderRoutes.includes(location.pathname) && <Header />}
+      <Routes>
         <Route exact path="/" element={<MainPage />} />
         <Route path="/login" element={<Login />} /> {/* 로그인 */}
 
         {/* 예약페이지 */}
-        <Route path="/booking" element={<Booking/>}/>
+        <Route path="/booking" element={<Booking />} />
 
         {/* 로그인 되어야지만 볼 수 있는 페이지 */}
         <Route element={<PrivateRoute />}>
-          <Route path="/payment" element={ <Payment /> } />
-          <Route path="/payment/success/:partnerOrderId" element={ <PaymentSuccess /> } />
-          <Route path="/payment/cancel" element={ <PaymentCancel /> } />
-          <Route path="/payment/fail" element={ <PaymentFail /> } />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment/success/:partnerOrderId" element={<PaymentSuccess />} />
+          <Route path="/payment/cancel" element={<PaymentCancel />} />
+          <Route path="/payment/fail" element={<PaymentFail />} />
           <Route path="/test" element={<Test />} />
           <Route path="/chat" element={<Chat />} />
-          <Route path='/mypage' element={<MyPage />}/>
-          <Route path='/paymen/list' element={<PaymentList/>}/>
+          <Route path='/mypage' element={<MyPage />} />
+          <Route path='/paymen/list' element={<PaymentList />} />
         </Route>
 
 
         {/* 관리자만 봐야하는 페이지 */}
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/list" element={<AdminFlight />} />
+          <Route path="/admin/list" element={<AdminFlight />} />
         </Route>
 
         {/* 멤버만 못보는 페이지 -> ADMIN, AIRLINE만 가능 */}
@@ -126,8 +127,11 @@ const App = () => {
         <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
         </Route>
 
+
         {/* 공지사항 페이지 추가 */}
         <Route path="/notice" element={<Notice />} />  {/* Notice 페이지 경로 설정 */}
+        <Route path="/notice/:id" element={<NoticeDetail />} />  {/* 공지사항 상세 페이지 경로 설정 */}
+
 
         <Route path="*" element={<NotFound />} /> {/* 모든 잘못된 경로 처리 */}
       </Routes>

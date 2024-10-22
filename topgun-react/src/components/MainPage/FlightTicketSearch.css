@@ -22,7 +22,7 @@
 }
 /* 달력의 위치 조정 */
 .lightpick--2-columns {
-    left: 435px !important;
+    left: 20% !important;
     top: 190px !important;
 }
 /* 하단부 버튼(Reset , Apply) */
@@ -64,4 +64,18 @@ button:disabled {
     --bs-btn-active-bg: #78c2ad !important;  /* 버튼 배경 색상 변경 */
     --bs-btn-active-border-color: #78c2ad !important; /* 버튼 글자 색상 변경 */
 }
-
+/* 가는편/오는편 전체 기능에 대한 div */
+.flight-all-div{
+    border-radius: 1.5em;
+    border: 1px solid black;
+    width: 100%;
+    margin-bottom: 1.5em;
+    width: 1100px;
+}
+/* 가는편/오는편에 대한 div */
+.flight-select-div{
+    width: 1000px;
+    border: 1px solid skyblue;
+    border-radius: 0.5em;
+    margin-left: 3px;
+}

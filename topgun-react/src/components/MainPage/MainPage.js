@@ -11,6 +11,24 @@ import { IoClose } from "react-icons/io5";
 import * as hangul from 'hangul-js';
 
 const MainPage = () => {
+    const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+
+  // 창 크기 변화 감지
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth <= 768);  // 768px 이하일 때 true
+    };
+
+    // 처음 로드될 때와 창 크기 변화할 때 이벤트 핸들러 실행
+    window.addEventListener('resize', handleResize);
+    handleResize(); // 초기 실행
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
     //navigate
     const navigate = useNavigate();
 
@@ -282,7 +300,7 @@ const MainPage = () => {
     const passengerText = useMemo(() => {
         const text = `성인${adultNum}, 소아${childNum}, 유아${babyNum} `;
         // 만약 텍스트가 설정값을 넘으면 ... 처리 (필요에 따라 길이 조정 필요)
-        const maxLength = 15; // 최대 길이 설정
+        const maxLength = 11; // 최대 길이 설정
         return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
     }, [adultNum, childNum, babyNum]); // adultNum, childNum, babyNum가 변경될 때마다 재계산
 
@@ -371,9 +389,9 @@ const MainPage = () => {
     return (
         <>
             {/* 캐러셀 */}
-            <div className="row">
                 {/* 이미지1 */}
-                <div className="carousel-item active">
+            {/* <div className="row">
+                <div className="carousel-item active"> */}
                     {/* <img
                             src="https://picsum.photos/800/400"
                             alt="Example image"
@@ -381,315 +399,317 @@ const MainPage = () => {
                             aria-hidden="true"
                             focusable="false"
                             style={{ backgroundColor: 'var(--bs-secondary-color)', width: '100%', height: '100%' }} /> */}
-                </div>
-
-
-            </div>
-                            {/* 가는편 오는편 기능 구현 */}
-                            <div className="row mt-4">
-                <h2>항공권 조회 구현중..</h2>
-                    <div className="col-sm-2">
-                        <input
-                            type="text"
-                            name="departure"
-                            className="form-control"
-                            placeholder="출발지"
-                            value={departureText}
-                            onChange={changeInput}
-                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                            onClick={DepartureClick}
-                            autoComplete="off"
-                        />
-                    </div>
-
-                    <div className="col-sm-2">
-                        <input
-                            type="text"
-                            name="destination"
-                            className="form-control"
-                            placeholder="도착지"
-                            value={destinationText}
-                            onChange={changeInput}
-                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                            onClick={destinationClick}
-                            autoComplete="off"
-                        />
-                    </div>
-
-                    <div className="col-sm-2">
-                        <input
-                            type="text"
-                            name="boardingDate"
-                            className="form-control"
-                            placeholder="가는편"
-                            readOnly
-                            value={input.boardingDate}
-                            onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
-                            ref={datePickerRef} // ref 추가
-                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                        />
-                    </div>
-
-                    <div className="col-sm-2">
-                        <input
-                            type="text"
-                            name="departureDate"
-                            className="form-control"
-                            placeholder="오는편"
-                            readOnly
-                            value={input.departureDate}
-                            onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
-                            ref={datePickerRef} // ref 추가
-                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                        />
-                    </div>
-
-                    <div className="col-sm-2">
-                        <input
-                            type="text"
-                            name="passengers"
-                            className="form-control"
-                            placeholder="탑승객 및 좌석등급"
-                            readOnly
-                            value={input.passengers}
-                            onClick={showPassengerClick} // 클릭 시 설정 기능 표시
-                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                        />
-                    </div>
-
-                    <div className="col-sm-2">
-                        <button className="btn btn-success" onClick={checkInputEmpty}>조회</button>
-                    </div>
-                </div>
-
-                {/*   ☆☆☆☆ 출발지 입력창 기능 구현 ☆☆☆☆ */}
-                {departureInputClick && ( // 출발지 입력창 클릭 시에만 보여주기
-                    // 검색창 기능
-                    <div className="row mt-3" style={{ width: "1000px", border: "1px solid skyblue", borderRadius: "0.5em" }}>
-                        <div className="d-flex" style={{ display: "flex", justifyContent: "space-between" }}>
-                            <h4 className="mt-3" style={{ fontWeight: "bold" }}>출발지 선택</h4>
-                            <button className="btn btn-danger mt-3" onClick={CloseSetting}><IoClose /></button>
+                {/* </div>
+            </div> */}
+            {/* 가는편 오는편 기능 구현 */}
+            <div className="flight-all-div mt-3" style={{        
+                            marginLeft: isSmallScreen ? "0" : "20%"
+                        }}>   {/* 전체 기능에 대한 div */}
+                <div className="row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
+                    <h5>항공권 조회 구현중..</h5>
+                        <div className="col-sm-2">
+                            <input
+                                type="text"
+                                name="departure"
+                                className="form-control"
+                                placeholder="출발지"
+                                value={departureText}
+                                onChange={changeInput}
+                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                                onClick={DepartureClick}
+                                autoComplete="off"
+                            />
                         </div>
-                        <div className="flights_list_national row mt-3">
-                            <div className="nation col-2">
-                                <ul className="list-group nation-group-box">
-                                    <li className="nation-list">
-                                        <button type="button" className={getButtonClass(selectedDepNational, '한국')}
-                                            onClick={sendNationDep('한국', departureNationalClick)}>
-                                            <span>한국</span>
-                                        </button>
-                                    </li>
-                                    <li className="nation-box-list">
-                                        <button type="button" className={getButtonClass(selectedDepNational, '동북아시아')}
-                                            onClick={sendNationDep('동북아시아', departureNationalClick)}>
-                                            <span>동북아시아</span>
-                                        </button>
-                                    </li>
-                                    <li className="nation-box-list">
-                                        <button type="button" className={getButtonClass(selectedDepNational, '동남아시아')}
-                                            onClick={sendNationDep('동남아시아', departureNationalClick)}>
-                                            <span>동남아시아</span>
-                                        </button>
-                                    </li>
-                                </ul>
+
+                        <div className="col-sm-2">
+                            <input
+                                type="text"
+                                name="destination"
+                                className="form-control"
+                                placeholder="도착지"
+                                value={destinationText}
+                                onChange={changeInput}
+                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                                onClick={destinationClick}
+                                autoComplete="off"
+                            />
+                        </div>
+
+                        <div className="col-sm-2">
+                            <input
+                                type="text"
+                                name="boardingDate"
+                                className="form-control"
+                                placeholder="가는편"
+                                readOnly
+                                value={input.boardingDate}
+                                onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
+                                ref={datePickerRef} // ref 추가
+                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                            />
+                        </div>
+
+                        <div className="col-sm-2">
+                            <input
+                                type="text"
+                                name="departureDate"
+                                className="form-control"
+                                placeholder="오는편"
+                                readOnly
+                                value={input.departureDate}
+                                onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
+                                ref={datePickerRef} // ref 추가
+                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                            />
+                        </div>
+
+                        <div className="col-sm-2">
+                            <input
+                                type="text"
+                                name="passengers"
+                                className="form-control"
+                                placeholder="탑승객 및 좌석등급"
+                                readOnly
+                                value={input.passengers}
+                                onClick={showPassengerClick} // 클릭 시 설정 기능 표시
+                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                            />
+                        </div>
+
+                        <div className="col-sm-2">
+                            <button className="btn btn-success" onClick={checkInputEmpty}>조회</button>
+                        </div>
+                    </div>
+
+                    {/*   ☆☆☆☆ 출발지 입력창 기능 구현 ☆☆☆☆ */}
+                    {departureInputClick && ( // 출발지 입력창 클릭 시에만 보여주기
+                        //검색창
+                        <div className="flight-select-div mt-3">   
+                            <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between"}}>
+                                <h4 className="mt-3" style={{ fontWeight: "bold" }}>출발지 선택</h4>
+                                <button className="btn btn-danger mt-3" onClick={CloseSetting}><IoClose /></button>
                             </div>
-                            <div className="list_airport col-4" style={{ marginBottom: "1em" }}>
-                                <h5 style={{ fontWeight: "bold" }}>취항지</h5>
-                                <div className="national_list_box">
-                                    <ul className="list-group city_group-box">
-                                        {cities.map((city) => (
-                                            <li key={city} className="city_name_list">
-                                                <button type="button" className={getButtonClass(selectedDepCity, city)}
-                                                    onClick={sendNationDep(city, handleCityClick)}>
-                                                    <span>{city}</span>
-                                                </button>
-                                            </li>
-                                        ))}
+                            <div className="flights_list_national row mt-3">
+                                <div className="nation col-2">
+                                    <ul className="list-group nation-group-box">
+                                        <li className="nation-list">
+                                            <button type="button" className={getButtonClass(selectedDepNational, '한국')}
+                                                onClick={sendNationDep('한국', departureNationalClick)}>
+                                                <span>한국</span>
+                                            </button>
+                                        </li>
+                                        <li className="nation-box-list">
+                                            <button type="button" className={getButtonClass(selectedDepNational, '동북아시아')}
+                                                onClick={sendNationDep('동북아시아', departureNationalClick)}>
+                                                <span>동북아시아</span>
+                                            </button>
+                                        </li>
+                                        <li className="nation-box-list">
+                                            <button type="button" className={getButtonClass(selectedDepNational, '동남아시아')}
+                                                onClick={sendNationDep('동남아시아', departureNationalClick)}>
+                                                <span>동남아시아</span>
+                                            </button>
+                                        </li>
                                     </ul>
                                 </div>
-                            </div>
-                            <div className="col-3">
-                                <h5 style={{ fontWeight: "bold" }}>최근 검색 목록</h5>
-                                <button className="btn btn-success" onClick={handleNextClick}>다음</button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/*    ☆☆☆☆ 도착지 입력창 기능 구현 ☆☆☆☆   */}
-                {destinationInputClick && ( // 도착지 입력창 클릭 시에만 보여주기
-                    // 검색창 기능
-                    <div className="row mt-3" style={{ width: "1000px", border: "1px solid skyblue", borderRadius: "0.5em" }}>
-                        <div className="d-flex" style={{ display: "flex", justifyContent: "space-between" }}>
-                            <h4 className="mt-3" style={{ fontWeight: "bold" }}>도착지 선택</h4>
-                            <button className="btn btn-danger mt-3" onClick={CloseSetting}><IoClose /></button>
-                        </div>
-                        <div className="flights_list_national row mt-3">
-                            <div className="nation col-2">
-                                <ul className="list-group nation-group-box">
-                                    <li className="nation-list">
-                                        <button type="button" className={getButtonClass(selectedDesNational, '한국')}
-                                            onClick={sendNationalDes('한국', destinationNationalClick)}>
-                                            <span>한국</span>
-                                        </button>
-                                    </li>
-                                    <li className="nation-box-list">
-                                        <button type="button" className={getButtonClass(selectedDesNational, '동북아시아')}
-                                            onClick={sendNationalDes('동북아시아', destinationNationalClick)}>
-                                            <span>동북아시아</span>
-                                        </button>
-                                    </li>
-                                    <li className="nation-box-list">
-                                        <button type="button" className={getButtonClass(selectedDesNational, '동남아시아')}
-                                            onClick={sendNationalDes('동남아시아', destinationNationalClick)}>
-                                            <span>동남아시아</span>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div className="list_airport col-4" style={{ marginBottom: "1em" }}>
-                                <h6 style={{ fontWeight: "bold" }}>취항지</h6>
-                                <div className="national_list_box">
-                                    <ul className="list-group city_group-box">
-                                        {destinationCities.map((cityDes) => (
-                                            <li key={cityDes} className="city_name_list">
-                                                <button type="button" className={getButtonClass(selectedDesCity, cityDes)}
-                                                    onClick={sendNationalDes(cityDes, destinationCity)}>
-                                                    <span>{cityDes}</span>
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                            <div className="col-3">
-                                <h5 style={{ fontWeight: "bold" }}>최근 검색 목록</h5>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                    {/*    ☆☆☆☆    탑승객 및 좌석 등급 설정 기능 구현   ☆☆☆☆  */}
-                    {showPassengerSettings && (
-                        <div className="row mt-4" style={{ width: "600px", border: "1px solid skyblue", borderRadius: "0.5em",  marginLeft:"450px"}}>
-                            {/* <div className="row">
-                            <div className="col">
-                                <h5 style={{fontWeight:"bold"}}>좌석 등급</h5>
-                                <select className="select-seat form-select" value={selectedSeatClass} onChange={SeatClassChange}>
-                                    <option value="">좌석 등급을 선택해주세요.</option>
-                                    <option value="일반석">일반석</option>
-                                    <option value="비지니스석">비지니스석</option>
-                                </select>
-                            </div>
-                        </div>*/}
-                            <div className="row mt-4">
-                                <div className="d-flex" style={{display: "flex", justifyContent: "space-between" }}>
-                                    <h3 style={{ fontWeight: "bold" }}>승객 선택</h3>
-                                    <button className="btn btn-danger" onClick={CloseSetting}><IoClose /></button>
-                                </div>
-                                <div className="row mt-5">
-                                    <h5 style={{ fontWeight: "bold" }}>성인 (만 12세~)</h5>
-                                    <div className="col mt-1">
-                                        <button className="btn btn-primary" onClick={() => decreaseCount('adult')}
-                                            disabled={adultNum <= 0}>
-                                            <FaMinus />
-                                        </button>
-                                        <span className="ms-3 mx-3">{adultNum}</span>
-                                        <button className="btn btn-primary" onClick={() => increaseCount('adult')}
-                                            disabled={adultNum + childNum + babyNum >= 9}>
-                                            <FaPlus />
-                                        </button>
+                                <div className="list_airport col-4" style={{ marginBottom: "1em" }}>
+                                    <h5 style={{ fontWeight: "bold" }}>취항지</h5>
+                                    <div className="national_list_box">
+                                        <ul className="list-group city_group-box">
+                                            {cities.map((city) => (
+                                                <li key={city} className="city_name_list">
+                                                    <button type="button" className={getButtonClass(selectedDepCity, city)}
+                                                        onClick={sendNationDep(city, handleCityClick)}>
+                                                        <span>{city}</span>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     </div>
                                 </div>
+                                <div className="col-3">
+                                    <h5 style={{ fontWeight: "bold" }}>최근 검색 목록</h5>
+                                    <button className="btn btn-success" onClick={handleNextClick}>다음</button>
+                                </div>
                             </div>
-                            {/* 소아 설정 */}
-                            <div className="row mt-4">
+                        </div>
+                    )}
+
+                    {/*    ☆☆☆☆ 도착지 입력창 기능 구현 ☆☆☆☆   */}
+                    {destinationInputClick && ( // 도착지 입력창 클릭 시에만 보여주기
+                        // 검색창 기능
+                        <div className="flight-select-div mt-3">
+                            <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
+                                <h4 className="mt-3" style={{ fontWeight: "bold" }}>도착지 선택</h4>
+                                <button className="btn btn-danger mt-3" onClick={CloseSetting}><IoClose /></button>
+                            </div>
+                            <div className="flights_list_national row mt-3">
+                                <div className="nation col-2">
+                                    <ul className="list-group nation-group-box">
+                                        <li className="nation-list">
+                                            <button type="button" className={getButtonClass(selectedDesNational, '한국')}
+                                                onClick={sendNationalDes('한국', destinationNationalClick)}>
+                                                <span>한국</span>
+                                            </button>
+                                        </li>
+                                        <li className="nation-box-list">
+                                            <button type="button" className={getButtonClass(selectedDesNational, '동북아시아')}
+                                                onClick={sendNationalDes('동북아시아', destinationNationalClick)}>
+                                                <span>동북아시아</span>
+                                            </button>
+                                        </li>
+                                        <li className="nation-box-list">
+                                            <button type="button" className={getButtonClass(selectedDesNational, '동남아시아')}
+                                                onClick={sendNationalDes('동남아시아', destinationNationalClick)}>
+                                                <span>동남아시아</span>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="list_airport col-4" style={{ marginBottom: "1em" }}>
+                                    <h6 style={{ fontWeight: "bold" }}>취항지</h6>
+                                    <div className="national_list_box">
+                                        <ul className="list-group city_group-box">
+                                            {destinationCities.map((cityDes) => (
+                                                <li key={cityDes} className="city_name_list">
+                                                    <button type="button" className={getButtonClass(selectedDesCity, cityDes)}
+                                                        onClick={sendNationalDes(cityDes, destinationCity)}>
+                                                        <span>{cityDes}</span>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div className="col-3">
+                                    <h5 style={{ fontWeight: "bold" }}>최근 검색 목록</h5>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                        {/*    ☆☆☆☆    탑승객 및 좌석 등급 설정 기능 구현   ☆☆☆☆  */}
+                        {showPassengerSettings && (
+                            <div className="row mt-4" style={{ width: "600px", border: "1px solid skyblue", borderRadius: "0.5em",  marginLeft:"450px"}}>
+                                {/* <div className="row">
                                 <div className="col">
-                                    <h5 style={{ fontWeight: "bold" }}>소아 (만 2세 ~ 12세 미만)</h5>
-                                    <div className="col mt-1">
-                                        <button className="btn btn-primary" onClick={() => decreaseCount('child')}
-                                            disabled={childNum <= 0}>
-                                            <FaMinus />
-                                        </button>
-                                        <span className="ms-3 mx-3">{childNum}</span>
-                                        <button className="btn btn-primary" onClick={() => increaseCount('child')}
-                                            disabled={adultNum + childNum + babyNum >= 9}><FaPlus />
-                                        </button>
-                                    </div>
+                                    <h5 style={{fontWeight:"bold"}}>좌석 등급</h5>
+                                    <select className="select-seat form-select" value={selectedSeatClass} onChange={SeatClassChange}>
+                                        <option value="">좌석 등급을 선택해주세요.</option>
+                                        <option value="일반석">일반석</option>
+                                        <option value="비지니스석">비지니스석</option>
+                                    </select>
                                 </div>
-                            </div>
-                            {/* 유아 설정 */}
-                            <div className="row mt-2">
+                            </div>*/}
                                 <div className="row mt-4">
-                                    <div className="col">
-                                        <h5 style={{ fontWeight: "bold" }}>유아 (만 2세 미만)</h5>
+                                    <div className="d-flex" style={{display: "flex", justifyContent: "space-between" }}>
+                                        <h3 style={{ fontWeight: "bold" }}>승객 선택</h3>
+                                        <button className="btn btn-danger" onClick={CloseSetting}><IoClose /></button>
+                                    </div>
+                                    <div className="row mt-5">
+                                        <h5 style={{ fontWeight: "bold" }}>성인 (만 12세~)</h5>
                                         <div className="col mt-1">
-                                            <button className="btn btn-primary" onClick={() => decreaseCount('baby')}
-                                                disabled={babyNum <= 0}>
+                                            <button className="btn btn-primary" onClick={() => decreaseCount('adult')}
+                                                disabled={adultNum <= 0}>
                                                 <FaMinus />
                                             </button>
-                                            <span className="ms-3 mx-3">{babyNum}</span>
-                                            <button className="btn btn-primary" onClick={() => increaseCount('baby')}
+                                            <span className="ms-3 mx-3">{adultNum}</span>
+                                            <button className="btn btn-primary" onClick={() => increaseCount('adult')}
+                                                disabled={adultNum + childNum + babyNum >= 9}>
+                                                <FaPlus />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* 소아 설정 */}
+                                <div className="row mt-4">
+                                    <div className="col">
+                                        <h5 style={{ fontWeight: "bold" }}>소아 (만 2세 ~ 12세 미만)</h5>
+                                        <div className="col mt-1">
+                                            <button className="btn btn-primary" onClick={() => decreaseCount('child')}
+                                                disabled={childNum <= 0}>
+                                                <FaMinus />
+                                            </button>
+                                            <span className="ms-3 mx-3">{childNum}</span>
+                                            <button className="btn btn-primary" onClick={() => increaseCount('child')}
                                                 disabled={adultNum + childNum + babyNum >= 9}><FaPlus />
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <ul>
-                                <li className="mt-3" style={{ marginLeft: "1em" }}>
-                                    <span style={{ color: "lightskyblue", fontWeight: "bold" }}>
-                                        만 14세 미만 승객은 예매 시 법정대리인의 동의 및 인증이 필요합니다. 로그인 후 예매를 진행하여 주시기 바랍니다.
-                                    </span>
-                                </li>
-                                <li style={{ marginLeft: "1em" }}>
-                                    <span>
-                                        2인 이상 예매 시 로그인 회원 본인의 마일리지만 사용 가능합니다.
-                                    </span>
-                                </li>
-                                <li style={{ marginLeft: "1em" }}>
-                                    <span>
-                                        예약인원은 성인, 소아, 유아를 포함하여 총 9명까지 선택 가능합니다.
-                                    </span>
-                                </li>
-                                <li style={{ marginLeft: "1em" }}>
-                                    <span>
-                                        유아는 탑승일 기준 만 2세 미만까지이며, 좌석을 점유하지 않습니다.
-                                    </span>
-                                </li>
-                            </ul>
-                    </div>
-                )}
-
-                {/* 자동완성 기능을 구현 연습 중 */}
-                <hr />
-                <div className="row mt-5 mb-5">
-                    <h3>자동완성 기능 구현중..(ex오사카,서울 등)</h3>
-                    <div className="col">
-                        <div className="form-group">
-                            <input type="text"
-                                className="form-control"
-                                placeholder="출발지를 검색하세요."
-                                value={keyword}
-                                onChange={changeKeyword}
-                                onKeyUp={handleKeyDown} // 키보드 이벤트 핸들러 추가
-                            />
-
-                            {/* {open === true && 화면} 왼쪽만 쓰겠다
-                                {open === true || 화면} 오르쪽만 쓰겠다 */}
-                            {open === true && (
-                                <ul className="list-group">
-                                    {/* 골라서 찍을 수 있도록 구현해야 함(자동완성이 동작할 수 있도록) */}
-                                    {searchResult.map((national, index) => (
-                                        <li key={national.nationalNo}
-                                            className={`list-group-item ${selectedIndex === index ? 'active' : ''}`} // 선택된 항목에 'active' 클래스 적용
-                                            onClick={e => selectKeyword(national.nationalName)}>
-                                            {national.nationalName}
-                                            {/* <span className="text-muted ms-1">({poketmon.poketmonType})</span> */}
-                                        </li>
-                                    ))}
+                                {/* 유아 설정 */}
+                                <div className="row mt-2">
+                                    <div className="row mt-4">
+                                        <div className="col">
+                                            <h5 style={{ fontWeight: "bold" }}>유아 (만 2세 미만)</h5>
+                                            <div className="col mt-1">
+                                                <button className="btn btn-primary" onClick={() => decreaseCount('baby')}
+                                                    disabled={babyNum <= 0}>
+                                                    <FaMinus />
+                                                </button>
+                                                <span className="ms-3 mx-3">{babyNum}</span>
+                                                <button className="btn btn-primary" onClick={() => increaseCount('baby')}
+                                                    disabled={adultNum + childNum + babyNum >= 9}><FaPlus />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul>
+                                    <li className="mt-3" style={{ marginLeft: "1em" }}>
+                                        <span style={{ color: "lightskyblue", fontWeight: "bold" }}>
+                                            만 14세 미만 승객은 예매 시 법정대리인의 동의 및 인증이 필요합니다. 로그인 후 예매를 진행하여 주시기 바랍니다.
+                                        </span>
+                                    </li>
+                                    <li style={{ marginLeft: "1em" }}>
+                                        <span>
+                                            2인 이상 예매 시 로그인 회원 본인의 마일리지만 사용 가능합니다.
+                                        </span>
+                                    </li>
+                                    <li style={{ marginLeft: "1em" }}>
+                                        <span>
+                                            예약인원은 성인, 소아, 유아를 포함하여 총 9명까지 선택 가능합니다.
+                                        </span>
+                                    </li>
+                                    <li style={{ marginLeft: "1em" }}>
+                                        <span>
+                                            유아는 탑승일 기준 만 2세 미만까지이며, 좌석을 점유하지 않습니다.
+                                        </span>
+                                    </li>
                                 </ul>
-                            )}
+                        </div>
+                    )}
+
+                    {/* 자동완성 기능을 구현 연습 중 */}
+                    <hr />
+                    <div className="row mt-5 mb-5">
+                        <h5>자동완성 기능 구현중..(ex오사카,서울 등)</h5>
+                        <div className="col">
+                            <div className="form-group">
+                                <input type="text"
+                                    className="form-control"
+                                    placeholder="출발지를 검색하세요."
+                                    value={keyword}
+                                    onChange={changeKeyword}
+                                    onKeyUp={handleKeyDown} // 키보드 이벤트 핸들러 추가
+                                />
+
+                                {/* {open === true && 화면} 왼쪽만 쓰겠다
+                                    {open === true || 화면} 오르쪽만 쓰겠다 */}
+                                {open === true && (
+                                    <ul className="list-group">
+                                        {/* 골라서 찍을 수 있도록 구현해야 함(자동완성이 동작할 수 있도록) */}
+                                        {searchResult.map((national, index) => (
+                                            <li key={national.nationalNo}
+                                                className={`list-group-item ${selectedIndex === index ? 'active' : ''}`} // 선택된 항목에 'active' 클래스 적용
+                                                onClick={e => selectKeyword(national.nationalName)}>
+                                                {national.nationalName}
+                                                {/* <span className="text-muted ms-1">({poketmon.poketmonType})</span> */}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
