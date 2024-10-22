@@ -26,6 +26,10 @@ import NoticeDetail from './components/notice/noticeDetail.js'; // 공지사항 
 import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
+import FlightDetail from './components/FlightDetail.js';
+import AdminFlightDetail from './components/AdminFlightDetail.js';
+import BookingList from './components/booking/BookingList.js';
+import Room from "./components/chat/Room.js";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
@@ -106,6 +110,7 @@ const App = () => {
 
         {/* 예약페이지 */}
         <Route path="/booking" element={<Booking />} />
+        <Route path="/bookingList" element={<BookingList/>} />
 
         {/* 로그인 되어야지만 볼 수 있는 페이지 */}
         <Route element={<PrivateRoute />}>
@@ -114,7 +119,8 @@ const App = () => {
           <Route path="/payment/cancel" element={<PaymentCancel />} />
           <Route path="/payment/fail" element={<PaymentFail />} />
           <Route path="/test" element={<Test />} />
-          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat/:roomNo" element={<Chat />} />
+          <Route path="/room" element={<Room/>} />
           <Route path='/mypage' element={<MyPage />} />
           <Route path='/paymen/list' element={<PaymentList />} />
         </Route>
@@ -129,7 +135,10 @@ const App = () => {
         {/* 멤버만 못보는 페이지 -> ADMIN, AIRLINE만 가능 */}
         <Route element={<NotMemberRoute />}>
           <Route path="/airline" element={<AirLine />} />
-          <Route path="/flight" element={<Flight />} />
+        <Route path="/flight" element={<Flight />} />
+        <Route path="/flight/detail/:flightId" element={<FlightDetail />} />
+        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
+        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
         </Route>
 
 

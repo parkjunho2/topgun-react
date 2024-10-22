@@ -1,0 +1,39 @@
+ .flight-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    background-color: white;
+  }
+  
+  .flight-header {
+    margin-right: 10px;
+  }
+  
+  .flight-logo {
+    width: 100px;
+  }
+  
+  .flight-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .flight-time {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-right: 20px;
+  }
+  
+  .flight-duration {
+    text-align: center;
+  }
+  
+  .airport-code {
+    font-weight: bold;
+    color: #4a4a4a;
+  }
+  

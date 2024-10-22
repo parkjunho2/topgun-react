@@ -3,6 +3,9 @@ import axios from "axios";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { Modal } from "bootstrap";
 import { FaMagnifyingGlass } from "react-icons/fa6";
+import { NavLink } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { userState } from "../util/recoil";
 
 const Flight = () => {
     const [flightList, setFlightList] = useState([]);
@@ -13,12 +16,14 @@ const Flight = () => {
         flightTime: "",
         departureAirport: "",
         arrivalAirport: "",
-        userId: "",
+        userId: "", // 이 값은 자동으로 설정되므로 초기화 시 비워둡니다.
         flightTotalSeat: "",
         flightStatus: "대기", // 기본 상태
     });
 
     const modalRef = useRef();
+    const [user, setUser] = useRecoilState(userState);
+    const currentDateTime = new Date().toISOString().slice(0, 16); // 현재 날짜와 시간을 ISO 형식으로 가져오기
 
     useEffect(() => {
         loadList();
@@ -29,22 +34,23 @@ const Flight = () => {
             const departure = new Date(input.departureTime);
             const arrival = new Date(input.arrivalTime);
             const timeDiff = (arrival - departure) / 1000; // 차이를 초 단위로 계산
-    
+
             const hours = Math.floor(timeDiff / 3600); // 시간 계산
             const minutes = Math.floor((timeDiff % 3600) / 60); // 분 계산
-    
+
             setInput((prevInput) => ({
                 ...prevInput,
                 flightTime: `${hours}시간 ${minutes}분`, // 포맷팅
             }));
         }
     }, [input.departureTime, input.arrivalTime]);
-    
 
     const loadList = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/flight/");
-        setFlightList(resp.data);
-    }, []);
+        // 항공편 리스트에서 현재 로그인된 사용자 ID와 일치하는 항공편만 필터링
+        const filteredFlights = resp.data.filter(flight => flight.userId === user.userId);
+        setFlightList(filteredFlights);
+    }, [user.userId]);
 
     const deleteFlight = useCallback(async (flightId) => {
         const choice = window.confirm("정말 삭제하시겠습니까?");
@@ -53,14 +59,20 @@ const Flight = () => {
         loadList();
     }, [loadList]);
 
-    const updateFlight = useCallback(async ()=>{
-        await axios.put("http://localhost:8080/flight/", input);
+    const updateFlight = useCallback(async () => {
+        const updatedInput = {
+            ...input,
+            flightStatus: input.flightStatus === "거절" ? "대기" : input.flightStatus,
+            userId: user.userId, // 수정할 때도 사용자 ID 설정
+        };
+
+        await axios.put("http://localhost:8080/flight/", updatedInput);
         loadList();
         closeModal();
-    }, [input]);
+    }, [input, user.userId, loadList]);
 
-      //memo
-      const addMode = useMemo(()=>{
+    // memo
+    const addMode = useMemo(() => {
         return input?.flightId === "";
     }, [input]);
 
@@ -76,38 +88,47 @@ const Flight = () => {
             flightTime: "",
             departureAirport: "",
             arrivalAirport: "",
-            userId: "",
+            userId: "", // 초기화 시 비워둡니다.
             flightTotalSeat: "",
             flightStatus: "대기",
         });
     }, []);
 
-    const addInput = useCallback(()=>{
+    const addInput = useCallback(() => {
         if (input.departureTime && input.arrivalTime) {
             const departure = new Date(input.departureTime);
             const arrival = new Date(input.arrivalTime);
-    
+
             if (arrival <= departure) {
                 alert("도착 시간은 출발 시간보다 늦어야 합니다.");
                 return;
             }
         }
 
+        const flightData = {
+            ...input,
+            userId: user.userId, // 현재 로그인된 사용자 ID 추가
+        };
+
         axios({
-            url:"http://localhost:8080/flight/",
-            method:"post",
-            data: input
+            url: "http://localhost:8080/flight/",
+            method: "post",
+            data: flightData,
         })
-        .then(resp=>{
-            clearInput();//입력창 초기화
-            loadList();//목록 다시 불러오기
+        .then(resp => {
+            clearInput(); // 입력창 초기화
+            loadList(); // 목록 다시 불러오기
         });
-    }, [input]);
+    }, [input, user.userId, loadList, clearInput]);
 
     const openModal = useCallback(() => {
+        setInput((prevInput) => ({
+            ...prevInput,
+            userId: user.userId, // 현재 로그인된 사용자 ID를 설정
+        }));
         const modal = Modal.getOrCreateInstance(modalRef.current);
         modal.show();
-    }, []);
+    }, [user.userId]);
 
     const closeModal = useCallback(() => {
         const modal = Modal.getInstance(modalRef.current);
@@ -119,158 +140,176 @@ const Flight = () => {
         if (input.departureTime && input.arrivalTime) {
             const departure = new Date(input.departureTime);
             const arrival = new Date(input.arrivalTime);
-    
+
             if (arrival <= departure) {
                 alert("도착 시간은 출발 시간보다 늦어야 합니다.");
                 return;
             }
         }
-    
 
-        await axios.post("http://localhost:8080/flight/", input);
+        const flightData = {
+            ...input,
+            userId: user.userId, // 현재 로그인된 사용자 ID 추가
+        };
+
+        await axios.post("http://localhost:8080/flight/", flightData);
         loadList();
         closeModal();
-    }, [input, loadList, closeModal]);
+    }, [input, user.userId, loadList, closeModal]);
 
     const editFlight = useCallback((flight) => {
         setInput({ ...flight });
         openModal();
     }, [openModal]);
 
-    //검색창 관련
+    // 검색창 관련
     const [column, setColumn] = useState("flight_number");
     const [keyword, setKeyword] = useState("");
 
-    const searchFlightList = useCallback(async ()=>{
-        if(keyword.length === 0) return;
-    const resp = await axios.get(`http://localhost:8080/flight/${column}/keyword/${encodeURIComponent(keyword)}`);
-    setFlightList(resp.data);
-}, [column, keyword, flightList]);
+    const searchFlightList = useCallback(async () => {
+        if (keyword.length === 0) return;
+        const resp = await axios.get(`http://localhost:8080/flight/${column}/keyword/${encodeURIComponent(keyword)}`);
+        setFlightList(resp.data);
+    }, [column, keyword]);
 
-    
     // 뷰
     return (
         <>
-
-        {/* 검색 화면 */}
-        <div className="row mt-2">
-            <div className="col-md-8 col-sm-10">
-                <div className="input-group">
-                    <select name="column" className="form-select w-auto"
-                        value={column} onChange={e=>setColumn(e.target.value)}>
-                        <option value="flight_number">항공편 번호</option>
-                        <option value="departure_airport">출발항공</option>
-                        <option value="arrival_airport">도착항공</option>
-                    </select>
-                    <input type="text" className="form-control w-auto"
-                        value={keyword} onChange={e=>setKeyword(e.target.value)}/>
-                    <button type="button" className="btn btn-secondary"
-                            onClick={searchFlightList}>
-                        <FaMagnifyingGlass/>
-                    </button>
+            {/* 검색 화면 */}
+            <div className="row mt-2">
+                <div className="col-md-8 col-sm-10">
+                    <div className="input-group">
+                        <select name="column" className="form-select w-auto"
+                            value={column} onChange={e => setColumn(e.target.value)}>
+                            <option value="flight_number">항공편 번호</option>
+                            <option value="departure_airport">출발항공</option>
+                            <option value="arrival_airport">도착항공</option>
+                        </select>
+                        <input type="text" className="form-control w-auto"
+                            value={keyword} onChange={e => setKeyword(e.target.value)} />
+                        <button type="button" className="btn btn-secondary"
+                                onClick={searchFlightList}>
+                            <FaMagnifyingGlass />
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-
 
             <div className="row mt-4">
                 <div className="col">
                     <table className="table table-striped">
                         <thead>
                         <tr>
-                                <td>
-                                    <input type="text" className="form-control"
-                                           placeholder="항공편 번호"
-                                           name="flightNumber"
-                                           value={input.flightNumber}
-                                           onChange={changeInput} />
-                                </td>
-                                <td>
-                                    <input type="datetime-local" className="form-control"
-                                           name="departureTime"
-                                           value={input.departureTime}
-                                           onChange={changeInput} />
-                                </td>
-                                <td>
-                                    <input type="datetime-local" className="form-control"
-                                           name="arrivalTime"
-                                           value={input.arrivalTime}
-                                           onChange={changeInput} />
-                                </td>
-                                <td>
-                                    <input type="text" className="form-control"
-                                           name="flightTime"
-                                           value={input.flightTime}
-                                           onChange={changeInput} />
-                                </td>
-                                <td>
-                                    <select name="departureAirport" className="form-control" value={input.departureAirport} onChange={changeInput}>
-                                        <option>출발 공항 선택</option>
-                                        <option>김포</option>
-                                        <option>인천</option>
-                                        <option>제주</option>
-                                        <option>도쿄</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select name="arrivalAirport" className="form-control" value={input.arrivalAirport} onChange={changeInput}>
-                                        <option>도착 공항 선택</option>
-                                        <option>김포</option>
-                                        <option>인천</option>
-                                        <option>제주</option>
-                                        <option>도쿄</option>
-                                    </select>
-                                </td>
+                            <td>
+                                <input type="text" className="form-control"
+                                       placeholder="항공편 번호"
+                                       name="flightNumber"
+                                       value={input.flightNumber}
+                                       onChange={changeInput} />
+                            </td>
+                            <td>
+                                <input type="datetime-local" className="form-control"
+                                       name="departureTime"
+                                       value={input.departureTime}
+                                       onChange={changeInput}
+                                       min={currentDateTime} />
+                            </td>
+                            <td>
+                                <input type="datetime-local" className="form-control"
+                                       name="arrivalTime"
+                                       value={input.arrivalTime}
+                                       onChange={changeInput}
+                                       min={currentDateTime} />
+                            </td>
+                            <td>
+                                <input type="text" className="form-control"
+                                placeholder="운항 시간"
+                                       name="flightTime"
+                                       value={input.flightTime}
+                                       onChange={changeInput} />
+                            </td>
+                            <td>
+                                <select name="departureAirport" className="form-control" value={input.departureAirport} onChange={changeInput}>
+                                    <option>출발 공항 선택</option>
+                                    <option>서울/인천(ICN)</option>
+                                    <option>서울/김포(GMP)</option>
+                                    <option>광주(KWJ)</option>
+                                    <option>대구(TAE)</option>
+                                    <option>제주(CJU)</option>
+                                    <option>여수(RSU)</option>
+                                    <option>도쿄/나리타(NRT)</option>
+                                    <option>오사카/간사이(KIX)</option>
+                                    <option>나트랑(CXR)</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="arrivalAirport" className="form-control" value={input.arrivalAirport} onChange={changeInput}>
+                                    <option>도착 공항 선택</option>
+                                    <option>서울/인천(ICN)</option>
+                                    <option>서울/김포(GMP)</option>
+                                    <option>광주(KWJ)</option>
+                                    <option>대구(TAE)</option>
+                                    <option>제주(CJU)</option>
+                                    <option>여수(RSU)</option>
+                                    <option>도쿄/나리타(NRT)</option>
+                                    <option>오사카/간사이(KIX)</option>
+                                    <option>나트랑(CXR)</option>
+                                </select>
+                            </td>
 
-                                <td>
-                                    <input type="text" className="form-control"
-                                           placeholder="아이디"
-                                           name="userId"
-                                           value={input.userId}
-                                           onChange={changeInput} />
-                                </td>
-                                <td>
-                                    <input type="number" className="form-control"
-                                           placeholder="총 좌석 수"
-                                           name="flightTotalSeat"
-                                           value={input.flightTotalSeat}
-                                           onChange={changeInput} />
-                                </td>
-                                <td>
-                                    <span className="badge bg-secondary">
-                                        {input.flightStatus}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button type="button"
-                                            className="btn btn-success"
-                                            onClick={addInput}>
-                                        신규 등록
-                                    </button>
-                                </td>
-                            </tr>
-                            
+                            <td>
+                                <input type="text" className="form-control"
+                                       placeholder="아이디"
+                                       name="userId"
+                                       value={user.userId} // userId는 비활성화
+                                       readOnly // 비활성화 설정
+                                       onChange={changeInput} />
+                            </td>
+                            <td>
+                                <input type="number" className="form-control"
+                                       placeholder="총 좌석 수"
+                                       name="flightTotalSeat"
+                                       value={input.flightTotalSeat}
+                                       onChange={changeInput} />
+                            </td>
+                            <td>
+                                <span className="badge bg-secondary">
+                                    {input.flightStatus}
+                                </span>
+                            </td>
+                            <td>
+                                <button type="button"
+                                        className="btn btn-success"
+                                        onClick={addInput}>
+                                    신규 등록
+                                </button>
+                            </td>
+                        </tr>
                         </thead>
                         <tbody className="table-dark">
                         <tr>
-                                <th>항공편 번호</th>
-                                <th>출발 시간</th>
-                                <th>도착 시간</th>
-                                <th>운항 시간</th>
-                                <th>출발 공항</th>
-                                <th>도착 공항</th>
-                                <th>ID</th>
-                                <th>총 좌석 수</th>
-                                <th>상태</th>
-                                <th>메뉴</th>
-                            </tr> 
+                            <th>항공편 번호</th>
+                            <th>출발 시간</th>
+                            <th>도착 시간</th>
+                            <th>운항 시간</th>
+                            <th>출발 공항</th>
+                            <th>도착 공항</th>
+                            <th>ID</th>
+                            <th>총 좌석 수</th>
+                            <th>상태</th>
+                            <th>메뉴</th>
+                        </tr>
                         </tbody>
                         <tfoot>
                             {flightList.map((flight) => (
                                 <tr key={flight.flightId}>
-                                    <td>{flight.flightNumber}</td>
+                                    <td>
+                                        <NavLink to={"/flight/detail/" + flight.flightId}>
+                                            {flight.flightNumber}
+                                        </NavLink>
+                                    </td>
                                     <td>{new Date(flight.departureTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
-                                    <td>{new Date(flight.arrivalTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</td>
+                                    <td>{new Date(flight.arrivalTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
                                     <td>{flight.flightTime}</td>
                                     <td>{flight.departureAirport}</td>
                                     <td>{flight.arrivalAirport}</td>
@@ -278,26 +317,26 @@ const Flight = () => {
                                     <td>{flight.flightTotalSeat}</td>
                                     <td>{flight.flightStatus}</td>
                                     <td>
-                                    <FaEdit 
-                    className={`text-warning ${flight.flightStatus === "승인" ? "disabled" : ""}`} 
-                    onClick={() => {
-                        if (flight.flightStatus === "승인") {
-                            alert("수정이 불가능합니다.");
-                        } else {
-                            editFlight(flight);
-                        }
-                    }} 
-                />
-                <FaTrash 
-                    className={`text-danger ms-2 ${flight.flightStatus === "승인" ? "disabled" : ""}`} 
-                    onClick={() => {
-                        if (flight.flightStatus === "승인") {
-                            alert("삭제가 불가능합니다.");
-                        } else {
-                            deleteFlight(flight.flightId);
-                        }
-                    }} 
-                />
+                                        <FaEdit 
+                                            className={`text-warning ${flight.flightStatus === "승인" ? "disabled" : ""}`} 
+                                            onClick={() => {
+                                                if (flight.flightStatus === "승인") {
+                                                    alert("수정이 불가능합니다.");
+                                                } else {
+                                                    editFlight(flight);
+                                                }
+                                            }} 
+                                        />
+                                        <FaTrash 
+                                            className={`text-danger ms-2 ${flight.flightStatus === "승인" ? "disabled" : ""}`} 
+                                            onClick={() => {
+                                                if (flight.flightStatus === "승인") {
+                                                    alert("삭제가 불가능합니다.");
+                                                } else {
+                                                    deleteFlight(flight.flightId);
+                                                }
+                                            }} 
+                                        />
                                     </td>
                                 </tr>
                             ))}
@@ -322,11 +361,11 @@ const Flight = () => {
                             </div>
                             <div className="mb-3">
                                 <label>출발 시간</label>
-                                <input type="datetime-local" name="departureTime" className="form-control" value={input.departureTime} onChange={changeInput} />
+                                <input type="datetime-local" name="departureTime" className="form-control" value={input.departureTime} onChange={changeInput} min={currentDateTime} />
                             </div>
                             <div className="mb-3">
                                 <label>도착 시간</label>
-                                <input type="datetime-local" name="arrivalTime" className="form-control" value={input.arrivalTime} onChange={changeInput} />
+                                <input type="datetime-local" name="arrivalTime" className="form-control" value={input.arrivalTime} onChange={changeInput} min={currentDateTime} />
                             </div>
                             <div className="mb-3">
                                 <label>운항 시간</label>
@@ -342,7 +381,13 @@ const Flight = () => {
                             </div>
                             <div className="mb-3">
                                 <label>ID</label>
-                                <input type="text" name="userId" className="form-control" value={input.userId} onChange={changeInput} />
+                                <input 
+                                    type="text" 
+                                    name="userId" 
+                                    className="form-control" 
+                                    value={user.userId} // userId는 비활성화
+                                    readOnly // 비활성화 설정
+                                />
                             </div>
                             <div className="mb-3">
                                 <label>총 좌석 수</label>
@@ -351,25 +396,23 @@ const Flight = () => {
                             <div className="mb-3">
                                 <label>상태</label>
                                 <span className="badge bg-secondary" 
-                                name="flightStatus"
-                                value={input.flightStatus}
-                                onChange={changeInput}>
-                                    대기
-                                    </span>
+                                name="flightStatus">
+                                    {input.flightStatus}
+                                </span>
                             </div>
                         </div>
                         
                         <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary btn-manual-close"
+                            <button type="button" className="btn btn-secondary btn-manual-close"
                                     onClick={closeModal}>닫기</button>
-                        {addMode ? (
-                            <button type="button" className="btn btn-success"
-                                    onClick={saveFlight}>저장</button>
-                        ) : (
-                            <button type="button" className="btn btn-warning"
-                                    onClick={updateFlight}>수정</button>
-                        )}
-                    </div>
+                            {addMode ? (
+                                <button type="button" className="btn btn-success"
+                                        onClick={saveFlight}>저장</button>
+                            ) : (
+                                <button type="button" className="btn btn-warning"
+                                        onClick={updateFlight}>수정</button>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -378,4 +421,3 @@ const Flight = () => {
 };
 
 export default Flight;
-
