@@ -1,6 +1,7 @@
 import { useCallback, useState, useEffect } from "react";
 import axios from "axios";
 import { FaMagnifyingGlass } from "react-icons/fa6";
+import { NavLink } from "react-router-dom";
 
 const AdminFlight = () => {
     const [flightList, setFlightList] = useState([]);
@@ -46,6 +47,7 @@ const AdminFlight = () => {
                     <div className="input-group">
                         <select name="column" className="form-select w-auto" value={column} onChange={e => setColumn(e.target.value)}>
                             <option value="flight_number">항공편 번호</option>
+                            <option value="user_id">항공사 ID</option>
                             <option value="departure_airport">출발 공항</option>
                             <option value="arrival_airport">도착 공항</option>
                         </select>
@@ -77,7 +79,9 @@ const AdminFlight = () => {
                         <tbody>
                             {flightList.map((flight) => (
                                 <tr key={flight.flightId}>
-                                    <td>{flight.flightNumber}</td>
+                                    <td><NavLink to={"/admin/detail/"+flight.flightId}>
+                                    {flight.flightNumber}
+                                    </NavLink></td>
                                     <td>{new Date(flight.departureTime).toLocaleString()}</td>
                                     <td>{new Date(flight.arrivalTime).toLocaleString()}</td>
                                     <td>{flight.flightTime}</td>

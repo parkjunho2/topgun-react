@@ -26,6 +26,7 @@ import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
 import FlightDetail from './components/FlightDetail.js';
+import AdminFlightDetail from './components/AdminFlightDetail.js';
 
 
 
@@ -121,6 +122,8 @@ const App = () => {
           <Route path="/airline" element={<AirLine />} />
         <Route path="/flight" element={<Flight />} />
         <Route path="/flight/detail/:flightId" element={<FlightDetail />} />
+        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
+        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
         </Route>
 
         {/* 공지사항 페이지 추가 */}

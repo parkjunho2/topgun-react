@@ -78,6 +78,10 @@ const FlightDetail = () => {
                     <div className="col-sm-9">{flight.flightTotalSeat}</div>
                 </div>
                 <div className="row mb-3">
+                    <div className="col-sm-2"><strong>항공사 ID</strong></div>
+                    <div className="col-sm-9">{flight.userId}</div>
+                </div>
+                <div className="row mb-3">
                     <div className="col-sm-2"><strong>상태:</strong></div>
                     <div className="col-sm-9">{flight.flightStatus}</div>
                 </div>
@@ -85,7 +89,7 @@ const FlightDetail = () => {
 
            {/* 버튼들 */}
            <div className="text-center mt-4">
-                <button className="btn btn-secondary ms-2" onClick={() => navigate("/flight")}>목록보기</button>
+                <button className="btn btn-secondary ms-2" onClick={() => navigate("admin/list")}>목록보기</button>
                {/*} <button className="btn btn-success" onClick={() => navigate("/flight/new")}>신규등록</button>
                 <button className="btn btn-warning ms-2" onClick={() => navigate(`/flight/edit/${flightId}`)}>수정하기</button>
                 <button className="btn btn-danger ms-2" onClick={deleteFlight}>삭제하기</button>*/}
