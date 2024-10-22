@@ -60,7 +60,7 @@ const MainPage = () => {
             return window.alert("인원을 입력해주세요.");
         }
         else {
-            navigate("/booking");   //위의 항목들이 모두 pass라면 이동
+            navigate("/bookingList");   //위의 항목들이 모두 pass라면 이동
         }
     }, [input]);
 
