@@ -29,6 +29,7 @@ import PaymentList from "./components/payment/PaymentList.js";
 import FlightDetail from './components/FlightDetail.js';
 import AdminFlightDetail from './components/AdminFlightDetail.js';
 import BookingList from './components/booking/BookingList.js';
+import Room from "./components/chat/Room.js";
 
 
 
@@ -108,7 +109,8 @@ const App = () => {
           <Route path="/payment/cancel" element={<PaymentCancel />} />
           <Route path="/payment/fail" element={<PaymentFail />} />
           <Route path="/test" element={<Test />} />
-          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat/:roomNo" element={<Chat />} />
+          <Route path="/room" element={<Room/>} />
           <Route path='/mypage' element={<MyPage />} />
           <Route path='/paymen/list' element={<PaymentList />} />
         </Route>
