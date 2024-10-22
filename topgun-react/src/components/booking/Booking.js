@@ -72,19 +72,19 @@ const Booking = () => {
                 borderRadius: isSmallScreen ? "1em" : "0",
               }}>
                 <span className="lowest-price">최저가</span>
-                <div className="d-flex mt-5" style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="d-flex mt-5 ms-3 me-3" style={{ display: "flex", justifyContent: "space-between" }}>
                   <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>20:30</span>
                   <span className="mt-4">------------------<IoIosAirplane style={{ fontSize: "23px" }} />
                   </span>
                   <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>23:35</span>
                 </div>
-                <div className="d-flex" style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="d-flex ms-4 me-4" style={{ display: "flex", justifyContent: "space-between" }}>
                   <span>ICN</span>
                   <span>CXR</span>
                 </div>
-                <div className="d-flex mt-4" style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="d-flex mt-4 ms-3" style={{ display: "flex", justifyContent: "space-between" }}>
                   <span>KE467<IoLogoReddit style={{ fontSize: "30px" }} /></span>
-                  <button type="button" className='btn btn-outline-primary' style={{ borderRadius: "2em", fontSize: "13px" }} onClick={openInfoModal}>상세보기</button>
+                  <button type="button" className='btn btn-outline-primary me-2' style={{ borderRadius: "2em", fontSize: "13px" }} onClick={openInfoModal}>상세보기</button>
                 </div>
               </div>
 
@@ -126,17 +126,17 @@ const Booking = () => {
                 borderRight: isSmallScreen ? "1px solid black" : "none",  // 창이 좁아지면 borderRight 추가
                 borderRadius: isSmallScreen ? "1em" : "0",
               }}>
-                <div className="d-flex mt-5" style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="d-flex mt-5 ms-3 me-3" style={{ display: "flex", justifyContent: "space-between" }}>
                   <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>19:00</span>
                   <span className="mt-4">------------------<IoIosAirplane style={{ fontSize: "23px" }} />
                   </span>
                   <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>22:00</span>
                 </div>
-                <div className="d-flex" style={{ display: "flex", justifyContent: "space-between" }}>
+                <div className="d-flex ms-4 me-4" style={{ display: "flex", justifyContent: "space-between" }}>
                   <span>ICN</span>
                   <span>CXR</span>
                 </div>
-                <div className="row mt-4">
+                <div className="row mt-4 ms-1">
                   <span>KE467<IoLogoReddit style={{ fontSize: "30px" }} /></span>
                 </div>
               </div>
@@ -180,19 +180,19 @@ const Booking = () => {
                   borderRadius: isSmallScreen ? "1em" : "0",
                 }}>
                   <span className="lowest-price">최저가</span>
-                  <div className="d-flex mt-5" style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="d-flex mt-5 ms-3 me-3" style={{ display: "flex", justifyContent: "space-between" }}>
                     <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>20:30</span>
                     <span className="mt-4">------------------<IoIosAirplane style={{ fontSize: "23px" }} />
                     </span>
                     <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>23:35</span>
                   </div>
-                  <div className="d-flex" style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="d-flex ms-4 me-4" style={{ display: "flex", justifyContent: "space-between" }}>
                     <span>ICN</span>
                     <span>CXR</span>
                   </div>
-                  <div className="d-flex mt-4" style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="d-flex mt-4 ms-3" style={{ display: "flex", justifyContent: "space-between" }}>
                     <span>KE467<IoLogoReddit style={{ fontSize: "30px" }} /></span>
-                    <button type="button" className='btn btn-outline-primary' style={{ borderRadius: "2em", fontSize: "13px" }} onClick={openInfoModal}>상세보기</button>
+                    <button type="button" className='btn btn-outline-primary me-2' style={{ borderRadius: "2em", fontSize: "13px" }} onClick={openInfoModal}>상세보기</button>
                   </div>
                 </div>
                 
@@ -231,17 +231,17 @@ const Booking = () => {
                   borderRight: isSmallScreen ? "1px solid black" : "none",  // 창이 좁아지면 borderRight 추가
                   borderRadius: isSmallScreen ? "1em" : "0",
                 }}>
-                  <div className="d-flex mt-5" style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="d-flex mt-5 ms-3 me-3" style={{ display: "flex", justifyContent: "space-between" }}>
                     <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>19:00</span>
                     <span className="mt-4">------------------<IoIosAirplane style={{ fontSize: "23px" }} />
                     </span>
                     <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>22:00</span>
                   </div>
-                  <div className="d-flex" style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="d-flex ms-4 me-4" style={{ display: "flex", justifyContent: "space-between" }}>
                     <span>ICN</span>
                     <span>CXR</span>
                   </div>
-                  <div className="row mt-4">
+                  <div className="row mt-4 ms-1">
                     <span>KE467<IoLogoReddit style={{ fontSize: "30px" }} /></span>
                   </div>
                 </div>
