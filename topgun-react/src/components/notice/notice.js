@@ -134,8 +134,8 @@ const NoticeBoard = () => {
         <div className="row mt-4">
             <div className="col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <h1 style={{ textAlign: 'center', marginBottom: '10px' }}>NOTICE</h1>
-      
-                <hr style={{ width: '80%', border: '1px solid #ec7393', marginBottom: '20px' }} />
+
+                <hr style={{ width: '80%', border: '1px solid #e3305f', marginBottom: '18px' }} />
                 <table className="table" style={{ width: '80%', tableLayout: 'fixed' }}>
                     <thead>
                         <tr>
@@ -172,7 +172,12 @@ const NoticeBoard = () => {
                                 <td style={{ padding: '15px', textAlign: 'center' }}>{notice.author}</td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>{notice.createdAt}</td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
-                                    <FaTrash className="text-danger" style={{ color: '#ec7393', fill: '#ec7393', fontSize: '1em' }} onClick={() => deleteNotice(notice)} />
+                                    <FaTrash
+                                        className="text-danger trash-icon" // trash-icon 클래스 추가
+                                        style={{ color: '#ec7393', fill: '#ec7393', fontSize: '1em' }}
+                                        onClick={() => deleteNotice(notice)}
+                                    />
+
                                 </td>
                             </tr>
                         ))}

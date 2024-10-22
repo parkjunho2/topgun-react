@@ -140,15 +140,15 @@ const NoticeDetail = () => {
                         <a className="arrow-btn" href="#" onClick={handleUpdate} style={{ marginRight: '19px', color: '#ec7393' }}>
                             confirm
                         </a>
-                        <a className="arrow-btn" href="#" onClick={() => setIsEditing(false)} style={{ color: '#ccc' }}>
+                        <a className="arrow-btn" href="#" onClick={() => navigate('/notice')} style={{ color: '#ccc' }}> {/* 클릭 시 리스트 페이지로 이동 */}
                             exit
                         </a>
                         {/* <button style={styles.primaryButton} onClick={handleUpdate}>수정하기</button> */}
                         {/* <button style={styles.secondaryButton} onClick={() => setIsEditing(false)}>취소하기</button> */}
                     </>
                 ) : (
-                    <a className="arrow-btn" href="#"  onClick={() => setIsEditing(true)} style={{ marginRight: '19px', color: '#ec7393' }}>
-                    edit
+                    <a className="arrow-btn" href="#" onClick={() => setIsEditing(true)} style={{ marginRight: '19px', color: '#ec7393' }}>
+                        EDIT
                     </a>
                     // <button style={styles.editButton} onClick={() => setIsEditing(true)}>수정하기</button>
                 )}
@@ -178,7 +178,7 @@ const styles = {
         borderRadius: '4px',
         fontSize: '16px',
     },
-    
+
     buttonContainer: {
         display: 'flex',
         justifyContent: 'flex-end', // 버튼들을 오른쪽으로 정렬
@@ -242,7 +242,7 @@ const styles = {
         marginBottom: '40px', // 에디터 아래쪽 마진 조정
     },
     divider: {
-        border: '1px solid #ec7393', // 구분선 색상
+        border: '1px solid #e3305f', // 구분선 색상
         margin: '20px 0',
     },
 };

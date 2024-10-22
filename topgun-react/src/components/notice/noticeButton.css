@@ -486,3 +486,17 @@ body {
     opacity: 0;
   }
 }
+
+
+.trash-icon {
+  transition: transform 0.2s ease; /* 애니메이션의 부드러움을 위해 트랜지션 추가 */
+}
+
+.trash-icon:hover {
+  transform: scale(1.2); /* 마우스를 올리면 아이콘을 살짝 키우기 */
+}
+
+.trash-icon:active {
+  transform: scale(1); /* 클릭할 때 다시 원래 크기로 복귀 */
+  transition: transform 0.1s ease; /* 클릭 시 더 빠른 애니메이션 */
+}
