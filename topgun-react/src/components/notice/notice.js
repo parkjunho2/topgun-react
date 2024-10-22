@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
+import './noticeButton.css'; // 프레임 라인 버튼 스타일을 포함한 CSS 파일
 
 const NoticeBoard = () => {
     const [noticeList, setNoticeList] = useState([]);
@@ -133,15 +134,16 @@ const NoticeBoard = () => {
         <div className="row mt-4">
             <div className="col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <h1 style={{ textAlign: 'center', marginBottom: '10px' }}>NOTICE</h1>
-                <hr style={{ width: '80%', border: '1px solid #ec7393', marginBottom: '20px' }} />
+
+                <hr style={{ width: '80%', border: '1px solid #e3305f', marginBottom: '18px' }} />
                 <table className="table" style={{ width: '80%', tableLayout: 'fixed' }}>
                     <thead>
                         <tr>
                             <th style={{ padding: '15px', textAlign: 'center', width: '10%' }}>NO.</th>
                             <th style={{ padding: '15px', textAlign: 'center', width: '30%' }}>TITLE</th>
                             <th style={{ padding: '15px', textAlign: 'center', width: '20%' }}>AUTHOR</th>
-                            <th style={{ padding: '15px', textAlign: 'center', width: '30%' }}>DATE</th>
-                            <th style={{ padding: '15px', textAlign: 'center', width: '10%' }}>DELETE</th>
+                            <th style={{ padding: '15px', textAlign: 'center', width: '35%' }}>DATE</th>
+                            <th style={{ padding: '15px', textAlign: 'center', width: '5%' }}></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -170,7 +172,12 @@ const NoticeBoard = () => {
                                 <td style={{ padding: '15px', textAlign: 'center' }}>{notice.author}</td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>{notice.createdAt}</td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
-                                    <FaTrash className="text-danger" style={{ color: '#ec7393', fill: '#ec7393', fontSize: '1em' }} onClick={() => deleteNotice(notice)} />
+                                    <FaTrash
+                                        className="text-danger trash-icon" // trash-icon 클래스 추가
+                                        style={{ color: '#ec7393', fill: '#ec7393', fontSize: '1em' }}
+                                        onClick={() => deleteNotice(notice)}
+                                    />
+
                                 </td>
                             </tr>
                         ))}
@@ -192,13 +199,21 @@ const NoticeBoard = () => {
                                     value={input.author}
                                     onChange={changeInput} />
                             </td>
-                            <td style={{ textAlign: 'center' }}>
-                                <button type="button"
-                                    className="btn"
-                                    style={{ backgroundColor: '#ec7393', color: 'white' }}
-                                    onClick={addInput}>
-                                    등록
-                                </button>
+                            <td style={{ textAlign: 'center', padding: '15px' }}>
+                                <div style={{ marginBottom: '52px' }}> {/* 버튼과 아래 선 간격 조정 */}
+                                    <a className="frame-btn" href="#" onClick={addInput}>
+                                        <span className="frame-btn__outline frame-btn__outline--tall">
+                                            <span className="frame-btn__line frame-btn__line--tall"></span>
+                                            <span className="frame-btn__line frame-btn__line--flat"></span>
+                                        </span>
+                                        <span className="frame-btn__outline frame-btn__outline--flat">
+                                            <span className="frame-btn__line frame-btn__line--tall"></span>
+                                            <span className="frame-btn__line frame-btn__line--flat"></span>
+                                        </span>
+                                        <span className="frame-btn__solid"></span>
+                                        <span className="frame-btn__text">POST NOTICE</span>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                         <tr>
@@ -208,7 +223,8 @@ const NoticeBoard = () => {
                                     value={input.content}
                                     onChange={handleContentChange}
                                     modules={modules}
-                                    style={{ height: '200px', width: '110%', resize: 'vertical', overflowY: 'auto' }} // 너비를 100%로 설정
+                                    placeholder="오른쪽 아래 선택자로 에디터 크기를 자유롭게 조절하세요!"
+                                    style={{ height: '290px', width: '110%', resize: 'vertical', overflowY: 'auto' }} // 너비를 100%로 설정
                                 />
                             </td>
                         </tr>
