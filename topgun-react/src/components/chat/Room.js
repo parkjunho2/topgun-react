@@ -22,6 +22,7 @@ const Room = ()=>{
     //state
     const [roomList, setRoomList] = useState([]);
     
+    console.log(user.userName);
     //effect
     useEffect(()=>{
         loadRoomList();

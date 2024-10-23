@@ -19,7 +19,7 @@
     margin-bottom: 20px;
 }
 
-.list-group {
+/* .list-group {
     list-style: none;
     padding: 0;
 }
@@ -32,11 +32,11 @@
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
-}
+} */
 
-.list-group-item:hover {
+/* .list-group-item:hover {
     background-color: #e9ecef;
-}
+} */
 
 .room-item {
     display: flex;
