@@ -1,4 +1,4 @@
-@charset "UTF-8";
+/* @charset "UTF-8";
 *, *:before, *:after {
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
@@ -19,7 +19,7 @@ body {
   position: relative;
   display: inline-block;
   border-radius: 0;
-  color: #ec7393; /* 핑크톤으로 변경 */
+  color: #ec7393;
   margin-top: 2rem;
   font-weight: bold;
   font-size: 0.8rem;
@@ -59,7 +59,7 @@ body {
   display: inline-block;
   padding: 1em 2em;
   border-radius: 0;
-  color:  #ec7393; /* 핑크톤으로 변경 */
+  color:  #ec7393;
   margin-top: 2rem;
   font-weight: bold;
   font-size: 0.678rem;
@@ -92,7 +92,7 @@ body {
   position: relative;
 }
 .frame-btn__text {
-  color: #ec7393; /* 핑크톤으로 변경 */
+  color: #ec7393; 
   font-weight: bold;
   text-transform: uppercase;
   transition: 300ms ease;
@@ -106,7 +106,7 @@ body {
   top: 0;
   left: 0;
   margin: 10px;
-  background-color: #ec7393; /* 핑크톤으로 변경 */
+  background-color: #ec7393; 
   width: calc(100% - (5px * 4));
   height: calc(100% - (5px * 4));
   transform-origin: 50%;
@@ -180,7 +180,7 @@ body {
   content: "";
   display: block;
   position: absolute;
-  background-color:#ec7393; /* 핑크톤으로 변경 */
+  background-color:#ec7393; 
   transition: 800ms cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 .frame-btn:hover .frame-btn__line:before, .frame-btn:hover .frame-btn__line:after {
@@ -489,14 +489,14 @@ body {
 
 
 .trash-icon {
-  transition: transform 0.2s ease; /* 애니메이션의 부드러움을 위해 트랜지션 추가 */
+  transition: transform 0.2s ease; 
 }
 
 .trash-icon:hover {
-  transform: scale(1.2); /* 마우스를 올리면 아이콘을 살짝 키우기 */
+  transform: scale(1.2);
 }
 
 .trash-icon:active {
-  transform: scale(1); /* 클릭할 때 다시 원래 크기로 복귀 */
-  transition: transform 0.1s ease; /* 클릭 시 더 빠른 애니메이션 */
-}
+  transform: scale(1);
+  transition: transform 0.1s ease; 
+} */

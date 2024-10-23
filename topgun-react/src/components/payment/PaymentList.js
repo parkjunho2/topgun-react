@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 
 const PaymentList=()=>{
     //state
@@ -47,36 +48,37 @@ const PaymentList=()=>{
     return(<>
     <div className="row mt-4">
         <div className="col">
-
             <ul className="list-group">
-                {paymentList.map(payment=>(
-                    <li key={payment.paymentNo} className="list-group-item" 
-                    onClick={e=>loadPaymentDetailList(payment)}>
-                        <h3 className="d-flex justify-content-between">
-                            {payment.paymentTime}
-                            <span/>
-                            {payment.paymentName}    
-                            <span/>
-                            총 결제금액: {payment.paymentTotal.toLocaleString()}원
-                        </h3>
-                        {/* 상세 결제 내용 */}
-                        {payment.paymentDetailList?.length>0 && (
-                        <ul className="list-group list-group-flush mt-4">
-                            {payment.paymentDetailList.map(detail=>(
-                            <li className="list-group-item" key={detail.paymentDetailNo}>
-                                <h3 className="d-flex justify-content-between">
-                                    {detail.paymentDetailName}
-                                    <span/>
-                                    {detail.paymentDetailPrice.toLocaleString()}원
-                                </h3>
-                            </li>
-                            ))}
-                        </ul>
-                        )}
-                        <div className="text-end">
-                            더보기
-                        </div>
-                    </li>
+                 {paymentList.map(payment => (
+                    payment && (  // payment가 유효한 경우에만 렌더링
+                        <li key={payment.paymentNo} className="list-group-item" 
+                            onClick={() => loadPaymentDetailList(payment)}>
+                            <h3 className="d-flex justify-content-between">
+                                {payment.paymentTime}
+                                <span/>
+                                {payment.paymentName}    
+                                <span/>
+                                총 결제금액: {payment.paymentTotal.toLocaleString()}원
+                            </h3>
+                            {/* 상세 결제 내용 */}
+                            {payment.paymentDetailList?.length > 0 && (
+                                <ul className="list-group list-group-flush mt-4">
+                                    {payment.paymentDetailList.map(detail => (
+                                        <li className="list-group-item" key={detail?.paymentDetailNo}>
+                                            <h3 className="d-flex justify-content-between">
+                                                {detail.paymentDetailName}
+                                                <span/>
+                                                {detail.paymentDetailPrice.toLocaleString()}원
+                                            </h3>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                            <div className="text-end">
+                                <NavLink to={`/payment/detail/${payment.paymentNo}`}>더보기</NavLink>
+                            </div>
+                        </li>
+                    )
                 ))}
             </ul>
         </div>

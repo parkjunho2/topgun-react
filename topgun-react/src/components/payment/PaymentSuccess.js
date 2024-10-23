@@ -82,14 +82,14 @@ const PaymentSuccess=()=>{
                             <tr key={seats.seatsNo}>
                                 <td>{seats.seatsNo}</td>
                                 <td>{seats.seatsRank}</td>
-                                <td>{seats.seatsPrice}원</td>
+                                <td>{seats.seatsPrice.toLocaleString()}원</td>
                             </tr>
                         ))}
                     </tbody>
                     <tfoot>
                         <tr>
                             <th colSpan={3}>총 결제 금액</th>
-                            <th>{total}원</th>
+                            <th>{total.toLocaleString()}원</th>
                         </tr>
                     </tfoot>
                 </table>
