@@ -25,6 +25,7 @@ import Notice from './components/notice.js'; // Notice 컴포넌트 임포트
 import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
+import PaymentAllList from "./components/payment/PaymentAllList.js";
 
 
 
@@ -105,7 +106,8 @@ const App = () => {
           <Route path="/test" element={<Test />} />
           <Route path="/chat" element={<Chat />} />
           <Route path='/mypage' element={<MyPage />}/>
-          <Route path='/paymen/list' element={<PaymentList/>}/>
+          <Route path='/payment/list' element={<PaymentList/>}/>
+          <Route path='/payment/alllist' element={<PaymentAllList/>}/>
         </Route>
 
 
