@@ -45,16 +45,11 @@ const PaymentDetail=()=>{
                             </div>
                         </div>
                 </div>
-            </div>
-              ) : (
-                <div>Loading...</div>  // 데이터 로딩 중 표시할 메시지
-            )}
-
-            <h2 className="mt-4">결제 상세 항목</h2>
+            <h3 className="mt-4">결제 상세 항목</h3>
             <ul className="list-group mt-2">
                 {info.paymentDetailList.map(detail=>(
                     <li className="list-group-item">
-                        <h4>{detail.paymentDetailName}</h4>
+                        <h5>{detail.paymentDetailName}</h5>
                         <div className="row mt-2">
                             <div className="col-3">판매가</div>
                             <div className="col-9">{detail.paymentDetailPrice.toLocaleString()}원</div>
@@ -74,6 +69,11 @@ const PaymentDetail=()=>{
                     </li>
                 ))}
             </ul>
+            </div>
+              ) : (
+                <div>Loading...</div>  // 데이터 로딩 중 표시할 메시지
+            )}
+
                 
         {info ? (  // info가 존재할 경우에만 렌더링
             <div className="row mt-4">
