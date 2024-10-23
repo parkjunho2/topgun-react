@@ -10,7 +10,7 @@ import { memberLoadingState, userState } from './util/recoil';
 import { useCallback, useEffect } from 'react';
 import axios from 'axios';
 import PrivateRoute from './components/Route/PrivateRoute';
-import Flight from './components/Flight';
+import Flight from './components/flight/Flight.js';
 import Payment from "./components/payment/Payment";
 import PaymentSuccess from "./components/payment/PaymentSuccess";
 import PaymentCancel from "./components/payment/PaymentCancel";
@@ -19,7 +19,7 @@ import AdminRoute from './components/Route/AdminRoute';
 import Admin from './components/Admin';
 import NotMemberRoute from './components/Route/NotMemberRoute';
 import AirLine from './components/AirLine.js';
-import AdminFlight from './components/AdminFlight.js';
+import AdminFlight from './components/flight/AdminFlight.js';
 import Chat from './components/chat/Chat';
 import Notice from './components/notice/notice.js'; // Notice 컴포넌트 임포트
 import NoticeDetail from './components/notice/noticeDetail.js'; // 공지사항 상세 페이지 컴포넌트 임포트
@@ -27,8 +27,8 @@ import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
 import PaymentAllList from "./components/payment/PaymentAllList.js";
-import FlightDetail from './components/FlightDetail.js';
-import AdminFlightDetail from './components/AdminFlightDetail.js';
+import FlightDetail from './components/flight/FlightDetail.js';
+import AdminFlightDetail from './components/flight/AdminFlightDetail.js';
 import BookingList from './components/booking/BookingList.js';
 import Room from "./components/chat/Room.js";
 import 'react-toastify/dist/ReactToastify.css';
@@ -139,6 +139,7 @@ const App = () => {
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/list" element={<AdminFlight />} />
+        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
         </Route>
 
         {/* 멤버만 못보는 페이지 -> ADMIN, AIRLINE만 가능 */}
@@ -146,8 +147,6 @@ const App = () => {
           <Route path="/airline" element={<AirLine />} />
         <Route path="/flight" element={<Flight />} />
         <Route path="/flight/detail/:flightId" element={<FlightDetail />} />
-        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
-        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
         </Route>
 
 
