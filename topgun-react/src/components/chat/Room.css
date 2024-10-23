@@ -1,0 +1,66 @@
+.list-group-item h5 {
+    cursor: pointer; /* 커서를 포인터로 변경 */
+    transition: color 0.3s; /* 색상 변화에 부드러운 효과 추가 */
+}
+
+.list-group-item h5:hover {
+    color: #007bff; /* 마우스 오버 시 색상 변경 */
+}
+
+.room-container {
+    padding: 20px;
+    background-color: #f7f7f7;
+    height: 100vh; /* 화면 전체 높이 */
+}
+
+.room-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.list-group {
+    list-style: none;
+    padding: 0;
+}
+
+.list-group-item {
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 15px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+.list-group-item:hover {
+    background-color: #e9ecef;
+}
+
+.room-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.room-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.room-participants {
+    font-size: 14px;
+    color: #888;
+}
+
+.room-last-message {
+    font-size: 14px;
+    color: #888;
+}

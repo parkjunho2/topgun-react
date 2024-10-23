@@ -1,6 +1,7 @@
 import { useCallback, useState, useEffect } from "react";
 import axios from "axios";
 import { FaMagnifyingGlass } from "react-icons/fa6";
+import { NavLink } from "react-router-dom";
 
 const AdminFlight = () => {
     const [flightList, setFlightList] = useState([]);
@@ -17,6 +18,13 @@ const AdminFlight = () => {
     }, []);
 
     const updateFlight = useCallback(async (flightId, status) => {
+
+         // 승인 시 알림창
+         if (status === "승인" && !window.confirm("승인 처리하시겠습니까?")) return;
+
+          // 반려 시 알림창
+        if (status === "거절" && !window.confirm("거절 처리하시겠습니까?")) return;
+
         const updatedFlight = {
             ...flightList.find(flight => flight.flightId === flightId),
             flightStatus: status,
@@ -39,6 +47,7 @@ const AdminFlight = () => {
                     <div className="input-group">
                         <select name="column" className="form-select w-auto" value={column} onChange={e => setColumn(e.target.value)}>
                             <option value="flight_number">항공편 번호</option>
+                            <option value="user_id">항공사 ID</option>
                             <option value="departure_airport">출발 공항</option>
                             <option value="arrival_airport">도착 공항</option>
                         </select>
@@ -64,13 +73,15 @@ const AdminFlight = () => {
                                 <th>ID</th>
                                 <th>총 좌석 수</th>
                                 <th>상태</th>
-                                <th>승인 및 반려</th>
+                                <th>승인 및 거절</th>
                             </tr>
                         </thead>
                         <tbody>
                             {flightList.map((flight) => (
                                 <tr key={flight.flightId}>
-                                    <td>{flight.flightNumber}</td>
+                                    <td><NavLink to={"/admin/detail/"+flight.flightId}>
+                                    {flight.flightNumber}
+                                    </NavLink></td>
                                     <td>{new Date(flight.departureTime).toLocaleString()}</td>
                                     <td>{new Date(flight.arrivalTime).toLocaleString()}</td>
                                     <td>{flight.flightTime}</td>
@@ -81,7 +92,7 @@ const AdminFlight = () => {
                                     <td>{flight.flightStatus}</td>
                                     <td>
                                         <button className="btn btn-success" onClick={() => updateFlight(flight.flightId, "승인")}>승인</button>
-                                        <button className="btn btn-danger" onClick={() => updateFlight(flight.flightId, "반려")}>반려</button>
+                                        <button className="btn btn-danger" onClick={() => updateFlight(flight.flightId, "거절")}>거절</button>
                                     </td>
                                 </tr>
                             ))}

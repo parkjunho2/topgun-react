@@ -21,11 +21,19 @@ import NotMemberRoute from './components/Route/NotMemberRoute';
 import AirLine from './components/AirLine.js';
 import AdminFlight from './components/AdminFlight.js';
 import Chat from './components/chat/Chat';
-import Notice from './components/notice.js'; // Notice 컴포넌트 임포트
+import Notice from './components/notice/notice.js'; // Notice 컴포넌트 임포트
+import NoticeDetail from './components/notice/noticeDetail.js'; // 공지사항 상세 페이지 컴포넌트 임포트
 import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
 import PaymentAllList from "./components/payment/PaymentAllList.js";
+import FlightDetail from './components/FlightDetail.js';
+import AdminFlightDetail from './components/AdminFlightDetail.js';
+import BookingList from './components/booking/BookingList.js';
+import Room from "./components/chat/Room.js";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
 
 
 
@@ -88,43 +96,62 @@ const App = () => {
   const noHeaderRoutes = ['/login', '/join'];
 
   return (
-    <>
-      { !noHeaderRoutes.includes(location.pathname) && <Header /> }
-      <Routes>  
+    <>{/* ToastContainer 추가 */}
+      <ToastContainer
+        position="top-right" // 토스트 위치
+        autoClose={5000} // 자동 닫힘 시간
+        hideProgressBar={false} // 진행 바 표시 여부
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
+      {!noHeaderRoutes.includes(location.pathname) && <Header />}
+      <Routes>
         <Route exact path="/" element={<MainPage />} />
         <Route path="/login" element={<Login />} /> {/* 로그인 */}
 
         {/* 예약페이지 */}
-        <Route path="/booking" element={<Booking/>}/>
+        <Route path="/booking" element={<Booking />} />
+        <Route path="/bookingList" element={<BookingList/>} />
 
         {/* 로그인 되어야지만 볼 수 있는 페이지 */}
         <Route element={<PrivateRoute />}>
-          <Route path="/payment" element={ <Payment /> } />
-          <Route path="/payment/success/:partnerOrderId" element={ <PaymentSuccess /> } />
-          <Route path="/payment/cancel" element={ <PaymentCancel /> } />
-          <Route path="/payment/fail" element={ <PaymentFail /> } />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment/success/:partnerOrderId" element={<PaymentSuccess />} />
+          <Route path="/payment/cancel" element={<PaymentCancel />} />
+          <Route path="/payment/fail" element={<PaymentFail />} />
           <Route path="/test" element={<Test />} />
           <Route path="/chat" element={<Chat />} />
           <Route path='/mypage' element={<MyPage />}/>
           <Route path='/payment/list' element={<PaymentList/>}/>
           <Route path='/payment/alllist' element={<PaymentAllList/>}/>
+          <Route path="/chat/:roomNo" element={<Chat />} />
+          <Route path="/room" element={<Room/>} />
+          <Route path='/mypage' element={<MyPage />} />
+          <Route path='/paymen/list' element={<PaymentList />} />
         </Route>
 
 
         {/* 관리자만 봐야하는 페이지 */}
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/list" element={<AdminFlight />} />
+          <Route path="/admin/list" element={<AdminFlight />} />
         </Route>
 
         {/* 멤버만 못보는 페이지 -> ADMIN, AIRLINE만 가능 */}
         <Route element={<NotMemberRoute />}>
           <Route path="/airline" element={<AirLine />} />
         <Route path="/flight" element={<Flight />} />
+        <Route path="/flight/detail/:flightId" element={<FlightDetail />} />
+        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
+        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
         </Route>
+
 
         {/* 공지사항 페이지 추가 */}
         <Route path="/notice" element={<Notice />} />  {/* Notice 페이지 경로 설정 */}
+        <Route path="/notice/:id" element={<NoticeDetail />} />  {/* 공지사항 상세 페이지 경로 설정 */}
+
 
         <Route path="*" element={<NotFound />} /> {/* 모든 잘못된 경로 처리 */}
       </Routes>
