@@ -177,6 +177,7 @@ const Login = () => {
             setUser({
                 userId: resp.data.usersId,
                 userType: resp.data.usersType,
+                userName: resp.data.usersName
             });
 
             axios.defaults.headers.common["Authorization"]

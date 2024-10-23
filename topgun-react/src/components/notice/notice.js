@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
-import './noticeButton.css'; // 프레임 라인 버튼 스타일을 포함한 CSS 파일
+// import './noticeButton.css'; // 프레임 라인 버튼 스타일을 포함한 CSS 파일
 
 const NoticeBoard = () => {
     const [noticeList, setNoticeList] = useState([]);
