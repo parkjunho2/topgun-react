@@ -5,15 +5,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  font-size: 1.2rem;
-  font-family: "Open Sans", sans-serif;
-  color: #444;
-  background-color: #fff;
-  margin: 0;
-  padding: 4rem;
-  text-align: center;
-}
+
 
 .arrow-btn {
   position: relative;
