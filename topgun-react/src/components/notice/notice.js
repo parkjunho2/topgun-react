@@ -6,6 +6,7 @@ import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import './noticeButton.css'; // 프레임 라인 버튼 스타일을 포함한 CSS 파일
 
+//업데이트 테스트
 const NoticeBoard = () => {
     const [noticeList, setNoticeList] = useState([]);
     const [input, setInput] = useState({
