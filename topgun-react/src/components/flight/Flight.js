@@ -5,7 +5,7 @@ import { Modal } from "bootstrap";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { userState } from "../util/recoil";
+import { userState } from "../../util/recoil";
 
 const Flight = () => {
     const [flightList, setFlightList] = useState([]);
@@ -168,32 +168,36 @@ const Flight = () => {
 
     const searchFlightList = useCallback(async () => {
         if (keyword.length === 0) return;
-        const resp = await axios.get(`http://localhost:8080/flight/${column}/keyword/${encodeURIComponent(keyword)}`);
-        setFlightList(resp.data);
+        const resp = await axios.get(`http://localhost:8080/flight/column/${column}/keyword/${encodeURIComponent(keyword)}`);
+       // 항공편 리스트에서 현재 로그인된 사용자 ID와 일치하는 항공편만 필터링
+       const filteredFlights = resp.data.filter(flight => flight.userId === user.userId);
+        setFlightList(filteredFlights);
     }, [column, keyword]);
 
     // 뷰
     return (
         <>
-            {/* 검색 화면 */}
-            <div className="row mt-2">
-                <div className="col-md-8 col-sm-10">
-                    <div className="input-group">
-                        <select name="column" className="form-select w-auto"
-                            value={column} onChange={e => setColumn(e.target.value)}>
-                            <option value="flight_number">항공편 번호</option>
-                            <option value="departure_airport">출발항공</option>
-                            <option value="arrival_airport">도착항공</option>
-                        </select>
-                        <input type="text" className="form-control w-auto"
-                            value={keyword} onChange={e => setKeyword(e.target.value)} />
-                        <button type="button" className="btn btn-secondary"
-                                onClick={searchFlightList}>
-                            <FaMagnifyingGlass />
-                        </button>
-                    </div>
-                </div>
-            </div>
+         {/* 검색 화면 */}
+<div className="d-flex justify-content-center mt-2">
+    <div className="col-md-8 col-sm-10">
+        <div className="input-group shadow-sm">
+            <select name="column" className="form-select"
+                value={column} onChange={e => setColumn(e.target.value)}>
+                <option value="flight_number">항공편 번호</option>
+                <option value="departure_airport">출발공항</option>
+                <option value="arrival_airport">도착공항</option>
+            </select>
+            <input type="text" className="form-control"
+                value={keyword} onChange={e => setKeyword(e.target.value)} 
+                placeholder="검색어 입력" />
+            <button type="button" className="btn btn-secondary"
+                onClick={searchFlightList}>
+                <FaMagnifyingGlass />
+            </button>
+        </div>
+    </div>
+</div>
+
 
             <div className="row mt-4">
                 <div className="col">
