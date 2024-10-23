@@ -42,7 +42,7 @@ import { ToastContainer } from 'react-toastify';
 const App = () => {
 
   //recoil state
-  const [, setUser] = useRecoilState(userState);
+  const [user, setUser] = useRecoilState(userState);
   const [, setMemberLoading] = useRecoilState(memberLoadingState);
 
 
@@ -76,6 +76,7 @@ const App = () => {
     setUser({
       userId: resp.data.usersId,
       userType: resp.data.usersType,
+      userName: resp.data.usersName
     });
 
     axios.defaults.headers.common["Authorization"] = "Bearer " + resp.data.accessToken;
@@ -94,6 +95,8 @@ const App = () => {
 
   // 헤더를 숨길 경로 배열
   const noHeaderRoutes = ['/login', '/join'];
+
+  console.log("user = "+user.userName);
 
   return (
     <>{/* ToastContainer 추가 */}
