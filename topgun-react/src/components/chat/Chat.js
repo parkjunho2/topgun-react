@@ -62,7 +62,7 @@ const Chat = () => {
                 //채널 구독 처리
                 client.subscribe("/private/chat/" + roomNo, (message) => {
                     const data = JSON.parse(message.body);
-                    // console.log("보낸 메세지 : ", data);
+                    console.log("보낸 메세지 : ", data);
                     setMessageList(prev=>[...prev, data]); //새 메세지를 list에 추가
                 });
                 client.subscribe("/private/db/" + roomNo + "/" + user.userId,(message)=>{
@@ -158,18 +158,18 @@ const Chat = () => {
     const messagesEndRef = useRef(null);
 
     // 메시지 목록 업데이트 시 자동 스크롤
-    // useEffect(() => {
-    //     if (!isTyping) {    // 입력 중이 아닐 때만 스크롤
-    //         scrollToBottom();
-    //     }
-    // }, [messageList, isTyping]);
+    useEffect(() => {
+        if (!isTyping) {    // 입력 중이 아닐 때만 스크롤
+            scrollToBottom();
+        }
+    }, [messageList, isTyping]);
 
     // 자동 스크롤 함수
-    // const scrollToBottom = () => {
-    //     if (messagesEndRef.current) {
-    //         messagesEndRef.current.scrollIntoView({ behavior: "smooth" }); // 부드럽게 스크롤
-    //     }
-    // };
+    const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" }); // 부드럽게 스크롤
+        }
+    };
 
     const filteredMessages = messageList.filter(message => {
         if(roomNo === "1"){
@@ -234,7 +234,7 @@ const Chat = () => {
                                 {message.type === "dm" && (
                                     <div className={`chat-message ${login && user.userId === message.senderUsersId ? "my-message" : "other-message"}`}>
                                         <div className="chat-bubble">
-                                            {/* 수신자일 경우 ooo님으로부터 온 메세지 형태로 출력 */}
+                                            {/* 수신자일 경우 '회원등급' 님으로부터 온 메세지 형태로 출력 */}
                                             {(user.userId === message.receiverUsersId) && (
                                                 <div className="message-header">
                                                     <p>
@@ -275,7 +275,7 @@ const Chat = () => {
                             </div>
                         </div>
                     </div>
-                    {/* <div ref={messagesEndRef} /> */}
+                    <div ref={messagesEndRef} /> 
                 </div>
             </div>
         </div>
