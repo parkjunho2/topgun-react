@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useParams } from "react-router";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useLinkClickHandler } from "react-router-dom";
 import { loginState, memberLoadingState, userState } from "../../util/recoil";
 import SockJS from "sockjs-client";
@@ -15,12 +15,22 @@ const Chat = () => {
     const { roomNo } = useParams();
     const navigate = useNavigate();
 
-   //state
-   const [input, setInput] = useState("");
-   const [messageList, setMessageList] = useState([]);    
-   const [client, setClient] = useState(null);
-   const [connect, setConnect] = useState(false);
-   const [receiverUsersId, setReceiverUsersId] = useState("");
+    //state
+    const [input, setInput] = useState("");
+    const [messageList, setMessageList] = useState([]);
+    const [client, setClient] = useState(null);
+    const [connect, setConnect] = useState(false);
+    const [receiverUsersId, setReceiverUsersId] = useState("");
+    const [more, setMore] = useState(false);
+
+    //memo
+    const firstMessageNo = useMemo(() => {
+        if (messageList.length === 0) return false; //메세지 없음(첫메세지도 없음)
+        //제일 앞 메세지의 no를 조사
+        const message = messageList[0];
+        return message.no || null; //메세지 번호 반환 or 없으면 null
+    }, [messageList]);
+    console.log("첫 번호 : ", firstMessageNo);
 
     //recoil
     const user = useRecoilValue(userState);
@@ -35,122 +45,122 @@ const Chat = () => {
     //effect
     const location = useLocation();
 
-    useEffect(()=>{
-        if(memberLoading === false)  return;
+    useEffect(() => {
+        if (memberLoading === false) return;
 
         const canEnter = checkRoom();
 
         const client = connectToServer();
         setClient(client);
-        return()=>{
+        return () => {
             disconnectFromServer(client);
         }
-    },[location.pathname, memberLoading]);
+    }, [location.pathname, memberLoading]);
 
     //callback
-    const connectToServer = useCallback(()=>{
+    const connectToServer = useCallback(() => {
         const socket = new SockJS("http://localhost:8080/ws");
 
         const client = new Client({
-            webSocketFactory : ()=> socket,
-            connectHeaders : {
-                accessToken : accessToken,
-                refreshToken : refreshToken,
+            webSocketFactory: () => socket,
+            connectHeaders: {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
             },
-            onConnect : () => {
+            onConnect: () => {
                 setClient(client);
                 //채널 구독 처리
                 client.subscribe("/private/chat/" + roomNo, (message) => {
                     const data = JSON.parse(message.body);
                     console.log("보낸 메세지 : ", data);
-                    setMessageList(prev=>[...prev, data]); //새 메세지를 list에 추가
+                    setMessageList(prev => [...prev, data]); //새 메세지를 list에 추가
                 });
-                client.subscribe("/private/db/" + roomNo + "/" + user.userId,(message)=>{
+                client.subscribe("/private/db/" + roomNo + "/" + user.userId, (message) => {
                     const data = JSON.parse(message.body);
                     if (data && Array.isArray(data.messageList)) {
                         setMessageList(data.messageList);
                     }
                     setMessageList(data.messageList);
                 });
-                client.subscribe("/private/dm/"+user.userId, (message)=>{
+                client.subscribe("/private/dm/" + user.userId, (message) => {
                     const json = JSON.parse(message.body);
-                    setMessageList(prev=>[...prev, json]);//순서 보장
+                    setMessageList(prev => [...prev, json]);//순서 보장
                 });
                 setConnect(true); //연결상태 갱신
             },
-            onDisconnect : ()=> {
+            onDisconnect: () => {
                 setConnect(false); //연결상태 갱신
-            }, 
+            },
             // debug : (str) => {
             //     console.log(str);
             // }
         });
         client.activate();
         return client;
-    },[memberLoading]);
+    }, [memberLoading]);
 
-   const disconnectFromServer = useCallback((client)=>{
-        if(client){
+    const disconnectFromServer = useCallback((client) => {
+        if (client) {
             client.deactivate();
         }
-    },[]);
+    }, []);
 
-    const sendMessage = useCallback((receiverUsersId)=>{
-        if(client === null) return;
-        if(connect === false) return;
-        if(input.length === 0) return;
+    const sendMessage = useCallback((receiverUsersId) => {
+        if (client === null) return;
+        if (connect === false) return;
+        if (input.length === 0) return;
 
-        if(input.startsWith("@ ")) {
+        if (input.startsWith("@ ")) {
             sendDM();
             return;
         }
-        
+
         const message = {
-            content : input,
-            senderUsersId : user.userId,
-            senderUsersType : user.userType,
-            receiverUsersId : receiverUsersId,
-            time : new Date().toISOString()
+            content: input,
+            senderUsersId: user.userId,
+            senderUsersType: user.userType,
+            receiverUsersId: receiverUsersId,
+            time: new Date().toISOString()
         };
-        
+
         client.publish({
-            destination : "/app/room/" + roomNo,
-            headers : {
-                accessToken : accessToken,
-                refreshToken : refreshToken
+            destination: "/app/room/" + roomNo,
+            headers: {
+                accessToken: accessToken,
+                refreshToken: refreshToken
             },
-            body : JSON.stringify( message )
+            body: JSON.stringify(message)
         });
         setInput(""); // 입력창 초기화
-    },[input, client, connect, user]);
+    }, [input, client, connect, user]);
 
-    const sendDM  = useCallback(()=>{
+    const sendDM = useCallback(() => {
         const convertStr = input.substring(2);
         const firstSpace = convertStr.indexOf(" ");
         const receiverId = convertStr.substring(0, firstSpace); //아이디
-        const content = convertStr.substring(firstSpace+1); //보낼 메세지 내용
+        const content = convertStr.substring(firstSpace + 1); //보낼 메세지 내용
 
         const json = {
-            content : content
+            content: content
         };
         const message = {
-            destination : "/app/room/" + roomNo + "/dm/" + receiverId,
-            body : JSON.stringify(json),
-            headers : {
-                accessToken : accessToken,
-                refreshToken : refreshToken
+            destination: "/app/room/" + roomNo + "/dm/" + receiverId,
+            body: JSON.stringify(json),
+            headers: {
+                accessToken: accessToken,
+                refreshToken: refreshToken
             }
         }
         client.publish(message);
         setInput("");
-    },[input, client, connect]);
+    }, [input, client, connect]);
 
-    const checkRoom = useCallback(async ()=>{
+    const checkRoom = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/room/check/" + roomNo);
-        if(resp.data === false){
-            navigate("/room", {replace : true});
+        if (resp.data === false) {
+            navigate("/room", { replace: true });
         }
-    },[roomNo]);
+    }, [roomNo]);
 
     const [isTyping, setIsTyping] = useState(false); // 입력 중인지 여부
 
@@ -172,43 +182,52 @@ const Chat = () => {
     };
 
     const filteredMessages = messageList.filter(message => {
-        if(roomNo === "1"){
+        if (roomNo === "1") {
             if (user.userType === "ADMIN") {
                 return true; // ADMIN은 모든 메시지 보기
-            } 
+            }
             else {
                 return (message.senderUsersType === "ADMIN" ||  // MEMBER/AIRLINE은 ADMIN의 메시지만 보기
                     message.senderUsersId === user.userId // 본인의 메시지
                 );
             }
         }
-        else if(roomNo === "2" || roomNo === "3"){
-            if(user.userType === "AIRLINE"){
+        else if (roomNo === "2" || roomNo === "3") {
+            if (user.userType === "AIRLINE") {
                 return true;
             }
             else {
-                return (message.senderUsersType == "AIRLINE" || 
+                return (message.senderUsersType == "AIRLINE" ||
                     message.senderUsersId === user.userId
                 );
             }
         }
     });
 
-    const handleUserClick = (userId)=>{
+    const handleUserClick = (userId) => {
         setInput(`@ ${userId} `); //입력창에 클릭한 ID 추가
     }
 
+    const loadMoreMessageList = useCallback(async ()=>{
+        const resp = await axios.get("http://localhost:8080/message/more/"+firstMessageNo);
+
+        console.log("API 응답:", resp.data);
+        setMessageList(prev=>[...resp.data.messageList, ...prev]);
+        setMore(resp.data.last === false);//더보기 여부 설정
+    },[messageList, firstMessageNo, more]);
+
+
     return (<>
         {/* <h3>{"현재 연결 상태 = " + (connect ? "연결됨" : "종료됨")}</h3> */}
-         <div className="row mt-4">
+        <div className="row mt-4">
             {/* 메세지 목록 */}
             <div className="col">
                 {/* 더보기 버튼(firstMessageNo가 null이 아니면) */}
-                {/* {more === true && (
+                {more === true && (
                     <button className="btn btn-outline-success w-100" onClick={loadMoreMessageList}>
                         더보기
                     </button>
-                )} */}
+                )}
                 <div className="chat-container mt-3">
                     <ul className="list-group">
                         {filteredMessages.map((message, index) => (
@@ -275,7 +294,7 @@ const Chat = () => {
                             </div>
                         </div>
                     </div>
-                    <div ref={messagesEndRef} /> 
+                    <div ref={messagesEndRef} />
                 </div>
             </div>
         </div>

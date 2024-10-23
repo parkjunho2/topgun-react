@@ -1,16 +1,7 @@
-.list-group-item h5 {
-    cursor: pointer; /* 커서를 포인터로 변경 */
-    transition: color 0.3s; /* 색상 변화에 부드러운 효과 추가 */
-}
-
-.list-group-item h5:hover {
-    color: #007bff; /* 마우스 오버 시 색상 변경 */
-}
-
 .room-container {
     padding: 20px;
     background-color: #f7f7f7;
-    height: 100vh; /* 화면 전체 높이 */
+    height: 100vh; 
 }
 
 .room-title {
@@ -47,6 +38,12 @@
 .room-name {
     font-size: 18px;
     font-weight: bold;
+    cursor: pointer; 
+    transition: color 0.3s; 
+}
+
+.room-name:hover {
+    color: #007bff; 
 }
 
 .room-info {
