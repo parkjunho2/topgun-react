@@ -33,6 +33,7 @@ import BookingList from './components/booking/BookingList.js';
 import Room from "./components/chat/Room.js";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import PaymentDetail from "./components/payment/PaymentDetail.js";
 
 
 
@@ -130,8 +131,8 @@ const App = () => {
           <Route path='/payment/alllist' element={<PaymentAllList/>}/>
           <Route path="/chat/:roomNo" element={<Chat />} />
           <Route path="/room" element={<Room/>} />
-          <Route path='/mypage' element={<MyPage />} />
-          <Route path='/paymen/list' element={<PaymentList />} />
+          <Route path='/payment/list' element={<PaymentList />} />
+          <Route path='/payment/detail/:paymentNo' element={<PaymentDetail/>}/>
         </Route>
 
 

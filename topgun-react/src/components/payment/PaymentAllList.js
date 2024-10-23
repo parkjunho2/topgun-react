@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 
 const PaymentAllList=()=>{
 
@@ -45,7 +46,7 @@ const PaymentAllList=()=>{
                              <span/>
                              {payment.paymentDto.paymentName}    
                              <span/>
-                             총 결제금액: {payment.paymentDto.paymentTotal}원
+                             총 결제금액: {payment.paymentDto.paymentTotal.toLocaleString()}원
                          </h3>
                          {/* 상세 결제 내용 */}
                          {payment.paymentDetailList?.length>0 && (
@@ -55,10 +56,10 @@ const PaymentAllList=()=>{
                                  <h3 className="d-flex justify-content-between">
                                      {detail.paymentDetailName}
                                      <span/>
-                                     {detail.paymentDetailPrice}원
+                                     {detail.paymentDetailPrice.toLocaleString()}원
                                  </h3>
                                  <div className="text-end">
-                                <small>여권정보 등록 및 변경</small>
+                                 <NavLink to={`/payment/detail/${payment.paymentDto.paymentNo}`}>더보기</NavLink>
                                </div>
                              </li>
                              ))}
