@@ -89,7 +89,7 @@ const Payment=()=>{
                             <th>선택</th>
                             <th>좌석번호</th>
                             <th>등급</th>
-                            {/* <th>가격</th> */}
+                            <th>가격</th>
                             <th>수량</th>{/* 추후 삭제 예정 */}
                         </tr>
                     </thead>
@@ -102,7 +102,7 @@ const Payment=()=>{
                                 </td>
                                 <td>{seats.seatsNo}</td>
                                 <td>{seats.seatsRank}</td>
-                                {/* <td>{seats.seatsPrice}</td> */}
+                                <td>{seats.seatsPrice.toLocaleString()}</td>
                                 <td>
                                     <input type="number" className="form-control" min="1" max="1" step="1"
                                     style={{width:"100px"}} value={seats.qty}
@@ -119,7 +119,7 @@ const Payment=()=>{
         <div className="row mt-4">
             <div className="col">
                 {/* 비지니스 선택 금액 , 이코노미 선택 금액  */}
-                <h2>결제하실 총 금액은 {checkedSeatsTotal}원 입니다.</h2>{/* 총 금액 */}
+                <h2>결제하실 총 금액은 {checkedSeatsTotal.toLocaleString()}원 입니다.</h2>{/* 총 금액 */}
             </div>
         </div>
         <div className="row mt-4">

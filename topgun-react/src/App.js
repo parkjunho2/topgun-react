@@ -26,12 +26,14 @@ import NoticeDetail from './components/notice/noticeDetail.js'; // 공지사항 
 import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
+import PaymentAllList from "./components/payment/PaymentAllList.js";
 import FlightDetail from './components/FlightDetail.js';
 import AdminFlightDetail from './components/AdminFlightDetail.js';
 import BookingList from './components/booking/BookingList.js';
 import Room from "./components/chat/Room.js";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+
 
 
 
@@ -119,6 +121,10 @@ const App = () => {
           <Route path="/payment/cancel" element={<PaymentCancel />} />
           <Route path="/payment/fail" element={<PaymentFail />} />
           <Route path="/test" element={<Test />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path='/mypage' element={<MyPage />}/>
+          <Route path='/payment/list' element={<PaymentList/>}/>
+          <Route path='/payment/alllist' element={<PaymentAllList/>}/>
           <Route path="/chat/:roomNo" element={<Chat />} />
           <Route path="/room" element={<Room/>} />
           <Route path='/mypage' element={<MyPage />} />

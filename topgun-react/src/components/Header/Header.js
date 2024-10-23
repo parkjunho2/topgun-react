@@ -71,7 +71,7 @@ const Header = () => {
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="/paymen/list" className="nav-link px-2 text-white">
+                                <NavLink to="/payment/alllist" className="nav-link px-2 text-white">
                                     paymentlist
                                 </NavLink>
                             </li>
