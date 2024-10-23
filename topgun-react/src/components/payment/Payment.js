@@ -98,7 +98,8 @@ const Payment=()=>{
                             <tr key={seats.seatsNo}>
                                 <td>
                                     <input type="checkbox" className="form-check-input"
-                                    checked={seats.select} onChange={e=>selectSeats(seats, e.target.checked)}/>
+                                    checked={seats.select} onChange={e=>selectSeats(seats, e.target.checked)}
+                                    />
                                 </td>
                                 <td>{seats.seatsNo}</td>
                                 <td>{seats.seatsRank}</td>

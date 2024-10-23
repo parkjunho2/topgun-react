@@ -17,8 +17,19 @@ const PaymentDetail=()=>{
     const loadPaymentInfo= useCallback(async()=>{
         const resp= await axios.get("http://localhost:8080/seats/detail/"+paymentNo);
         setInfo(resp.data);
-    }, [])
-    ;
+    }, []);
+    
+    const cancelPaymentAll = useCallback(async()=>{
+        const resp= await axios.delete("http://localhost:8080/seats/cancelAll/"+paymentNo);
+        loadPaymentInfo();//화면 갱신
+    }, []);
+
+    const cancelPaymentItem = useCallback(async(detail)=>{
+        const resp= await axios.delete("http://localhost:8080/seats/cancelItem/"+detail.paymentDetailNo)
+        loadPaymentInfo();//화면 갱신
+    }, [info]);
+
+
     //view
     return(<>
             <div className="row mt-4">
@@ -41,7 +52,8 @@ const PaymentDetail=()=>{
                         <div className="row mt-2">
                             <div className="col">
                                 <button className="btn btn-danger"
-                                disabled={info.paymentDto.paymentRemain ===0}>전체취소</button>
+                                disabled={info.paymentDto.paymentRemain ===0}
+                                onClick={cancelPaymentAll}>전체취소</button>
                             </div>
                         </div>
                 </div>
@@ -55,13 +67,18 @@ const PaymentDetail=()=>{
                             <div className="col-9">{detail.paymentDetailPrice.toLocaleString()}원</div>
                         </div>
                         <div className="row mt-2">
+                            <div className="col-3">소계</div>
+                            <div className="col-9">{(detail.paymentDetailPrice * detail.paymentDetailQty).toLocaleString()}원</div>
+                        </div>
+                        <div className="row mt-2">
                             <div className="col-3">상태</div>
                             <div className="col-9">{detail.paymentDetailStatus}</div>
                         </div>
                         <div className="row mt-2">
                             <div className="col">
                                 <button className="btn btn-danger"
-                                disabled={detail.paymentDetailStatus=== '취소'}>
+                                disabled={detail.paymentDetailStatus=== '취소'} 
+                                onClick={e=>cancelPaymentItem(detail)}>
                                     항목취소
                                 </button>
                             </div>
