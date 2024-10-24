@@ -78,7 +78,11 @@ const Header = () => {
                             <li>
                                 <a href="/notice" className="nav-link px-2 text-white">
                                     notice
-
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/graph" className="nav-link px-2 text-white">
+                                    graph
                                 </a>
                             </li>
                         </ul>

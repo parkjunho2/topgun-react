@@ -8,6 +8,9 @@ import axios from 'axios';
 import moment from 'moment';
 
 const BookingList = () => {
+    //const [flightList , setflightList] = useState([]);
+    const [flightList , setflightList] = useState([]);
+
     //navigate
     const navigate = useNavigate();
     const [departureTime, setDepartureTime] = useState(12); // 출발 시간 초기 값 (시간.분 형태)
@@ -25,7 +28,7 @@ const BookingList = () => {
         return `${ampm} ${hourIn12}:${minute === 0 ? '00' : '30'}`;
     };
 
-    const [flightList , setflightList] = useState([]);
+
 
     //페이지 갱신 후 한번만 실행
     useEffect(()=>{
@@ -35,9 +38,8 @@ const BookingList = () => {
     const loadFlightList = useCallback(async()=>{
         const resp = await axios.get("http://localhost:8080/flight/");
         setflightList(resp.data);
+        // console.log(resp.data);
     },[flightList]);
-
-
 
     return (
         <>
@@ -106,54 +108,45 @@ const BookingList = () => {
                     </div>
                     <div className="row">
                         {flightList.map((flight) => (
-                            <NavLink to="/booking" style={{textDecoration:"none"}} key={flight.flightId}>
-                                <div className="row mt-3" style={{border:"1px solid black", borderRadius:"1.5em", width:"100%"}}>
-                                    <div className="row mt-3 mb-3 ms-1">
+                            <NavLink to={`/flight/booking/${flight.flightId}`} style={{textDecoration:"none"}} key={flight.flightId}>
+                             {/* <NavLink to="/booking" style={{textDecoration:"none"}} key={flight.flightId}> */}
+                                <div className="d-flex mt-3" style={{border:"1px solid black", borderRadius:"1.5em", width:"100%"}}>
+                                    <div className="row mt-3 mb-3 ms-1" style={{width:"70%"}}>
                                         {/* 가는날 */}
                                         <h3 style={{color:"black", fontWeight:"bold"}}>{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}<GiCommercialAirplane /></h3>
                                             {/* <div className="row">
                                                 <span style={{color:"red"}}>(+1 day)</span>
                                             </div> */}
                                         <div className="d-flex mb-2" style={{justifyContent:"space-between"}}>
-                                            <div className="d-flex mt-3" style={{width:"300px" , justifyContent:"space-between"}}>
-                                                <span style={{width:"50%", textAlign:"center"}}>{flight.departureAirport}</span>
-                                                <span style={{width:"50%", textAlign:"center"}}>{moment(flight.departureTime).format("a HH:mm")}</span>
+                                            <div className="d-flex mt-3" style={{width:"150px" , justifyContent:"space-between"}}>
+                                                <span style={{width:"100%", textAlign:"center"}}>{moment(flight.departureTime).format("a HH:mm")}
+                                                    <p>{flight.departureAirport.substring(
+                                                            flight.departureAirport.indexOf("(") + 1,  // 시작 인덱스: 괄호 다음
+                                                            flight.departureAirport.indexOf(")")      // 종료 인덱스: 괄호 전
+                                                            )}
+                                                    </p>
+                                                </span>
                                             </div>
                                             <div className="row" style={{width:"150px"}}>
                                                 <span style={{textAlign:"center"}}>{flight.flightTime}</span>
                                                 <span style={{textAlign:"center"}}>------------</span>
                                                 <span style={{textAlign:"center"}}>직항</span>
                                             </div>
-                                            <div className="d-flex mt-3" style={{width:"300px" , justifyContent:"space-between"}}>
-                                                <span style={{width:"50%", textAlign:"center"}}>{moment(flight.arrivalTime).format("a HH:mm ")}</span>
-                                                <span style={{width:"50%", textAlign:"center"}}>{flight.arrivalAirport}</span>
-                                            </div>
-                                                
-                                        </div>
-
-                                        <hr/>
-                                        {/* 오는날 */}
-                                        <div className="d-flex mt-2" style={{justifyContent:"space-between"}}>
-                                            <div className="d-flex mt-4" style={{width:"300px" , justifyContent:"space-between"}}>
-                                                <span style={{width:"50%" , textAlign:"center"}}>{flight.arrivalAirport}</span>
-                                                <span className="ms-2" style={{width:"50%", textAlign:"center"}}>{moment(flight.arrivalTime).format("a HH:mm ")}</span>
-                                            </div>
-                                            <div className="row" style={{width:"150px"}}>
-                                                <span style={{textAlign:"center"}}>{flight.flightTime}</span>
-                                                <span style={{textAlign:"center"}}>------------</span>
-                                                <span style={{textAlign:"center"}}>직항</span>
-                                            </div>
-                                            <div className="d-flex mt-4" style={{width:"300px" , justifyContent:"space-between"}}>
-                                                <span style={{width:"50%", textAlign:"center"}}>{moment(flight.departureTime).format("a HH:mm")}</span>
-                                                <span style={{textAlign:"center" , width:"50%"}}>{flight.departureAirport}</span>
+                                            <div className="d-flex mt-3" style={{width:"150px" , justifyContent:"space-between"}}>
+                                                <span style={{width:"100%", textAlign:"center"}}>{moment(flight.arrivalTime).format("a HH:mm ")}
+                                                    <p>{flight.arrivalAirport.substring(
+                                                            flight.arrivalAirport.indexOf("(") + 1,  // 시작 인덱스: 괄호 다음
+                                                            flight.arrivalAirport.indexOf(")")      // 종료 인덱스: 괄호 전
+                                                            )}
+                                                    </p>
+                                                </span>
                                             </div>
                                         </div>
-                                        {/* <div className="d-flex">
-                                            <span>오전 06:50</span>
-                                            <span className="ms-2 me-2">---------</span>
-                                            <span>오전 08:30</span>
-                                        </div> */}
                                     </div>
+                                            <div className="row flight-price-box" style={{width:"30%"}}>
+                                                    <span className="mt-3" style={{textAlign:"center"}}>412,000원</span>
+                                                    <button className="btn btn-primary ms-5" style={{width:"50%" , height:"30%"}}>선택하기</button>
+                                            </div>
                                 </div>
                             </NavLink>
                         ))}

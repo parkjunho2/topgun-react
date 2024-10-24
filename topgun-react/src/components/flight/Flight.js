@@ -17,7 +17,7 @@ const Flight = () => {
         departureAirport: "",
         arrivalAirport: "",
         userId: "", // 이 값은 자동으로 설정되므로 초기화 시 비워둡니다.
-        flightTotalSeat: "",
+        flightPrice: "",
         flightStatus: "대기", // 기본 상태
     });
 
@@ -47,10 +47,18 @@ const Flight = () => {
 
     const loadList = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/flight/");
-        // 항공편 리스트에서 현재 로그인된 사용자 ID와 일치하는 항공편만 필터링
-        const filteredFlights = resp.data.filter(flight => flight.userId === user.userId);
-        setFlightList(filteredFlights);
-    }, [user.userId]);
+
+        // 현재 시간 (오늘 날짜)
+    const now = new Date();
+
+        // 항공편 리스트에서 현재 로그인된 사용자 ID와 도착 시간이 현재 시간보다 이후인 항공편만 필터링
+    const filteredFlights = resp.data.filter(flight => {
+        const arrivalTime = new Date(flight.arrivalTime);
+        return flight.userId === user.userId && arrivalTime >= now;
+    });
+    
+    setFlightList(filteredFlights);
+}, [user.userId]);
 
     const deleteFlight = useCallback(async (flightId) => {
         const choice = window.confirm("정말 삭제하시겠습니까?");
@@ -89,7 +97,7 @@ const Flight = () => {
             departureAirport: "",
             arrivalAirport: "",
             userId: "", // 초기화 시 비워둡니다.
-            flightTotalSeat: "",
+            flightPrice: "",
             flightStatus: "대기",
         });
     }, []);
@@ -99,6 +107,31 @@ const Flight = () => {
             const departure = new Date(input.departureTime);
             const arrival = new Date(input.arrivalTime);
 
+            // 필드 검증
+    if (!input.flightNumber) {
+        alert("항공편 번호를 입력하세요.");
+        return;
+    }
+    if (!input.departureTime) {
+        alert("출발 시간을 입력하세요.");
+        return;
+    }
+    if (!input.arrivalTime) {
+        alert("도착 시간을 입력하세요.");
+        return;
+    }
+    if (!input.flightPrice) {
+        alert("가격을 입력 하세요.");
+        return;
+    }
+    if (!input.departureAirport) {
+        alert("출발 공항을 선택하세요.");
+        return;
+    }
+    if (!input.arrivalAirport) {
+        alert("도착 공항을 선택하세요.");
+        return;
+    }
             if (arrival <= departure) {
                 alert("도착 시간은 출발 시간보다 늦어야 합니다.");
                 return;
@@ -186,6 +219,7 @@ const Flight = () => {
                 <option value="flight_number">항공편 번호</option>
                 <option value="departure_airport">출발공항</option>
                 <option value="arrival_airport">도착공항</option>
+                <option value="flight_status">결제상태</option>
             </select>
             <input type="text" className="form-control"
                 value={keyword} onChange={e => setKeyword(e.target.value)} 
@@ -262,7 +296,7 @@ const Flight = () => {
                             </td>
 
                             <td>
-                                <input type="text" className="form-control"
+                                <input type="hidden" className="form-control"
                                        placeholder="아이디"
                                        name="userId"
                                        value={user.userId} // userId는 비활성화
@@ -271,9 +305,9 @@ const Flight = () => {
                             </td>
                             <td>
                                 <input type="number" className="form-control"
-                                       placeholder="총 좌석 수"
-                                       name="flightTotalSeat"
-                                       value={input.flightTotalSeat}
+                                       placeholder="가격"
+                                       name="flightPrice"
+                                       value={input.flightPrice}
                                        onChange={changeInput} />
                             </td>
                             <td>
@@ -299,7 +333,7 @@ const Flight = () => {
                             <th>출발 공항</th>
                             <th>도착 공항</th>
                             <th>ID</th>
-                            <th>총 좌석 수</th>
+                            <th>가격</th>
                             <th>상태</th>
                             <th>메뉴</th>
                         </tr>
@@ -318,7 +352,7 @@ const Flight = () => {
                                     <td>{flight.departureAirport}</td>
                                     <td>{flight.arrivalAirport}</td>
                                     <td>{flight.userId}</td>
-                                    <td>{flight.flightTotalSeat}</td>
+                                    <td>{Number(flight.flightPrice).toLocaleString()}원</td>
                                     <td>{flight.flightStatus}</td>
                                     <td>
                                         <FaEdit 
@@ -377,16 +411,38 @@ const Flight = () => {
                             </div>
                             <div className="mb-3">
                                 <label>출발 공항</label>
-                                <input type="text" name="departureAirport" className="form-control" value={input.departureAirport} onChange={changeInput} />
+                                <select name="departureAirport" className="form-control" value={input.departureAirport} onChange={changeInput}>
+                                    <option>출발 공항 선택</option>
+                                    <option>서울/인천(ICN)</option>
+                                    <option>서울/김포(GMP)</option>
+                                    <option>광주(KWJ)</option>
+                                    <option>대구(TAE)</option>
+                                    <option>제주(CJU)</option>
+                                    <option>여수(RSU)</option>
+                                    <option>도쿄/나리타(NRT)</option>
+                                    <option>오사카/간사이(KIX)</option>
+                                    <option>나트랑(CXR)</option>
+                                </select>
                             </div>
                             <div className="mb-3">
                                 <label>도착 공항</label>
-                                <input type="text" name="arrivalAirport" className="form-control" value={input.arrivalAirport} onChange={changeInput} />
+                                <select name="arrivalAirport" className="form-control" value={input.arrivalAirport} onChange={changeInput}>
+                                    <option>도착 공항 선택</option>
+                                    <option>서울/인천(ICN)</option>
+                                    <option>서울/김포(GMP)</option>
+                                    <option>광주(KWJ)</option>
+                                    <option>대구(TAE)</option>
+                                    <option>제주(CJU)</option>
+                                    <option>여수(RSU)</option>
+                                    <option>도쿄/나리타(NRT)</option>
+                                    <option>오사카/간사이(KIX)</option>
+                                    <option>나트랑(CXR)</option>
+                                </select>
                             </div>
                             <div className="mb-3">
-                                <label>ID</label>
+                                
                                 <input 
-                                    type="text" 
+                                    type="hidden" 
                                     name="userId" 
                                     className="form-control" 
                                     value={user.userId} // userId는 비활성화
@@ -394,8 +450,8 @@ const Flight = () => {
                                 />
                             </div>
                             <div className="mb-3">
-                                <label>총 좌석 수</label>
-                                <input type="number" name="flightTotalSeat" className="form-control" value={input.flightTotalSeat} onChange={changeInput} />
+                                <label>가격</label>
+                                <input type="number" name="flightPrice" className="form-control" value={input.flightPrice} onChange={changeInput} />
                             </div>
                             <div className="mb-3">
                                 <label>상태</label>

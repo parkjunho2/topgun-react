@@ -2,7 +2,7 @@ import { Navigate, useNavigate, useParams } from "react-router";
 import { useEffect, useCallback, useState } from 'react';
 import axios from "axios";
 
-const FlightDetail = () => {
+const AdminFlightDetail = () => {
     const { flightId } = useParams(); 
     const navigate = useNavigate();
     const [flight, setFlight] = useState(null);
@@ -23,10 +23,7 @@ const FlightDetail = () => {
     }, [flightId]);
 
     const updateFlight = useCallback(async (status) => {
-        // 승인 시 알림창
         if (status === "승인" && !window.confirm("승인 처리하시겠습니까?")) return;
-
-        // 거절 시 알림창
         if (status === "거절" && !window.confirm("거절 처리하시겠습니까?")) return;
 
         const updatedFlight = {
@@ -35,7 +32,7 @@ const FlightDetail = () => {
         };
 
         await axios.put("http://localhost:8080/admin/update", updatedFlight);
-        navigate("/admin/list"); // 업데이트 후 목록으로 이동
+        navigate("/admin/list");
     }, [flight, navigate]);
 
     if (load === false) { 
@@ -85,8 +82,8 @@ const FlightDetail = () => {
                     <div className="col-sm-8">{flight.arrivalAirport}</div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>총 좌석 수:</strong></div>
-                    <div className="col-sm-8">{flight.flightTotalSeat}</div>
+                    <div className="col-sm-4"><strong>가격:</strong></div>
+                    <div className="col-sm-8">{Number(flight.flightPrice).toLocaleString()}원</div>
                 </div>
                 <div className="row mb-3">
                     <div className="col-sm-4"><strong>항공사 ID:</strong></div>
@@ -94,7 +91,7 @@ const FlightDetail = () => {
                 </div>
                 <div className="row mb-3">
                     <div className="col-sm-4"><strong>상태:</strong></div>
-                    <div className="col-sm-8">{flight.flightStatus}</div>
+                    <div className="col-sm-8"><span className="text-dark bg-warning border border-warning p-1 rounded">{flight.flightStatus}</span></div>
                 </div>
             </div>
 
@@ -102,10 +99,10 @@ const FlightDetail = () => {
             <div className="text-center mt-4">
                 <button className="btn btn-success ms-2" onClick={() => updateFlight("승인")}>승인</button>
                 <button className="btn btn-danger ms-2" onClick={() => updateFlight("거절")}>거절</button>
-                <button className="btn btn-secondary ms-2" onClick={() => navigate("/flight/list")}>목록보기</button>
+                <button className="btn btn-secondary ms-2" onClick={() => navigate("/admin/list")}>목록보기</button>
             </div>
         </div>
     );
 };
 
-export default FlightDetail;
+export default AdminFlightDetail;
