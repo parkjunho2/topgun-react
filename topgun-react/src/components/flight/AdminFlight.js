@@ -80,7 +80,7 @@ const AdminFlight = () => {
                                 <th>출발 공항</th>
                                 <th>도착 공항</th>
                                 <th>ID</th>
-                                <th>총 좌석 수</th>
+                                <th>가격</th>
                                 <th>상태</th>
                                 <th>승인 및 거절</th>
                             </tr>
@@ -97,7 +97,7 @@ const AdminFlight = () => {
                                     <td>{flight.departureAirport}</td>
                                     <td>{flight.arrivalAirport}</td>
                                     <td>{flight.userId}</td>
-                                    <td>{flight.flightTotalSeat}</td>
+                                    <td>{Number(flight.flightPrice).toLocaleString()}원</td>
                                     <td>{flight.flightStatus}</td>
                                     <td>
                                         <button className="btn btn-success" onClick={() => updateFlight(flight.flightId, "승인")}>승인</button>
