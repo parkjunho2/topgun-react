@@ -23,6 +23,7 @@ import AdminFlight from './components/flight/AdminFlight.js';
 import Chat from './components/chat/Chat';
 import Notice from './components/notice/notice.js'; // Notice 컴포넌트 임포트
 import NoticeDetail from './components/notice/noticeDetail.js'; // 공지사항 상세 페이지 컴포넌트 임포트
+import Graph from './components/notice/graph'; // 대문자로 변경
 import MyPage from './components/MyPage/MyPage';
 import Booking from './components/booking/Booking.js';
 import PaymentList from "./components/payment/PaymentList.js";
@@ -154,6 +155,7 @@ const App = () => {
         {/* 공지사항 페이지 추가 */}
         <Route path="/notice" element={<Notice />} />  {/* Notice 페이지 경로 설정 */}
         <Route path="/notice/:id" element={<NoticeDetail />} />  {/* 공지사항 상세 페이지 경로 설정 */}
+        <Route path="/graph" element={<Graph />} /> // 대문자로 변경
 
 
         <Route path="*" element={<NotFound />} /> {/* 모든 잘못된 경로 처리 */}

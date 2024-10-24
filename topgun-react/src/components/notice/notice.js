@@ -208,13 +208,14 @@ const NoticeBoard = () => {
                                 </tr>
                                 <tr>
                                     <td colSpan="5">
-                                        <ReactQuill
-                                            ref={quillRef}
-                                            value={input.noticeContent} // 내용 필드 이름 변경
-                                            onChange={handleContentChange}
-                                            modules={modules}
-                                            style={{ height: '200px' }}
-                                        />
+                                    <ReactQuill
+                                    ref={quillRef} // ref 추가
+                                    value={input.content}
+                                    onChange={handleContentChange}
+                                    modules={modules}
+                                    placeholder="오른쪽 아래 선택자로 에디터 크기를 자유롭게 조절하세요!"
+                                    style={{ height: '290px', width: '110%', resize: 'vertical', overflowY: 'auto' }} // 너비를 100%로 설정
+                                />
                                     </td>
                                 </tr>
                             </>
