@@ -22,7 +22,7 @@
 }
 /* 달력의 위치 조정 */
 .lightpick--2-columns {
-    left: 20% !important;
+    left: 21% !important;
     top: 190px !important;
 }
 /* 하단부 버튼(Reset , Apply) */
@@ -74,8 +74,18 @@ button:disabled {
 }
 /* 가는편/오는편에 대한 div box*/
 .flight-select-div{
-    width: 1000px;
     border: 1px solid skyblue;
     border-radius: 0.5em;
     margin-left: 3px;
+}
+
+
+.auto-search {
+    position: absolute; /* 리스트를 부모 요소에 상대적으로 배치 */
+    z-index: 1000; /* 다른 요소 위에 표시되도록 z-index 설정 */
+    width: 100%; /* 검색창 너비에 맞춤 */
+    background-color: white; /* 리스트 배경색 */
+    border: 1px solid #ccc; /* 리스트 테두리 */
+    max-height: 300px; /* 리스트 최대 높이 설정 (스크롤 가능하게) */
+    overflow-y: auto; /* 리스트가 길어지면 스크롤 생성 */
 }

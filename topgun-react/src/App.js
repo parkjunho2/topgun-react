@@ -98,7 +98,7 @@ const App = () => {
   // 헤더를 숨길 경로 배열
   const noHeaderRoutes = ['/login', '/join'];
 
-  console.log("user = "+user.userName);
+  // console.log("user = "+user.userName);
 
   return (
     <>{/* ToastContainer 추가 */}
@@ -116,8 +116,8 @@ const App = () => {
         <Route path="/login" element={<Login />} /> {/* 로그인 */}
 
         {/* 예약페이지 */}
-        <Route path="/booking" element={<Booking />} />
-        <Route path="/bookingList" element={<BookingList/>} />
+        <Route path="/flight/booking/:flightId" element={<Booking />} />
+        <Route path="/flight/bookingList" element={<BookingList/>} />
 
         {/* 로그인 되어야지만 볼 수 있는 페이지 */}
         <Route element={<PrivateRoute />}>
