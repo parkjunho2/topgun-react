@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import ReactQuill from "react-quill"; // Quill 에디터 임포트
-import "react-quill/dist/quill.snow.css"; // 기본 스타일 임포트
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { useRecoilValue } from "recoil";
+import { loginState, userState } from "../../util/recoil";
 
 const NoticeDetail = () => {
-    const { id } = useParams(); // URL 파라미터에서 id 가져오기
+    const { id } = useParams();
     const navigate = useNavigate();
     const [notice, setNotice] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -15,6 +17,8 @@ const NoticeDetail = () => {
         author: '',
         createdAt: ''
     });
+    const login = useRecoilValue(loginState);
+    const user = useRecoilValue(userState); // Get user state for admin check
 
     const quillRef = useRef(null);
 
@@ -22,7 +26,7 @@ const NoticeDetail = () => {
         const loadNotice = async () => {
             if (!id) {
                 alert("Invalid notice ID");
-                navigate('/notice'); // 알림 후 목록으로 이동
+                navigate('/notice');
                 return;
             }
             try {
@@ -39,24 +43,21 @@ const NoticeDetail = () => {
             }
         };
         loadNotice();
-    }, [id]);
+    }, [id, navigate]);
 
     const handleUpdate = async () => {
         const content = quillRef.current ? quillRef.current.getEditor().root.innerHTML : '';
         try {
             await axios.put(`http://localhost:8080/notice/${id}`, { ...updatedNotice, content });
             alert('공지사항이 수정되었습니다!');
-
-            // 수정 완료 후 에디터를 비활성화 설정
             setIsEditing(false);
-            navigate(`/notice/${id}`); // 수정 후 상세 페이지로 이동
+            navigate(`/notice/${id}`);
         } catch (error) {
             console.error("Failed to update notice:", error);
             alert('수정 실패. 다시 시도해 주세요.');
         }
     };
 
-    // 이미지 업로드 핸들러
     const handleImageUpload = () => {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -67,15 +68,15 @@ const NoticeDetail = () => {
             const file = input.files[0];
             const reader = new FileReader();
             reader.onloadend = () => {
-                const quill = quillRef.current.getEditor(); // Quill 인스턴스 가져오기
+                const quill = quillRef.current.getEditor();
                 const range = quill.getSelection();
                 if (range) {
-                    quill.insertEmbed(range.index, 'image', reader.result); // 데이터 URL을 사용하여 이미지 삽입
-                    quill.setSelection(range.index + 1, 0); // 커서를 이미지 뒤로 이동
+                    quill.insertEmbed(range.index, 'image', reader.result);
+                    quill.setSelection(range.index + 1, 0);
                 }
             };
             if (file) {
-                reader.readAsDataURL(file); // 파일을 URL로 변환
+                reader.readAsDataURL(file);
             }
         };
     };
@@ -86,19 +87,18 @@ const NoticeDetail = () => {
                 [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
                 [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                 ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                ['link', 'image'], // 이미지 버튼 추가
+                ['link', 'image'],
                 [{ 'align': [] }],
                 [{ 'color': [] }, { 'background': [] }],
                 ['clean']
             ],
             handlers: {
-                'image': handleImageUpload // 이미지 버튼 핸들러
+                'image': handleImageUpload
             }
         }
-    }), []); // 빈 배열로 의존성을 지정하여 재렌더링 방지
+    }), []);
 
     if (!notice) return <div>Loading...</div>;
-
     return (
         <div style={styles.container}>
             {isEditing ? (
@@ -115,7 +115,7 @@ const NoticeDetail = () => {
                         ref={quillRef}
                         value={updatedNotice.content}
                         onChange={(content) => setUpdatedNotice({ ...updatedNotice, content })}
-                        modules={modules} // 모듈 추가
+                        modules={modules}
                         style={styles.quillEditor}
                     />
                 </div>
@@ -140,22 +140,22 @@ const NoticeDetail = () => {
                         <a className="arrow-btn" href="#" onClick={handleUpdate} style={{ marginRight: '19px', color: '#ec7393' }}>
                             confirm
                         </a>
-                        <a className="arrow-btn" href="#" onClick={() => navigate('/notice')} style={{ color: '#ccc' }}> {/* 클릭 시 리스트 페이지로 이동 */}
+                        <a className="arrow-btn" href="#" onClick={() => navigate('/notice')} style={{ color: '#ccc' }}>
                             exit
                         </a>
-                        {/* <button style={styles.primaryButton} onClick={handleUpdate}>수정하기</button> */}
-                        {/* <button style={styles.secondaryButton} onClick={() => setIsEditing(false)}>취소하기</button> */}
                     </>
                 ) : (
-                    <a className="arrow-btn" href="#" onClick={() => setIsEditing(true)} style={{ marginRight: '19px', color: '#ec7393' }}>
-                        EDIT
-                    </a>
-                    // <button style={styles.editButton} onClick={() => setIsEditing(true)}>수정하기</button>
+                    login && user.userType === 'ADMIN' && ( // 관리자일 때만 수정 버튼 표시
+                        <a className="arrow-btn" href="#" onClick={() => setIsEditing(true)} style={{ marginRight: '19px', color: '#ec7393' }}>
+                            EDIT
+                        </a>
+                    )
                 )}
             </div>
         </div>
     );
 };
+
 
 // 스타일 객체
 const styles = {
