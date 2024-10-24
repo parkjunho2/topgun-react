@@ -63,26 +63,22 @@ const PaymentSuccess=()=>{
 
         else if(result){
         return(<>
-        <h1>결제 성공 했습니다.</h1>
-        <h1>partnerOrderId: {partnerOrderId}</h1>
-        <h1>pg_token : {new URLSearchParams(window.location.search).get("pg_token")}</h1>
-        <h1>tid:{window.sessionStorage.getItem("tid")}</h1>
         <div className="row mt-4">
             <div className="col">
                 <table className="table">
-                    <thead>
-                        <tr>
-                            <th>좌석번호</th>
-                            <th>좌석등급</th>
-                            <th>가격</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                   <tbody>
+                    <tr>
+                        <th>좌석번호</th>
+                        <th>좌석등급</th>
+                        <th>가격</th>
+                        <th>여권번호</th>
+                    </tr>
                         {seatsList.map(seats=>(
                             <tr key={seats.seatsNo}>
                                 <td>{seats.seatsNo}</td>
                                 <td>{seats.seatsRank}</td>
                                 <td>{seats.seatsPrice}원</td>
+                                <td><input type="text"/></td>{/* 업데이트 필요 detail 정보 */}
                             </tr>
                         ))}
                     </tbody>
@@ -95,6 +91,7 @@ const PaymentSuccess=()=>{
                 </table>
             </div>
         </div>
+
         </>);
         }
         else{
