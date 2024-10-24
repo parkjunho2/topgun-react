@@ -12,13 +12,13 @@ const NoticeDetail = () => {
     const [notice, setNotice] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [updatedNotice, setUpdatedNotice] = useState({
-        title: '',
-        content: '',
-        author: '',
-        createdAt: ''
+        noticeTitle: '',
+        noticeContent: '',
+        noticeAuthor: '',
+        noticeCreatedAt: ''
     });
     const login = useRecoilValue(loginState);
-    const user = useRecoilValue(userState); // Get user state for admin check
+    const user = useRecoilValue(userState);
 
     const quillRef = useRef(null);
 
@@ -33,10 +33,10 @@ const NoticeDetail = () => {
                 const response = await axios.get(`http://localhost:8080/notice/${id}`);
                 setNotice(response.data);
                 setUpdatedNotice({
-                    title: response.data.title,
-                    content: response.data.content,
-                    author: response.data.author,
-                    createdAt: response.data.createdAt
+                    noticeTitle: response.data.noticeTitle,
+                    noticeContent: response.data.noticeContent,
+                    noticeAuthor: response.data.noticeAuthor,
+                    noticeCreatedAt: response.data.noticeCreatedAt
                 });
             } catch (error) {
                 console.error("Failed to load notice:", error);
@@ -48,13 +48,35 @@ const NoticeDetail = () => {
     const handleUpdate = async () => {
         const content = quillRef.current ? quillRef.current.getEditor().root.innerHTML : '';
         try {
-            await axios.put(`http://localhost:8080/notice/${id}`, { ...updatedNotice, content });
+            await axios.put(`http://localhost:8080/notice/${id}`, { ...updatedNotice, noticeContent: content });
             alert('공지사항이 수정되었습니다!');
             setIsEditing(false);
-            navigate(`/notice/${id}`);
+            
+            // 수정된 공지사항을 다시 불러오기
+            await loadNotice();
         } catch (error) {
             console.error("Failed to update notice:", error);
             alert('수정 실패. 다시 시도해 주세요.');
+        }
+    };
+
+    const loadNotice = async () => {
+        if (!id) {
+            alert("Invalid notice ID");
+            navigate('/notice');
+            return;
+        }
+        try {
+            const response = await axios.get(`http://localhost:8080/notice/${id}`);
+            setNotice(response.data);
+            setUpdatedNotice({
+                noticeTitle: response.data.noticeTitle,
+                noticeContent: response.data.noticeContent,
+                noticeAuthor: response.data.noticeAuthor,
+                noticeCreatedAt: response.data.noticeCreatedAt
+            });
+        } catch (error) {
+            console.error("Failed to load notice:", error);
         }
     };
 
@@ -107,27 +129,27 @@ const NoticeDetail = () => {
                     <input
                         type="text"
                         style={styles.titleInput}
-                        value={updatedNotice.title}
-                        onChange={(e) => setUpdatedNotice({ ...updatedNotice, title: e.target.value })}
+                        value={updatedNotice.noticeTitle}
+                        onChange={(e) => setUpdatedNotice({ ...updatedNotice, noticeTitle: e.target.value })}
                         placeholder="제목을 입력하세요"
                     />
                     <ReactQuill
                         ref={quillRef}
-                        value={updatedNotice.content}
-                        onChange={(content) => setUpdatedNotice({ ...updatedNotice, content })}
+                        value={updatedNotice.noticeContent}
+                        onChange={(content) => setUpdatedNotice({ ...updatedNotice, noticeContent: content })}
                         modules={modules}
                         style={styles.quillEditor}
                     />
                 </div>
             ) : (
                 <div style={styles.viewMode}>
-                    <h1 style={styles.title}>{notice.title}</h1>
+                    <h1 style={styles.title}>{notice.noticeTitle}</h1>
                     <hr style={styles.divider} />
-                    <h4>작성자: {notice.author}</h4>
-                    <p>작성일: {notice.createdAt}</p>
+                    <h4>작성자: {notice.noticeAuthor}</h4>
+                    <p>작성일: {notice.noticeCreatedAt}</p>
                     <div style={styles.noticeContent}>
                         <ReactQuill
-                            value={notice.content}
+                            value={notice.noticeContent}
                             readOnly={true}
                             theme="bubble"
                         />
@@ -145,7 +167,7 @@ const NoticeDetail = () => {
                         </a>
                     </>
                 ) : (
-                    login && user.userType === 'ADMIN' && ( // 관리자일 때만 수정 버튼 표시
+                    login && user.userType === 'ADMIN' && (
                         <a className="arrow-btn" href="#" onClick={() => setIsEditing(true)} style={{ marginRight: '19px', color: '#ec7393' }}>
                             EDIT
                         </a>
@@ -156,7 +178,6 @@ const NoticeDetail = () => {
     );
 };
 
-
 // 스타일 객체
 const styles = {
     container: {
@@ -164,7 +185,7 @@ const styles = {
         margin: '20px auto',
         padding: '20px',
         backgroundColor: 'transparent',
-        position: 'relative', // 위치 조정을 위해 relative로 설정
+        position: 'relative',
     },
     title: {
         textAlign: 'center',
@@ -174,58 +195,57 @@ const styles = {
         width: '100%',
         padding: '10px',
         marginBottom: '15px',
-        border: '1px solid #ccc', // 얇은 테두리 설정
+        border: '1px solid #ccc',
         borderRadius: '4px',
         fontSize: '16px',
     },
-
     buttonContainer: {
         display: 'flex',
-        justifyContent: 'flex-end', // 버튼들을 오른쪽으로 정렬
-        position: 'absolute', // 버튼 컨테이너를 절대 위치로 설정
-        top: '20px', // 선과 겹치지 않도록 위치 조정
-        right: '20px', // 오른쪽으로 조정
-        marginTop: '0', // 상단 마진 제거
-        marginBottom: '0', // 하단 마진 제거
+        justifyContent: 'flex-end',
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        marginTop: '0',
+        marginBottom: '0',
     },
     primaryButton: {
-        padding: '10px 15px', // 패딩 조정
-        border: 'none', // 테두리 없애기
+        padding: '10px 15px',
+        border: 'none',
         borderRadius: '4px',
         cursor: 'pointer',
-        backgroundColor: '#ec7393', // 분홍색 버튼
+        backgroundColor: '#ec7393',
         color: 'white',
-        marginRight: '10px', // 버튼 간격 조정
-        transition: 'background-color 0.3s ease', // 배경색 전환 효과
-        fontSize: '16px', // 글씨 크기 조정
+        marginRight: '10px',
+        transition: 'background-color 0.3s ease',
+        fontSize: '16px',
     },
     primaryButtonHover: {
-        backgroundColor: '#d6286b', // 호버 시 색상
+        backgroundColor: '#d6286b',
     },
     secondaryButton: {
-        padding: '10px 15px', // 패딩 조정
-        border: 'none', // 테두리 없애기
+        padding: '10px 15px',
+        border: 'none',
         borderRadius: '4px',
         cursor: 'pointer',
-        backgroundColor: '#ccc', // 취소 버튼 색상
+        backgroundColor: '#ccc',
         color: 'black',
-        transition: 'background-color 0.3s ease', // 배경색 전환 효과
-        fontSize: '16px', // 글씨 크기 조정
+        transition: 'background-color 0.3s ease',
+        fontSize: '16px',
     },
     secondaryButtonHover: {
-        backgroundColor: '#b3b3b3', // 호버 시 색상
+        backgroundColor: '#b3b3b3',
     },
     editButton: {
         marginTop: '25px',
-        padding: '10px 15px', // 패딩 조정
+        padding: '10px 15px',
         borderRadius: '4px',
-        border: 'none', // 테두리 없애기
+        border: 'none',
         cursor: 'pointer',
         margin: '10px',
-        backgroundColor: '#ec7393', // 분홍색 버튼
+        backgroundColor: '#ec7393',
         color: 'white',
-        transition: 'background-color 0.3s ease', // 배경색 전환 효과
-        fontSize: '16px', // 글씨 크기 조정
+        transition: 'background-color 0.3s ease',
+        fontSize: '16px',
     },
     noticeContent: {
         margin: '20px 0',
@@ -238,11 +258,11 @@ const styles = {
         marginTop: '20px',
     },
     quillEditor: {
-        height: '500px', // 높이를 500px로 설정
-        marginBottom: '40px', // 에디터 아래쪽 마진 조정
+        height: '500px',
+        marginBottom: '40px',
     },
     divider: {
-        border: '1px solid #e3305f', // 구분선 색상
+        border: '1px solid #e3305f',
         margin: '20px 0',
     },
 };
