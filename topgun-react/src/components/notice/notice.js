@@ -6,15 +6,15 @@ import ReactQuill from "react-quill";
 import { useRecoilValue } from "recoil"; // Recoil 상태 불러오기
 import { loginState, userState } from "../../util/recoil"; // Recoil atoms
 import 'react-quill/dist/quill.snow.css';
-//import './noticeButton.css'; // 프레임 라인 버튼 스타일을 포함한 CSS 파일
+import './noticeButton.css'; // 프레임 라인 버튼 스타일을 포함한 CSS 파일
 
 const NoticeBoard = () => {
     const [noticeList, setNoticeList] = useState([]);
     const [input, setInput] = useState({
-        title: "",
-        content: "",
-        author: "",
-        createdAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+        noticeTitle: "", // 제목 필드 이름 변경
+        noticeContent: "", // 내용 필드 이름 변경
+        noticeAuthor: "", // 작성자 필드 이름 변경
+        noticeCreatedAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
     });
     const quillRef = useRef(null);
 
@@ -60,7 +60,7 @@ const NoticeBoard = () => {
     const handleContentChange = useCallback(value => {
         setInput(prevInput => ({
             ...prevInput,
-            content: value
+            noticeContent: value // 내용 필드 이름 변경
         }));
     }, []);
 
@@ -71,10 +71,10 @@ const NoticeBoard = () => {
         }
 
         const newNotice = {
-            title: input.title,
-            content: input.content,
-            author: `${user.userId} (${user.userType})`, // ID와 타입을 함께 설정
-            createdAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+            noticeTitle: input.noticeTitle, // 제목 필드 이름 변경
+            noticeContent: input.noticeContent, // 내용 필드 이름 변경
+            noticeAuthor: `${user.userId} (${user.userType})`, // 작성자 필드 이름 변경
+            noticeCreatedAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
         };
 
         try {
@@ -89,10 +89,10 @@ const NoticeBoard = () => {
 
     const clearInput = useCallback(() => {
         setInput({
-            title: "",
-            content: "",
-            author: "",
-            createdAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+            noticeTitle: "", // 제목 필드 이름 변경
+            noticeContent: "", // 내용 필드 이름 변경
+            noticeAuthor: "", // 작성자 필드 이름 변경
+            noticeCreatedAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
         });
     }, []);
 
@@ -157,11 +157,11 @@ const NoticeBoard = () => {
                                 <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeId}</td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
                                     <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                        {notice.title}
+                                        {notice.noticeTitle} {/* 제목 필드 이름 변경 */}
                                     </Link>
                                 </td>
-                                <td style={{ padding: '15px', textAlign: 'center' }}>{notice.author}</td>
-                                <td style={{ padding: '15px', textAlign: 'center' }}>{notice.createdAt}</td>
+                                <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeAuthor}</td> {/* 작성자 필드 이름 변경 */}
+                                <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeCreatedAt}</td> {/* 생성일 필드 이름 변경 */}
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
                                     {login && ( // 로그인 상태일 때만 쓰레기통 아이콘 표시
                                         <FaTrash
@@ -183,13 +183,11 @@ const NoticeBoard = () => {
                                     <td>
                                         <input type="text" className="form-control"
                                             placeholder="제목"
-                                            name="title"
-                                            value={input.title}
+                                            name="noticeTitle" // 제목 필드 이름 변경
+                                            value={input.noticeTitle} // 제목 필드 이름 변경
                                             onChange={changeInput} />
                                     </td>
-                                    <td>
-
-                                    </td>
+                                    <td></td>
                                     <td style={{ textAlign: 'center', padding: '15px' }}>
                                         <div style={{ marginBottom: '52px' }}>
                                             <a className="frame-btn" href="#" onClick={addInput}>
@@ -209,14 +207,13 @@ const NoticeBoard = () => {
                                     <td></td>
                                 </tr>
                                 <tr>
-                                    <td colSpan="4" style={{ padding: '15px' }}>
+                                    <td colSpan="5">
                                         <ReactQuill
-                                            ref={quillRef} // ref 추가
-                                            value={input.content}
+                                            ref={quillRef}
+                                            value={input.noticeContent} // 내용 필드 이름 변경
                                             onChange={handleContentChange}
                                             modules={modules}
-                                            placeholder="오른쪽 아래 선택자로 에디터 크기를 자유롭게 조절하세요!"
-                                            style={{ height: '290px', width: '110%', resize: 'vertical', overflowY: 'auto' }} // 너비를 100%로 설정
+                                            style={{ height: '200px' }}
                                         />
                                     </td>
                                 </tr>
