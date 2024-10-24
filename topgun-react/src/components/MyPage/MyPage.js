@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../../util/recoil";
 import moment from 'moment';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS import
@@ -9,19 +9,48 @@ import './Mypage.css'; // 스타일을 위한 CSS 파일
 import DatePicker from "react-datepicker";
 // Handle save click
 import { toast } from 'react-toastify';
+import { useNavigate } from "react-router";
 
 const MyPage = () => {
+
+
+
     // Recoil
+    const [baseduser, setBasedUser] = useRecoilState(userState);
+
     const user = useRecoilValue(userState);
+
+    // navigate
+    const navigate = useNavigate();
 
     //ref
     const modalRef = useRef(null);
+    const imgRef = useRef(null); // 이미지 요소를 참조하기 위한 ref
 
     // State
     const [userInfo, setUserInfo] = useState(null); // 상태 초기화
     const [isEditing, setIsEditing] = useState(false); // 편집 모드 상태 추가
     const [editedUserInfo, setEditedUserInfo] = useState(null); // 편집할 사용자 정보 상태 추가
     const [checkPw, setCheckPw] = useState(''); // 체크 비밀번호
+    const [delPw, setDelPw] = useState(''); // 탈퇴시 비밀번호
+    const [buttonStyle, setButtonStyle] = useState({}); // 버튼 스타일 상태
+    const [isHovered, setIsHovered] = useState(false);
+    // 이미지 상태 관리
+    const [imageSrc, setImageSrc] = useState("https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp");
+
+    const MouseEnter = () => {
+        setIsHovered(true);
+        if (imgRef.current) {
+            const rect = imgRef.current.getBoundingClientRect(); // 이미지의 위치 및 크기 정보 가져오기
+            setButtonStyle(rect);
+        }
+    };
+
+    const MouseLeave = () => {
+        setIsHovered(false);
+    };
+
+
 
     // Callback
     const loadMyInfo = useCallback(async () => {
@@ -39,20 +68,123 @@ const MyPage = () => {
         }
     }, [user]); // user를 의존성 배열에 추가
 
+    // 2. 이미지 다운로드 및 렌더링
+    const fetchProfileImage = useCallback(async (attachmentNo) => {
+        try {
+            const imageResponse = await axios.get(`http://localhost:8080/attach/download?attachmentNo=${attachmentNo}`, {
+                responseType: 'blob' // 파일을 Blob 형태로 받아오기
+            });
+            if (imageResponse && imageResponse.data) {
+                if (imageResponse.data instanceof Blob) { // Blob인지 확인
+                    const imageUrl = URL.createObjectURL(new Blob([imageResponse.data])); // Blob 데이터를 URL로 변환
+                    setImageSrc(imageUrl); // 상태 업데이트로 이미지 렌더링
+                } else {
+                }
+            } else {
+                toast.error('이미지 응답이 유효하지 않습니다'); // 실패 메시지
+            }
+        } catch (error) {
+        }
+    }, [setImageSrc]);
+
+    // 1. 이미지 번호 가져오기
+    const fetchImageNumber = useCallback(async () => {
+        try {
+            const response = await axios.post('http://localhost:8080/users/myImage', {});
+            const attachmentNo = response.data;
+            if (attachmentNo !== -1) {
+                fetchProfileImage(attachmentNo);
+            } else {
+            }
+        } catch (error) {
+            toast.error('이미지 번호 요청 실패:'); // 실패 메시지
+        }
+    }, [fetchProfileImage]);
+
+    // 이미지 업로드 핸들러
+    const ImageUpload = useCallback(async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('attach', file);
+
+            try {
+                await axios.post('http://localhost:8080/users/profile', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    }
+                });
+                toast.success('프로필 이미지 업로드 성공');
+                fetchImageNumber(); // 이미지 업로드 후 새 이미지 가져오기
+            } catch (error) {
+                // data가 false일 경우
+                toast.error('프로필 이미지 업로드 에러:'); // 실패 메시지
+            }
+        }
+    }, [fetchImageNumber]);
+
+    // 컴포넌트 렌더링 시 이미지 번호 요청
+    useEffect(() => {
+        fetchImageNumber();
+    }, [fetchImageNumber]);
+
+
     // Effect
     useEffect(() => {
         loadMyInfo(); // 컴포넌트 마운트 시 사용자 정보 로드
-    }, []); // loadMyInfo를 의존성 배열에 추가
+    }, []);
+
 
     // Handle input change
     const handleInputChange = (e) => {
-        const { name, value } = e.target || {}; // e.target이 없을 수도 있으니 기본값으로 빈 객체를 설정
+        // e.target이 없을 수도 있으니 기본값으로 빈 객체를 설정
+        const { name, value } = e.target || {};
 
+        // memberBirth일 경우 Date로 변환
         setEditedUserInfo((prev) => ({
             ...prev,
-            [name]: name === 'memberBirth' ? new Date(value) : value, // memberBirth일 경우 Date로 변환
+            [name]: name === 'memberBirth' ? new Date(value) : value,
         }));
     };
+
+    const deleteUser = useCallback(async () => {
+        if (!user || !user.userId || !user.userType) return; // user가 유효한지 확인
+
+        try {
+            const resp = await axios.delete('http://localhost:8080/users/delete', {
+                data: {
+                    userId: user.userId,
+                    delPw: delPw,
+                },
+            });
+
+            // 응답의 data가 true인 경우
+            if (resp.data) {
+                toast.success('이용해주셔서 감사합니다!', {
+                    position: "top-center",
+                    onClose: () => {
+                        setTimeout(() => {
+                            setBasedUser({ userId: '', userType: '' });
+                            delete axios.defaults.headers.common["Authorization"];
+                            window.localStorage.removeItem("refreshToken");
+                            window.sessionStorage.removeItem("refreshToken");
+                            navigate('/'); // 2초 후에 /로 네비게이트
+                        }, 1500); // 2000ms (2초) 대기
+                    },
+                });
+            } else {
+                // 응답이 false인 경우의 처리 (필요하다면)
+                toast.error('탈퇴 처리에 실패했습니다.', {
+                    position: "top-center",
+                });
+            }
+        } catch (error) {
+            setDelPw(''); // 비밀번호 초기화
+            toast.error('탈퇴 처리에러', {
+                position: "top-center",
+            });
+        }
+    }, [user, delPw, navigate, setBasedUser]);
 
     const saveEdit = useCallback(async () => {
         try {
@@ -61,22 +193,19 @@ const MyPage = () => {
                     authPassword: checkPw // authPassword를 쿼리 파라미터로 전달
                 }
             });
-    
-            // 요청이 성공하면 처리할 내용
-            console.log('성공:', response.data);
-    
+
             if (response.data === true) {
                 // data가 true일 경우
                 toast.success('정보가 성공적으로 수정되었습니다!'); // 성공 메시지
-    
+
                 // 체크 비밀번호 초기화
                 setCheckPw('');
                 // 수정 모드 초기화
                 setIsEditing(false);
-    
+
                 // 저장내용 리로드
                 loadMyInfo();
-    
+
             } else {
                 // data가 false일 경우
                 toast.error('정보 수정에 실패했습니다.'); // 실패 메시지
@@ -93,7 +222,7 @@ const MyPage = () => {
             setIsEditing(false);
         }
     }, [editedUserInfo, checkPw, modalRef]);
-    
+
 
 
 
@@ -118,12 +247,58 @@ const MyPage = () => {
                     <div className="col-lg-4">
                         <div className="card border-0 mb-4 shadow-sm">
                             <div className="card-body text-center">
-                                <img
-                                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
-                                    alt="avatar"
-                                    className="rounded-circle img-fluid"
-                                    style={{ width: "150px" }}
-                                />
+                                <div className="position-relative" id="ImageWrapper"
+                                    onMouseEnter={MouseEnter} // 호버 시 상태 업데이트
+                                    onMouseLeave={MouseLeave} // 호버 해제 시 상태 업데이트
+                                    style={{ display: 'inline-block' }} // 추가된 부분
+                                >
+                                    <img
+                                        ref={imgRef}
+                                        src={imageSrc}
+                                        alt="avatar"
+                                        //이미지가 찌그러질 것인가 말 것인가
+                                        className="rounded-circle img-thumbnail"
+                                        style={{ width: "150px", height: "150px", objectFit: "cover" }}
+
+                                    />
+                                    <div style={{
+                                        position: "absolute", // position을 absolute로 설정하여 부모 요소를 기준으로 위치
+                                        top: '50%', // 수직 중앙 정렬
+                                        left: '50%', // 수평 중앙 정렬
+                                        transform: 'translate(-50%, -50%)', // 중앙 정렬을 위한 변환
+                                        zIndex: 10, // z-index를 높여서 다른 요소 위에 표시
+                                        display: isHovered ? 'flex' : 'none', // 마우스가 호버할 때만 표시
+                                        justifyContent: 'center', // 수평 중앙 정렬
+                                        alignItems: 'center', // 수직 중앙 정렬
+                                        width: '100%', // 버튼의 너비
+                                        height: '100%', // 버튼의 높이
+                                    }}>
+                                        <label
+                                            htmlFor="file-upload"
+                                            className="rounded-circle"
+                                            style={{
+                                                backgroundColor: 'rgba(128, 128, 128, 0.25)', // 회색 배경색, 투명도 0.25
+                                                color: 'white', // 글자색 설정
+                                                borderRadius: '50%', // 버튼을 원형으로 만들기
+                                                cursor: 'pointer', // 커서를 포인터로 변경
+                                                width: '150px', // 원하는 너비로 설정
+                                                height: buttonStyle.height, // 원하는 높이로 설정
+                                                display: 'flex', // 플렉스 박스 사용
+                                                justifyContent: 'center', // 수평 중앙 정렬
+                                                alignItems: 'center', // 수직 중앙 정렬
+                                            }}
+                                        >
+                                            +
+                                        </label>
+                                        <input
+                                            id="file-upload"
+                                            type="file"
+                                            onChange={ImageUpload} // 파일 업로드 핸들러
+                                            style={{ display: 'none' }} // 숨김 처리
+                                            accept="image/*" // 이미지만 허용
+                                        />
+                                    </div>
+                                </div>
                                 <h5 className="my-3">{userInfo ? userInfo.usersName : "Loading..."}</h5>
                                 <p className="text-muted mb-1">{userInfo ? (userInfo.usersType === 'AIRLINE' ? "Airline" : userInfo.usersType) : ""}</p>
                                 <p className="text-muted mb-1"><big>{userInfo ? userInfo.usersEmail : "Loading..."}</big></p>
@@ -154,12 +329,19 @@ const MyPage = () => {
                                     </button>
                                 </>
                             ) : (
-                                <button type="button" onClick={() => {
-                                    setIsEditing(true);
-                                    setEditedUserInfo(userInfo); // 서버에서 받은 데이터를 수정을 위한 state에 업데이트
-                                }} className="btn btn-primary w-100 shadow-sm">
-                                    정보 수정 하기
-                                </button>
+                                <>
+                                    <button type="button" onClick={() => {
+                                        setIsEditing(true);
+                                        setEditedUserInfo(userInfo); // 서버에서 받은 데이터를 수정을 위한 state에 업데이트
+                                    }} className="btn btn-primary w-100 shadow-sm">
+                                        정보 수정 하기
+                                    </button>
+                                    <button type="button" onClick={() => {
+                                        // deleteUser
+                                    }} className="btn btn-danger w-100 shadow-sm mt-3" data-bs-toggle="modal" data-bs-target="#DeleteForm">
+                                        회원탈퇴
+                                    </button>
+                                </>
                             )}
                         </div>
 
@@ -579,7 +761,7 @@ const MyPage = () => {
                 </div>
             </div>
 
-            {/* 모달 기본 폼 */}
+            {/* 모달 수정 폼 */}
             <div
                 className="modal fade"
                 id="EditForm"
@@ -630,8 +812,60 @@ const MyPage = () => {
                     </div>
                 </div>
             </div>
-        </section>
 
+
+
+            {/* 회원 탈퇴시 사용할 폼 */}
+            <div
+                className="modal fade"
+                id="DeleteForm"
+                data-bs-backdrop="static"
+                data-bs-keyboard="false"
+                tabIndex="-1"
+                aria-labelledby="staticBackdropLabel"
+            >
+                <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">회원 탈퇴</h5>
+                        </div>
+                        <div className="modal-body">
+
+                            <p>회원 탈퇴를 위해 비밀번호를 입력해주세요</p>
+                            <div className="form-floating">
+                                <input
+                                    type="password"
+                                    value={delPw}
+                                    onChange={(e) => setDelPw(e.target.value)}
+                                    className="form-control"
+                                    id="floatingDelPassword" placeholder="Password"
+                                />
+                                <label htmlFor="floatingDelPassword">비밀번호</label>
+                            </div>
+                        </div>
+                        <div className="modal-footer d-flex">
+                            <button
+                                type="button"
+                                className="btn btn-secondary flex-fill me-1" // 오른쪽 여백 추가
+                                data-bs-dismiss="modal"
+                                onClick={e => setDelPw('')}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-primary flex-fill ms-1" // 왼쪽 여백 추가
+                                data-bs-dismiss="modal"
+                                onClick={deleteUser}
+                            >
+                                Confirm
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
     );
 };
 
