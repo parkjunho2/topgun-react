@@ -4,6 +4,10 @@ import * as am4maps from "@amcharts/amcharts4/maps";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4geodata_worldLow from "@amcharts/amcharts4-geodata/worldLow";
 import { Bar, Line } from "react-chartjs-2";
+import { Chart, registerables } from 'chart.js';
+
+// Chart.js의 모든 등록 가능한 요소를 등록
+Chart.register(...registerables);
 
 function WorldMapWithGraphs(props) {
   useEffect(() => {
