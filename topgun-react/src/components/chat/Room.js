@@ -21,19 +21,21 @@ const Room = ()=>{
 
     //state
     const [roomList, setRoomList] = useState([]);
+    const [airlineName, setAirlineName] = useState("");
     
-    console.log(user.userName);
     //effect
     useEffect(()=>{
         loadRoomList();
     },[]);
 
+    // console.log("항공사이름:", {airlineName});
+
     //callback
     const loadRoomList = useCallback(async ()=>{
         const resp = await axios.get("http://localhost:8080/room/");
-        console.log(resp);
+        // console.log(resp);
 
-        //userType에 따라 목록 필터링
+    //userType에 따라 목록 필터링
     const filterRoomList = resp.data.filter(room=>{
         if(user.userType === "ADMIN" || user.userType === "AIRLINE" || user.userType === "MEMBER"){
             return room.roomNo === 1 || room.roomNo === 2 || room.roomNo === 3;
@@ -42,6 +44,8 @@ const Room = ()=>{
     });
         setRoomList(filterRoomList);
     },[roomList, userState]);
+
+    console.log("액세스토큰 : ", accessToken);
 
     const enterRoom = useCallback(async (target)=>{
         if(target.join === 'Y'){

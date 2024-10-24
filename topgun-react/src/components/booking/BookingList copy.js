@@ -1,21 +1,51 @@
-import './FlightTicketSearch.css'
-import 'lightpick/css/lightpick.css';
-import './MainPage.css'
+import './BookingList.css';
+import { GiCommercialAirplane } from "react-icons/gi";
+import { IoClose } from "react-icons/io5";
+import { useNavigate } from 'react-router';
 import { useCallback, useRef, useEffect, useState, useMemo } from "react";
+import { IoRemoveOutline } from "react-icons/io5";
+import { NavLink } from 'react-router-dom';
+import axios from 'axios';
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
 import Lightpick from 'lightpick';
-import moment from "moment";
-import { useNavigate } from 'react-router';
-import { IoClose } from "react-icons/io5";
+import moment from 'moment';
 import * as hangul from 'hangul-js';
 
-const MainPage = () => {
+const BookingList = () => {
+    //navigate
+    const navigate = useNavigate();
+    const [departureTime, setDepartureTime] = useState(12); // 출발 시간 초기 값 (시간.분 형태)
+    const [departureRightTime, setDepartureRightTime] = useState(12); // 출발 시간 초기 값 (시간.분 형태)
+
+    const [returnTime, setReturnTime] = useState(23.5); // 오는 편 시간 초기 값 (오후 11시 30분)
+    const [returnRightTime, setReturnRightTime] = useState(23.5); // 오는 편 시간 초기 값 (오후 11시 30분)
+
+    // 시간 포맷팅 함수 (24시간 -> 12시간 AM/PM, 분 포함)
+    const formatTime = (time) => {
+        const hour = Math.floor(time); // 정수부: 시간
+        const minute = (time % 1) === 0.5 ? 30 : 0; // 소수부 0.5는 30분
+        const hourIn12 = hour % 12 || 12;
+        const ampm = hour >= 12 ? '오후' : '오전';
+        return `${ampm} ${hourIn12}:${minute === 0 ? '00' : '30'}`;
+    };
+
+    const [flightList , setflightList] = useState([]);
+
     const [isSmallScreen, setIsSmallScreen] = useState(false);
 
+    //페이지 갱신 후 한번만 실행
+    useEffect(()=>{
+        loadFlightList();
+    },[]);
 
-  // 창 크기 변화 감지
-  useEffect(() => {
+    const loadFlightList = useCallback(async()=>{
+        const resp = await axios.get("http://localhost:8080/flight/");
+        setflightList(resp.data);
+    },[flightList]);
+
+ // 창 크기 변화 감지
+ useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth <= 768);  // 768px 이하일 때 true
     };
@@ -30,7 +60,7 @@ const MainPage = () => {
   }, []);
 
     //navigate
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     // state
     const [input, setInput] = useState({
@@ -60,7 +90,7 @@ const MainPage = () => {
             return window.alert("인원을 입력해주세요.");
         }
         else {
-            navigate("/booking");   //위의 항목들이 모두 pass라면 이동
+            navigate("/bookingList");   //위의 항목들이 모두 pass라면 이동
         }
     }, [input]);
 
@@ -388,21 +418,9 @@ const MainPage = () => {
 
     return (
         <>
-            {/* 캐러셀 */}
-                {/* 이미지1 */}
-            {/* <div className="row">
-                <div className="carousel-item active"> */}
-                    {/* <img
-                            src="https://picsum.photos/800/400"
-                            alt="Example image"
-                            className="bd-placeholder-img d-block w-100 h-100"
-                            aria-hidden="true"
-                            focusable="false"
-                            style={{ backgroundColor: 'var(--bs-secondary-color)', width: '100%', height: '100%' }} /> */}
-                {/* </div>
-            </div> */}
-            {/* 가는편 오는편 기능 구현 */}
-            <div className="flight-all-div mt-3" style={{        
+            <div className="row mt-4">
+                {/* 상단바에 대한 처리 구현 */}
+                <div className="flight-all-div mt-3" style={{        
                             marginLeft: isSmallScreen ? "0" : "20%"
                         }}>   {/* 전체 기능에 대한 div */}
                 <div className="row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
@@ -714,202 +732,104 @@ const MainPage = () => {
                     </div>
                 </div>
 
+                {/* 항공권에 대한 리스트를 출력 */}
+                <div className="col-md-3">
+                    <div style={{ padding: '20px', width: "70%" }}>
+                        <h3>출발 시간대 설정</h3>
+                        {/* 가는 날 출발시간 */}
+                        <div>
+                            <span style={{display:"block"}}>가는 날 출발시간 :</span>
+                            <span>{formatTime(departureTime)} ~ {formatTime(departureRightTime)}</span>
+                            <input type="range" min="0" max="23.5" step="0.5" // 30분 단위로 조절 가능
+                                value={departureTime} onChange={(e) => setDepartureTime(Number(e.target.value))}
+                                style={{ width: '100%' }} />
 
-            {/* Marketing messaging and featurettes
-  ================================================== */}
-            {/* Wrap the rest of the page in another container to center all the content. */}
-
-            {/* 수정예정 */}
-            <div className="container marketing">
-                {/* Three columns of text below the carousel */}
-                <div className="row">
-                    <div className="col-lg-4">
-                        <svg
-                            className="bd-placeholder-img rounded-circle"
-                            width={140}
-                            height={140}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                        </svg>
-                        <h2 className="fw-normal">Heading</h2>
-                        <p>
-                            Some representative placeholder content for the three columns of
-                            text below the carousel. This is the first column.
-                        </p>
-                        <p>
-                            <a className="btn btn-secondary" href="#">
-                                View details »
-                            </a>
-                        </p>
-                    </div>
-                    {/* /.col-lg-4 */}
-                    <div className="col-lg-4">
-                        <svg
-                            className="bd-placeholder-img rounded-circle"
-                            width={140}
-                            height={140}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                        </svg>
-                        <h2 className="fw-normal">Heading</h2>
-                        <p>
-                            Another exciting bit of representative placeholder content. This
-                            time, we've moved on to the second column.
-                        </p>
-                        <p>
-                            <a className="btn btn-secondary" href="#">
-                                View details »
-                            </a>
-                        </p>
-                    </div>
-                    {/* /.col-lg-4 */}
-                    <div className="col-lg-4">
-                        <svg
-                            className="bd-placeholder-img rounded-circle"
-                            width={140}
-                            height={140}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                        </svg>
-                        <h2 className="fw-normal">Heading</h2>
-                        <p>
-                            And lastly this, the third column of representative placeholder
-                            content.
-                        </p>
-                        <p>
-                            <a className="btn btn-secondary" href="#">
-                                View details »
-                            </a>
-                        </p>
-                    </div>
-                    {/* /.col-lg-4 */}
-                </div>
-                {/* /.row */}
-
-
-                {/* START THE FEATURETTES */}
-                <hr className="featurette-divider" />
-                <div className="row featurette">
-                    <div className="col-md-7">
-                        <h2 className="featurette-heading fw-normal lh-1">
-                            First featurette heading.{" "}
-                            <span className="text-body-secondary">It’ll blow your mind.</span>
-                        </h2>
-                        <p className="lead">
-                            Some great placeholder content for the first featurette here.
-                            Imagine some exciting prose here.
-                        </p>
-                    </div>
-                    <div className="col-md-5">
-                        <svg
-                            className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"
-                            width={500}
-                            height={500}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder: 500x500"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-bg)" />
-                            <text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">
-                                500x500
-                            </text>
-                        </svg>
+                            <input type="range" min="0" max="23.5" step="0.5" // 30분 단위로 조절 가능
+                                value={departureRightTime} onChange={(e) => setDepartureRightTime(Number(e.target.value))}
+                                style={{ width: '100%' }} />
+                        </div>
+                        {/* 오는 편 시간 */}
+                        <div>
+                            <p>오는 편: {formatTime(returnTime)} ~ {formatTime(23.5)}</p>
+                            <input
+                                type="range"
+                                min="0"
+                                max="23.5"
+                                step="0.5" // 30분 단위로 조절 가능
+                                value={returnTime}
+                                onChange={(e) => setReturnTime(Number(e.target.value))}
+                                style={{ width: '100%' }}
+                            />
+                        </div>
                     </div>
                 </div>
-                <hr className="featurette-divider" />
-                <div className="row featurette">
-                    <div className="col-md-7 order-md-2">
-                        <h2 className="featurette-heading fw-normal lh-1">
-                            Oh yeah, it’s that good.{" "}
-                            <span className="text-body-secondary">See for yourself.</span>
-                        </h2>
-                        <p className="lead">
-                            Another featurette? Of course. More placeholder content here to give
-                            you an idea of how this layout would work with some actual
-                            real-world content in place.
-                        </p>
+                {/* 항공편 리스트에 대한 기능 */}
+                <div className="col-md-5">
+                    <div className="d-flex mb-3">
+                        <span className="me-2">출발시간순 |</span>
+                        <span className="ms -2 me-2">도착시간순 |</span>
+                        <span className="ms -2 me-2">최저가순</span>
                     </div>
-                    <div className="col-md-5 order-md-1">
-                        <svg
-                            className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"
-                            width={500}
-                            height={500}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder: 500x500"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-bg)" />
-                            <text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">
-                                500x500
-                            </text>
-                        </svg>
-                    </div>
-                </div>
-                <hr className="featurette-divider" />
-                <div className="row featurette">
-                    <div className="col-md-7">
-                        <h2 className="featurette-heading fw-normal lh-1">
-                            And lastly, this one.{" "}
-                            <span className="text-body-secondary">Checkmate.</span>
-                        </h2>
-                        <p className="lead">
-                            And yes, this is the last block of representative placeholder
-                            content. Again, not really intended to be actually read, simply here
-                            to give you a better view of what this would look like with some
-                            actual content. Your content.
-                        </p>
-                    </div>
-                    <div className="col-md-5">
-                        <svg
-                            className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"
-                            width={500}
-                            height={500}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder: 500x500"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-bg)" />
-                            <text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">
-                                500x500
-                            </text>
-                        </svg>
+                    <div className="row">
+                        {flightList.map((flight) => (
+                            <NavLink to="/booking" style={{textDecoration:"none"}} key={flight.flightId}>
+                                <div className="row mt-3" style={{border:"1px solid black", borderRadius:"1.5em", width:"100%"}}>
+                                    <div className="row mt-3 mb-3 ms-1">
+                                        {/* 가는날 */}
+                                        <h3 style={{color:"black", fontWeight:"bold"}}>{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}<GiCommercialAirplane /></h3>
+                                            {/* <div className="row">
+                                                <span style={{color:"red"}}>(+1 day)</span>
+                                            </div> */}
+                                        <div className="d-flex mb-2" style={{justifyContent:"space-between"}}>
+                                            <div className="d-flex mt-3" style={{width:"300px" , justifyContent:"space-between"}}>
+                                                <span style={{width:"50%", textAlign:"center"}}>{flight.departureAirport}</span>
+                                                <span style={{width:"50%", textAlign:"center"}}>{moment(flight.departureTime).format("a HH:mm")}</span>
+                                            </div>
+                                            <div className="row" style={{width:"150px"}}>
+                                                <span style={{textAlign:"center"}}>{flight.flightTime}</span>
+                                                <span style={{textAlign:"center"}}>------------</span>
+                                                <span style={{textAlign:"center"}}>직항</span>
+                                            </div>
+                                            <div className="d-flex mt-3" style={{width:"300px" , justifyContent:"space-between"}}>
+                                                <span style={{width:"50%", textAlign:"center"}}>{moment(flight.arrivalTime).format("a HH:mm ")}</span>
+                                                <span style={{width:"50%", textAlign:"center"}}>{flight.arrivalAirport}</span>
+                                            </div>
+                                                
+                                        </div>
+
+                                        <hr/>
+                                        {/* 오는날 */}
+                                        <div className="d-flex mt-2" style={{justifyContent:"space-between"}}>
+                                            <div className="d-flex mt-4" style={{width:"300px" , justifyContent:"space-between"}}>
+                                                <span style={{width:"50%" , textAlign:"center"}}>{flight.arrivalAirport}</span>
+                                                <span className="ms-2" style={{width:"50%", textAlign:"center"}}>{moment(flight.arrivalTime).format("a HH:mm ")}</span>
+                                            </div>
+                                            <div className="row" style={{width:"150px"}}>
+                                                <span style={{textAlign:"center"}}>{flight.flightTime}</span>
+                                                <span style={{textAlign:"center"}}>------------</span>
+                                                <span style={{textAlign:"center"}}>직항</span>
+                                            </div>
+                                            <div className="d-flex mt-4" style={{width:"300px" , justifyContent:"space-between"}}>
+                                                <span style={{width:"50%", textAlign:"center"}}>{moment(flight.departureTime).format("a HH:mm")}</span>
+                                                <span style={{textAlign:"center" , width:"50%"}}>{flight.departureAirport}</span>
+                                            </div>
+                                        </div>
+                                        {/* <div className="d-flex">
+                                            <span>오전 06:50</span>
+                                            <span className="ms-2 me-2">---------</span>
+                                            <span>오전 08:30</span>
+                                        </div> */}
+                                    </div>
+                                </div>
+                            </NavLink>
+                        ))}
                     </div>
                 </div>
-                <hr className="featurette-divider" />
-                {/* /END THE FEATURETTES */}
 
             </div>
-            {/* /.container */}
-        </>
 
+        </>
     );
 };
 
-export default MainPage;
+export default BookingList;

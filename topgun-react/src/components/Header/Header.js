@@ -56,14 +56,14 @@ const Header = () => {
                                 </a>
                             </li>
                             <li>
-                                <a href="/flight" className="nav-link px-2 text-white">
+                                <NavLink to="/flight" className="nav-link px-2 text-white">
                                     flight
-                                </a>
+                                </NavLink>
                             </li>
                             <li>
-                                <a href="/admin/list" className="nav-link px-2 text-white">
+                                <NavLink to="/admin/list" className="nav-link px-2 text-white">
                                     AdminFlight
-                                </a>
+                                </NavLink>
                             </li>
                             <li>
                                 <NavLink to="/payment" className="nav-link px-2 text-white">
