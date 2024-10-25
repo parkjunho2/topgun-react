@@ -9,7 +9,6 @@ import './Mypage.css'; // 스타일을 위한 CSS 파일
 import DatePicker from "react-datepicker";
 // Handle save click
 import { toast } from 'react-toastify';
-import { useNavigate } from "react-router";
 
 const MyPage = () => {
 
@@ -19,9 +18,6 @@ const MyPage = () => {
     const [baseduser, setBasedUser] = useRecoilState(userState);
 
     const user = useRecoilValue(userState);
-
-    // navigate
-    const navigate = useNavigate();
 
     //ref
     const modalRef = useRef(null);
@@ -168,7 +164,6 @@ const MyPage = () => {
                             delete axios.defaults.headers.common["Authorization"];
                             window.localStorage.removeItem("refreshToken");
                             window.sessionStorage.removeItem("refreshToken");
-                            navigate('/'); // 2초 후에 /로 네비게이트
                         }, 1500); // 2000ms (2초) 대기
                     },
                 });
@@ -184,7 +179,7 @@ const MyPage = () => {
                 position: "top-center",
             });
         }
-    }, [user, delPw, navigate, setBasedUser]);
+    }, [user, delPw, setBasedUser]);
 
     const saveEdit = useCallback(async () => {
         try {
@@ -777,7 +772,6 @@ const MyPage = () => {
                             <h5 className="modal-title">정보 수정</h5>
                         </div>
                         <div className="modal-body">
-
                             <p>정보를 수정하기위해 비밀번호 입력:</p>
                             <div className="form-floating">
                                 <input
@@ -812,8 +806,6 @@ const MyPage = () => {
                     </div>
                 </div>
             </div>
-
-
 
             {/* 회원 탈퇴시 사용할 폼 */}
             <div

@@ -37,6 +37,7 @@ import { ToastContainer } from 'react-toastify';
 import PaymentDetail from "./components/payment/PaymentDetail.js";
 import FindPw from './components/ForgotPw/FindPw/FindPw';
 import ResetPw from './components/ForgotPw/ResetPw/ResetPw.js';
+import Seats from './components/flight/Seats/Seasts.js';
 
 
 
@@ -103,7 +104,7 @@ const App = () => {
     <>{/* ToastContainer 추가 */}
       <ToastContainer
         position="top-right" // 토스트 위치
-        autoClose={5000} // 자동 닫힘 시간
+        autoClose={2000} // 자동 닫힘 시간
         hideProgressBar={false} // 진행 바 표시 여부
         closeOnClick
         pauseOnHover
@@ -118,7 +119,8 @@ const App = () => {
 
         {/* 예약페이지 */}
         <Route path="/flight/booking/:flightId" element={<Booking />} />
-        <Route path="/flight/bookingList" element={<BookingList/>} />
+        <Route path="/flight/booking/:flightId/seats" element={<Seats />} />
+        <Route path="/flight/bookingList" element={<BookingList />} />
 
         {/* 로그인 되어야지만 볼 수 있는 페이지 */}
         <Route element={<PrivateRoute />}>
@@ -128,13 +130,13 @@ const App = () => {
           <Route path="/payment/fail" element={<PaymentFail />} />
           <Route path="/test" element={<Test />} />
           <Route path="/chat" element={<Chat />} />
-          <Route path='/mypage' element={<MyPage />}/>
-          <Route path='/payment/list' element={<PaymentList/>}/>
-          <Route path='/payment/alllist' element={<PaymentAllList/>}/>
-          <Route path="/chat/:roomNo" element={<Chat />} />
-          <Route path="/room" element={<Room/>} />
+          <Route path='/mypage' element={<MyPage />} />
           <Route path='/payment/list' element={<PaymentList />} />
-          <Route path='/payment/detail/:paymentNo' element={<PaymentDetail/>}/>
+          <Route path='/payment/alllist' element={<PaymentAllList />} />
+          <Route path="/chat/:roomNo" element={<Chat />} />
+          <Route path="/room" element={<Room />} />
+          <Route path='/payment/list' element={<PaymentList />} />
+          <Route path='/payment/detail/:paymentNo' element={<PaymentDetail />} />
         </Route>
 
 
@@ -142,14 +144,14 @@ const App = () => {
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/list" element={<AdminFlight />} />
-        <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
+          <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
         </Route>
 
         {/* 멤버만 못보는 페이지 -> ADMIN, AIRLINE만 가능 */}
         <Route element={<NotMemberRoute />}>
           <Route path="/airline" element={<AirLine />} />
-        <Route path="/flight" element={<Flight />} />
-        <Route path="/flight/detail/:flightId" element={<FlightDetail />} />
+          <Route path="/flight" element={<Flight />} />
+          <Route path="/flight/detail/:flightId" element={<FlightDetail />} />
         </Route>
 
 

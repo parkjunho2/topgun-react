@@ -18,7 +18,7 @@ const PrivateRoute = () => {
     }
 
     // 로그인 상태에 따라 Outlet을 렌더링
-    return login === true ? <Outlet /> : <Navigate to="/login" />;
+    return login === true ? <Outlet /> : <Navigate to="/" />;
 };
 
 export default PrivateRoute;
