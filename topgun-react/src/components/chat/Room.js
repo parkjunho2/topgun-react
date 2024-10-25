@@ -59,6 +59,7 @@ const Room = () => {
 
     const deleteRoom = useCallback(async (target) => {
         const resp = await axios.delete("http://localhost:8080/room/" + target.roomNo);
+        window.alert("채팅방을 삭제하시겠습니까?");
         loadRoomList();
     }, [roomList]);
 
@@ -75,6 +76,7 @@ const Room = () => {
 
     const leaveRoom = useCallback(async (target) => {
         await axios.post("http://localhost:8080/room/leave", { roomNo: target.roomNo });
+        loadRoomList();
     }, [roomList]);
 
     const roomOptions = [
