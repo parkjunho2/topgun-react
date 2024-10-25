@@ -33,6 +33,7 @@ function WorldMapWithGraphs(props) {
       max: am4core.color("#ec7393") // Pink tone emphasis
     });
 
+
     // Add detailed data for each country
     polygonSeries.data = [
       { id: "US", value: 1000, gdp: "$21 trillion", population: "331 million" }, 
@@ -49,8 +50,25 @@ function WorldMapWithGraphs(props) {
       "Travel Count: {value} trips\n" +
       "GDP: {gdp}\n" +
       "Population: {population}";
-
+   
     polygonSeries.mapPolygons.template.fill = am4core.color("#74B266");
+
+    // Hover 애니메이션 추가
+    polygonSeries.mapPolygons.template.events.on("over", function (event) {
+      event.target.animate(
+        { property: "fill", to: am4core.color("#ff4081") }, // 호버 시 색상 변경
+        400, // 애니메이션 시간
+        am4core.ease.circleInOut // 애니메이션 효과
+      );
+    });
+
+    polygonSeries.mapPolygons.template.events.on("out", function (event) {
+      event.target.animate(
+        { property: "fill", to: event.target.dataItem.dataContext.color || am4core.color("#74B266") }, // 원래 색상으로 복원
+        400,
+        am4core.ease.circleInOut
+      );
+    });
 
     return () => {
       map.dispose();
@@ -63,9 +81,13 @@ function WorldMapWithGraphs(props) {
     datasets: [{
       label: "Travel Count",
       data: [1000, 850, 700, 600, 400],
-      backgroundColor: "rgba(236, 115, 147, 0.7)", // Pink tone color
+
+      backgroundColor: "rgba(236, 115, 147, 0.8)", // 핑크톤 강조 색상
+
       borderColor: "rgba(236, 115, 147, 1)",
       borderWidth: 2,
+      borderRadius: 8, // 둥근 모서리
+      hoverBackgroundColor: "rgba(236, 115, 147, 1)", // 호버 시 색상 변경
     }]
   };
 
@@ -74,9 +96,11 @@ function WorldMapWithGraphs(props) {
     datasets: [{
       label: "Revenue ($)",
       data: [100000, 85000, 70000, 60000, 40000],
-      backgroundColor: "rgba(75, 192, 192, 0.7)",
+      backgroundColor: "rgba(75, 192, 192, 0.8)",
       borderColor: "rgba(75, 192, 192, 1)",
       borderWidth: 2,
+      borderRadius: 8, // 둥근 모서리
+      hoverBackgroundColor: "rgba(75, 192, 192, 1)", // 호버 시 색상 변경
     }]
   };
 
@@ -97,12 +121,16 @@ function WorldMapWithGraphs(props) {
     },
     plugins: {
       legend: {
+
         display: false // Hide legend (set to true if needed)
+
       }
     },
     elements: {
       line: {
+
         tension: 0.4 // Smooth curve
+
       }
     }
   };
@@ -113,11 +141,11 @@ function WorldMapWithGraphs(props) {
 
       <div style={styles.graphContainer}>
         <div style={styles.graph}>
-          <h3>Travel Count by Country</h3>
+          <h3 style={styles.graphTitle}>Travel Count by Country</h3>
           <Bar data={travelData} options={graphOptions} />
         </div>
         <div style={styles.graph}>
-          <h3>Revenue by Country</h3>
+          <h3 style={styles.graphTitle}>Revenue by Country</h3>
           <Line data={revenueData} options={graphOptions} />
         </div>
       </div>
@@ -145,11 +173,14 @@ const styles = {
     gap: "20px",
   },
   graph: {
-    border: "none", // Remove border
+
+
     borderRadius: "10px",
-    padding: "20px",
+    padding: "12px",
     backgroundColor: "#f9f9f9",
+
     height: "300px", // Adjust graph size
+
   }
 };
 

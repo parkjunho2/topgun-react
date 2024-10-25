@@ -71,19 +71,22 @@ const NoticeBoard = () => {
         }
 
         const newNotice = {
-    noticeTitle: input.noticeTitle, // 제목 필드 이름 변경
-    noticeContent: input.noticeContent, // 내용 필드 이름 변경
-    noticeAuthor: `${user.userId} (${user.userType})`, // 작성자 필드 이름 변경
-    noticeCreatedAt: new Date().toLocaleString('ko-KR', { 
-        timeZone: 'Asia/Seoul',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-    }),
-};
+
+
+           noticeTitle: input.noticeTitle, // 제목 필드 이름 변경
+            noticeContent: input.noticeContent, // 내용 필드 이름 변경
+            noticeAuthor: `${user.userId} (${user.userType})`, // 작성자 필드 이름 변경
+            noticeCreatedAt: new Date().toLocaleString('ko-KR', { 
+                timeZone: 'Asia/Seoul',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            }),
+        };
+
 
         try {
             await axios.post("http://localhost:8080/notice/", newNotice);
