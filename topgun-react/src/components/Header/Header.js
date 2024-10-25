@@ -9,7 +9,7 @@ import Oval from 'react-loading-icons/dist/esm/components/oval';
 const Header = () => {
     const navigate = useNavigate();
     const login = useRecoilValue(loginState);
-    const [loading, setLoading] = useRecoilState(memberLoadingState);
+    const [loading, ] = useRecoilState(memberLoadingState);
     const [user, setUser] = useRecoilState(userState);
 
     const logout = useCallback(() => {

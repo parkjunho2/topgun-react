@@ -13,7 +13,6 @@ const userState = atom({
     default: {
         userId: '', // 사용자 ID
         userType: '', // 사용자 역할 (ex : MEMBER, ADMIN, AIRLINE)
-        userName: '', // 사용자 이름
     }
 });
 

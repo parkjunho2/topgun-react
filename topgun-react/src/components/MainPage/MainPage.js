@@ -13,6 +13,10 @@ import * as hangul from 'hangul-js';
 const MainPage = () => {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
 
+    const [keyword, setKeyword] = useState("");
+    const [open, setOpen] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(-1); // 선택된 항목의 인덱스
+
 
   // 창 크기 변화 감지
   useEffect(() => {
@@ -37,7 +41,7 @@ const MainPage = () => {
         departure: '',
         destination: '',
         boardingDate: '',
-        departureDate: "",
+        // departureDate: "",
         passengers: ''
     });
 
@@ -53,14 +57,14 @@ const MainPage = () => {
         else if (input.boardingDate.length === 0) {
             return window.alert("출발일자를 입력해주세요.");
         }
-        else if (input.departureDate.length === 0) {
-            return window.alert("도착일자를 입력해주세요.");
-        }
+        // else if (input.departureDate.length === 0) {
+        //     return window.alert("도착일자를 입력해주세요.");
+        // }
         else if (adultNum === 0 && childNum === 0 && babyNum === 0) {
             return window.alert("인원을 입력해주세요.");
         }
         else {
-            navigate("/booking");   //위의 항목들이 모두 pass라면 이동
+            navigate("/flight/bookingList");   //위의 항목들이 모두 pass라면 이동
         }
     }, [input]);
 
@@ -111,17 +115,18 @@ const MainPage = () => {
 
     // 출발지 값이 선택된 도시로 설정되도록 useMemo로 메모이제이션
     const departureText = useMemo(() => {
-        // selectedDepCity가 있으면 해당 도시를 반환, 없으면 기존 input.departure 값을 유지
-        return selectedDepCity ? selectedDepCity : input.departure;
-    }, [selectedDepCity, input.departure]);
+    // 우선적으로 keyword가 있으면 keyword를 반환, 그 다음 selectedDepCity를 반환
+    // if (keyword) return keyword;
+        return selectedDepCity ? selectedDepCity : input.departure;     // selectedDepCity가 있으면 해당 도시를 반환, 없으면 기존 input.departure 값을 유지
+    }, [keyword, selectedDepCity, input.departure]);
 
     // 출발지 상태 변경 처리
     useEffect(() => {
         setInput((prev) => ({
             ...prev,
-            departure: departureText // 선택된 취항지를 출발지 입력창에 설정
+            departure: selectedDepCity ? selectedDepCity : prev.departure // 선택된 도시가 있으면 해당 도시로 설정
         }));
-    }, [departureText]); // 선택된 도시가 변경될 때마다 업데이트
+    }, [selectedDepCity]); // 선택된 도시가 변경될 때마다 업데이트
 
     //사용자가 특정 국가/도시 버튼을 클릭할 때, 그 국가/도시를 선택된 도시로 기록
     const departureNationalClick = (nation) => {
@@ -134,17 +139,34 @@ const MainPage = () => {
             setCities(['서울/인천(ICN)', '서울/김포(GMP)', '제주(CJU)', '광주(KWJ)', '여수(RSU)', '청주(CJJ)', '대구(TAE)']); // 기본 도시 목록
         }
     };
+    
+// '다음' 버튼 클릭 시 도착지 입력창으로 포커스 이동 및 값 반영
+const handleNextClick = () => {
+    // 자동완성된 키워드 값을 input.departure에 설정
+    if (selectedDepCity) { // selectedDepCity가 존재하면
+        setInput(prev => ({
+            ...prev,
+            departure: selectedDepCity // 선택된 도시로 설정
+        }));
+    } else if (keyword) {
+        setInput(prev => ({
+            ...prev,
+            departure: keyword // 키워드로 설정
+        }));
+    }
+    
+    setOpen(false); // 자동완성 리스트 닫기
 
-    // 다음 버튼 클릭 시 도착지 입력창을 열고 포커스를 맞추는 함수
-    const handleNextClick = () => {
-        setTimeout(() => {
-            const destinationInput = document.querySelector('input[name="destination"]');
-            if (destinationInput) {
-                destinationInput.focus(); // 도착지 입력창에 포커스
-            }
-            setDestinationInputClick(true); // 도착지 입력창에 포커스 이후 도착지 선택 UI 열기
-        }, 100); // 약간의 딜레이를 두어 UI가 렌더링된 후에 포커스 이동
-    };
+    // 도착지 입력창으로 포커스 이동
+    setTimeout(() => {
+        const destinationInput = document.querySelector('input[name="destination"]');
+        if (destinationInput) {
+            destinationInput.focus(); // 도착지 입력창에 포커스
+        }
+        setDestinationInputClick(true); // 도착지 선택 UI 열기
+    }, 100); // 약간의 딜레이 후 포커스 이동
+};
+
 
     /*                         ☆☆☆☆ 도착지에 대한 기능 state ☆☆☆☆                             */
     const [destinationInputClick, setDestinationInputClick] = useState(false); // 도착지 입력창 표시 여부
@@ -244,7 +266,7 @@ const MainPage = () => {
         if (datePickerRef.current) {
             lightpickRef.current = new Lightpick({
                 field: datePickerRef.current,
-                singleDate: false, // 범위 선택 가능
+                singleDate: true, // 범위 선택 가능
                 format: 'YYYY-MM-DD', // 날짜 표시 형식
                 firstDay: 7, // 일요일부터 표시
                 numberOfMonths: 2, // 표시할 월의 수
@@ -258,12 +280,12 @@ const MainPage = () => {
                             boardingDate: start.format('YYYY-MM-DD') // 가는편 날짜 설정
                         }));
                     }
-                    if (end) {
-                        setInput((prev) => ({
-                            ...prev,
-                            departureDate: end.format('YYYY-MM-DD') // 오는편 날짜 설정
-                        }));
-                    }
+                    // if (end) {
+                    //     setInput((prev) => ({
+                    //         ...prev,
+                    //         departureDate: end.format('YYYY-MM-DD') // 오는편 날짜 설정
+                    //     }));
+                    // }
                 }
             });
         }
@@ -300,7 +322,7 @@ const MainPage = () => {
     const passengerText = useMemo(() => {
         const text = `성인${adultNum}, 소아${childNum}, 유아${babyNum} `;
         // 만약 텍스트가 설정값을 넘으면 ... 처리 (필요에 따라 길이 조정 필요)
-        const maxLength = 11; // 최대 길이 설정
+        const maxLength = 15; // 최대 길이 설정
         return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
     }, [adultNum, childNum, babyNum]); // adultNum, childNum, babyNum가 변경될 때마다 재계산
 
@@ -327,9 +349,6 @@ const MainPage = () => {
         { nationalNo: 9, nationalName: "나트랑(CXR)" }
     ]);
 
-    const [keyword, setKeyword] = useState("");
-    const [open, setOpen] = useState(false);
-    const [selectedIndex, setSelectedIndex] = useState(-1); // 선택된 항목의 인덱스
 
     // //effect
     // useEffect(()=>{
@@ -349,9 +368,13 @@ const MainPage = () => {
     }, []);
 
     const selectKeyword = useCallback((text) => {
-        setKeyword(text);
-        setOpen(false);     // 자동완성 키워드를 클릭했을 때 사라지게 함
-    }, []);
+        setKeyword(text); // 키워드를 상태로 유지
+        setInput(prev => ({
+            ...prev,
+            departure: text // 출발지 입력창에 반영
+        }));
+        setOpen(false); // 자동완성 리스트 닫기
+    }, [setKeyword, setInput]);
 
     //memo
     const searchResult = useMemo(() => {
@@ -418,6 +441,7 @@ const MainPage = () => {
                                 onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                                 onClick={DepartureClick}
                                 autoComplete="off"
+                                readOnly
                             />
                         </div>
 
@@ -435,7 +459,7 @@ const MainPage = () => {
                             />
                         </div>
 
-                        <div className="col-sm-2">
+                        <div className="col-sm-3">
                             <input
                                 type="text"
                                 name="boardingDate"
@@ -449,7 +473,7 @@ const MainPage = () => {
                             />
                         </div>
 
-                        <div className="col-sm-2">
+                        {/* <div className="col-sm-2">
                             <input
                                 type="text"
                                 name="departureDate"
@@ -461,9 +485,9 @@ const MainPage = () => {
                                 ref={datePickerRef} // ref 추가
                                 onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                             />
-                        </div>
+                        </div> */}
 
-                        <div className="col-sm-2">
+                        <div className="col-sm-3">
                             <input
                                 type="text"
                                 name="passengers"
@@ -483,62 +507,90 @@ const MainPage = () => {
 
                     {/*   ☆☆☆☆ 출발지 입력창 기능 구현 ☆☆☆☆ */}
                     {departureInputClick && ( // 출발지 입력창 클릭 시에만 보여주기
-                        //검색창
-                        <div className="flight-select-div mt-3">   
-                            <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between"}}>
-                                <h4 className="mt-3" style={{ fontWeight: "bold" }}>출발지 선택</h4>
-                                <button className="btn btn-danger mt-3" onClick={CloseSetting}><IoClose /></button>
-                            </div>
-                            <div className="flights_list_national row mt-3">
-                                <div className="nation col-2">
-                                    <ul className="list-group nation-group-box">
-                                        <li className="nation-list">
-                                            <button type="button" className={getButtonClass(selectedDepNational, '한국')}
-                                                onClick={sendNationDep('한국', departureNationalClick)}>
-                                                <span>한국</span>
-                                            </button>
-                                        </li>
-                                        <li className="nation-box-list">
-                                            <button type="button" className={getButtonClass(selectedDepNational, '동북아시아')}
-                                                onClick={sendNationDep('동북아시아', departureNationalClick)}>
-                                                <span>동북아시아</span>
-                                            </button>
-                                        </li>
-                                        <li className="nation-box-list">
-                                            <button type="button" className={getButtonClass(selectedDepNational, '동남아시아')}
-                                                onClick={sendNationDep('동남아시아', departureNationalClick)}>
-                                                <span>동남아시아</span>
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div className="list_airport col-4" style={{ marginBottom: "1em" }}>
-                                    <h5 style={{ fontWeight: "bold" }}>취항지</h5>
-                                    <div className="national_list_box">
-                                        <ul className="list-group city_group-box">
-                                            {cities.map((city) => (
-                                                <li key={city} className="city_name_list">
-                                                    <button type="button" className={getButtonClass(selectedDepCity, city)}
-                                                        onClick={sendNationDep(city, handleCityClick)}>
-                                                        <span>{city}</span>
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
+                        <>
+                            <div className="row mt-3 mb-1 ms-1 me-1">
+                                <div className="col">
+                                    <div className="form-group" style={{ position: "relative" }}>
+                                        <input type="text" className="form-control" placeholder="출발지를 검색하세요." value={keyword}
+                                            onChange={changeKeyword} onKeyUp={handleKeyDown} // 키보드 이벤트 핸들러 추가
+                                            style={{width:"100%"}}
+                                        />
+                                        {/* {open === true && 화면} 왼쪽만 쓰겠다
+                                            {open === true || 화면} 오르쪽만 쓰겠다 */}
+                                        {open === true && (
+                                            <ul className="auto-search list-group">
+                                                {/* 골라서 찍을 수 있도록 구현해야 함(자동완성이 동작할 수 있도록) */}
+                                                {searchResult.map((national, index) => (
+                                                    <li key={national.nationalNo}
+                                                        className={`list-group-item ${selectedIndex === index ? 'active' : ''}`} // 선택된 항목에 'active' 클래스 적용
+                                                        onClick={e => selectKeyword(national.nationalName)}>
+                                                        {national.nationalName}
+                                                        {/* <span className="text-muted ms-1">({poketmon.poketmonType})</span> */}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="col-3">
-                                    <h5 style={{ fontWeight: "bold" }}>최근 검색 목록</h5>
-                                    <button className="btn btn-success" onClick={handleNextClick}>다음</button>
+                            </div>
+
+                            {/* 검색창 */}
+                            <div className="flight-select-div mt-2 ms-3 me-3">   
+                                <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between"}}>
+                                    <h4 className="mt-3 ms-2" style={{ fontWeight: "bold" }}>출발지 선택</h4>
+                                    <button className="btn btn-danger mt-3 me-2" onClick={CloseSetting}><IoClose /></button>
+                                </div>
+                                <div className="flights_list_national row mt-3 ms-1">
+                                    <div className="nation col-2">
+                                        <ul className="list-group nation-group-box">
+                                            <li className="nation-list">
+                                                <button type="button" className={getButtonClass(selectedDepNational, '한국')}
+                                                    onClick={sendNationDep('한국', departureNationalClick)}>
+                                                    <span>한국</span>
+                                                </button>
+                                            </li>
+                                            <li className="nation-box-list">
+                                                <button type="button" className={getButtonClass(selectedDepNational, '동북아시아')}
+                                                    onClick={sendNationDep('동북아시아', departureNationalClick)}>
+                                                    <span>동북아시아</span>
+                                                </button>
+                                            </li>
+                                            <li className="nation-box-list">
+                                                <button type="button" className={getButtonClass(selectedDepNational, '동남아시아')}
+                                                    onClick={sendNationDep('동남아시아', departureNationalClick)}>
+                                                    <span>동남아시아</span>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className="list_airport col-4" style={{ marginBottom: "1em" }}>
+                                        <h5 style={{ fontWeight: "bold" }}>취항지</h5>
+                                        <div className="national_list_box">
+                                            <ul className="list-group city_group-box">
+                                                {cities.map((city) => (
+                                                    <li key={city} className="city_name_list">
+                                                        <button type="button" className={getButtonClass(selectedDepCity, city)}
+                                                            onClick={sendNationDep(city, handleCityClick)}>
+                                                            <span>{city}</span>
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div className="col-3">
+                                        <h5 style={{ fontWeight: "bold" }}>최근 검색 목록</h5>
+                                        <button className="btn btn-success" onClick={handleNextClick}>다음</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </>
                     )}
 
                     {/*    ☆☆☆☆ 도착지 입력창 기능 구현 ☆☆☆☆   */}
                     {destinationInputClick && ( // 도착지 입력창 클릭 시에만 보여주기
                         // 검색창 기능
-                        <div className="flight-select-div mt-3">
+                        <div className="flight-select-div mt-2 ms-3 me-3">
                             <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
                                 <h4 className="mt-3" style={{ fontWeight: "bold" }}>도착지 선택</h4>
                                 <button className="btn btn-danger mt-3" onClick={CloseSetting}><IoClose /></button>
@@ -590,7 +642,7 @@ const MainPage = () => {
 
                         {/*    ☆☆☆☆    탑승객 및 좌석 등급 설정 기능 구현   ☆☆☆☆  */}
                         {showPassengerSettings && (
-                            <div className="row mt-4" style={{ width: "600px", border: "1px solid skyblue", borderRadius: "0.5em",  marginLeft:"450px"}}>
+                            <div className="row mt-4" style={{ width: "600px", border: "1px solid skyblue", borderRadius: "0.5em",  marginLeft:"36%"}}>
                                 {/* <div className="row">
                                 <div className="col">
                                     <h5 style={{fontWeight:"bold"}}>좌석 등급</h5>
@@ -682,36 +734,7 @@ const MainPage = () => {
 
                     {/* 자동완성 기능을 구현 연습 중 */}
                     <hr />
-                    <div className="row mt-5 mb-5">
-                        <h5>자동완성 기능 구현중..(ex오사카,서울 등)</h5>
-                        <div className="col">
-                            <div className="form-group">
-                                <input type="text"
-                                    className="form-control"
-                                    placeholder="출발지를 검색하세요."
-                                    value={keyword}
-                                    onChange={changeKeyword}
-                                    onKeyUp={handleKeyDown} // 키보드 이벤트 핸들러 추가
-                                />
 
-                                {/* {open === true && 화면} 왼쪽만 쓰겠다
-                                    {open === true || 화면} 오르쪽만 쓰겠다 */}
-                                {open === true && (
-                                    <ul className="list-group">
-                                        {/* 골라서 찍을 수 있도록 구현해야 함(자동완성이 동작할 수 있도록) */}
-                                        {searchResult.map((national, index) => (
-                                            <li key={national.nationalNo}
-                                                className={`list-group-item ${selectedIndex === index ? 'active' : ''}`} // 선택된 항목에 'active' 클래스 적용
-                                                onClick={e => selectKeyword(national.nationalName)}>
-                                                {national.nationalName}
-                                                {/* <span className="text-muted ms-1">({poketmon.poketmonType})</span> */}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
 

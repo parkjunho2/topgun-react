@@ -20,7 +20,7 @@ const Payment=()=>{
             return{
                 ...seats,
                 select:false,
-                qty:1
+                qty:1//고정
             }
         }));
    }, []);
@@ -35,15 +35,6 @@ const Payment=()=>{
     }));
    }, [seatsList]);
 
-   //좌석 갯수 선택 *추후 삭제예정*
-   const changeSeatsQty = useCallback((target, qty)=>{
-    setSeatsList(seatsList.map(seats=>{
-        if(seats.seatsNo===target.seatsNo){
-            return {...seats, qty:qty};
-        }
-        return {...seats};
-    }));
-   }, [seatsList]);
 
    //memo 
    //체크된 도서 목록
@@ -80,6 +71,7 @@ const Payment=()=>{
 
     //view
     return(<>
+    <div className="container">
         <h1>?월?일 ??공항 // ?월?일 ??공항 // ??항공사 </h1>
         <div className="row mt-4">
             <div className="col">
@@ -87,10 +79,10 @@ const Payment=()=>{
                     <thead>
                         <tr>
                             <th>선택</th>
+                            <th>번호(삭제)</th>
                             <th>좌석번호</th>
                             <th>등급</th>
                             <th>가격</th>
-                            <th>수량</th>{/* 추후 삭제 예정 */}
                         </tr>
                     </thead>
                     <tbody>{/* 컨테이너 2개로 나눠서 오른쪽에 */}
@@ -102,14 +94,9 @@ const Payment=()=>{
                                     />
                                 </td>
                                 <td>{seats.seatsNo}</td>
+                                <td>{seats.seatsNumber}</td>
                                 <td>{seats.seatsRank}</td>
                                 <td>{seats.seatsPrice.toLocaleString()}</td>
-                                <td>
-                                    <input type="number" className="form-control" min="1" max="1" step="1"
-                                    style={{width:"100px"}} value={seats.qty}
-                                    onChange={e=>changeSeatsQty(seats, e.target.value)}
-                                        />{/* 추후 changeSeatsQty 삭제 예정*/}
-                                </td>
                         </tr>))}
                     </tbody>
                 </div>
@@ -130,6 +117,7 @@ const Payment=()=>{
                     구매하기
                 </button>
             </div>
+        </div>
         </div>
     </>);
 };

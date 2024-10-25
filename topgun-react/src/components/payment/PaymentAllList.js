@@ -35,19 +35,22 @@ const PaymentAllList=()=>{
  
      //view
      return(<>
-     <div className="row mt-4">
+      {paymentList.length === 0 ? (
+            <h1 className="text-center">결제한 목록이 없습니다.</h1>
+        ) : (
+            <div className="container">
+     <div className="row">
          <div className="col">
- 
              <ul className="list-group">
                  {paymentList.map(payment=>(
                      <li key={payment.paymentNo} className="list-group-item">
-                         <h3 className="d-flex justify-content-between">
-                             {payment.paymentDto.paymentTime}
-                             <span/>
+                         <h2 className="text-center my-4">{payment.paymentDto.paymentTime}</h2> {/* 날짜 */}
+                         <h3 className="d-flex justify-content-between ">
                              {payment.paymentDto.paymentName}    
                              <span/>
                              총 결제금액: {payment.paymentDto.paymentTotal.toLocaleString()}원
                          </h3>
+
                          {/* 상세 결제 내용 */}
                          {payment.paymentDetailList?.length>0 && (
                          <ul className="list-group list-group-flush mt-4">
@@ -56,22 +59,22 @@ const PaymentAllList=()=>{
                                  <h3 className="d-flex justify-content-between">
                                      {detail.paymentDetailName}
                                      <span/>
-                                     {detail.paymentDetailPrice.toLocaleString()}원
+                                     금액: {detail.paymentDetailPrice.toLocaleString()}원
                                  </h3>
-                                 <div className="text-end">
-                                 <NavLink to={`/payment/detail/${payment.paymentDto.paymentNo}`}>더보기</NavLink>
-                               </div>
                              </li>
                              ))}
+                             <div className="text-end mt-1">
+                             <NavLink className="btn btn-danger" to={`/payment/detail/${payment.paymentDto.paymentNo}`}>결제취소</NavLink>
+                           </div>
                          </ul>
                          )}
                      </li>
                  ))}
              </ul>
          </div>
- 
      </div>
- 
+        </div>
+        )};
      </>);
 };
 export default PaymentAllList;

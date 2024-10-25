@@ -35,6 +35,8 @@ import Room from "./components/chat/Room.js";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import PaymentDetail from "./components/payment/PaymentDetail.js";
+import FindPw from './components/ForgotPw/FindPw/FindPw';
+import ResetPw from './components/ForgotPw/ResetPw/ResetPw.js';
 
 
 
@@ -44,7 +46,7 @@ import PaymentDetail from "./components/payment/PaymentDetail.js";
 const App = () => {
 
   //recoil state
-  const [user, setUser] = useRecoilState(userState);
+  const [, setUser] = useRecoilState(userState);
   const [, setMemberLoading] = useRecoilState(memberLoadingState);
 
 
@@ -78,7 +80,6 @@ const App = () => {
     setUser({
       userId: resp.data.usersId,
       userType: resp.data.usersType,
-      userName: resp.data.usersName
     });
 
     axios.defaults.headers.common["Authorization"] = "Bearer " + resp.data.accessToken;
@@ -98,8 +99,6 @@ const App = () => {
   // 헤더를 숨길 경로 배열
   const noHeaderRoutes = ['/login', '/join'];
 
-  console.log("user = "+user.userName);
-
   return (
     <>{/* ToastContainer 추가 */}
       <ToastContainer
@@ -114,10 +113,12 @@ const App = () => {
       <Routes>
         <Route exact path="/" element={<MainPage />} />
         <Route path="/login" element={<Login />} /> {/* 로그인 */}
+        <Route path='/findPw' element={<FindPw />} />
+        <Route path="/resetPw" element={<ResetPw />} />
 
         {/* 예약페이지 */}
-        <Route path="/booking" element={<Booking />} />
-        <Route path="/bookingList" element={<BookingList/>} />
+        <Route path="/flight/booking/:flightId" element={<Booking />} />
+        <Route path="/flight/bookingList" element={<BookingList/>} />
 
         {/* 로그인 되어야지만 볼 수 있는 페이지 */}
         <Route element={<PrivateRoute />}>
