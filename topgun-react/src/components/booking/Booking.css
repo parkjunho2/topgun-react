@@ -35,11 +35,12 @@
 .seat-normal:hover{
     background-color: rgb(181, 198, 247);
 }
-/* 일반석(정상운임) */
-.seat-normal{
-    border: 1px solid black;
-    border-top-right-radius: 1em !important;
-    border-bottom-right-radius: 1em !important;
+/* 일반석(할인/정상운임) , 비지니스(할인/정상운임) */
+.seat-normal,
+.seat-normal-discount{
+    border:none;
+    justify-content: center;
+    align-content: center;
 }
 .seat-noraml-text{
     display: flex;
