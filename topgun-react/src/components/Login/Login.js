@@ -11,8 +11,12 @@ import { userState } from '../../util/recoil';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { debounce } from 'lodash';
+import { toast } from 'react-toastify';
+import { Modal } from 'bootstrap';
 
 const Login = () => {
+
+    let excludedKeys = [];
 
     // 정규식: 숫자와 특수 문자, 대문자 한개 이상이 포함된 패턴
     const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$])(?=.*[A-Z]).{8,}$/;
@@ -86,6 +90,8 @@ const Login = () => {
         // airlineNameValid: null,
     });
 
+    const [errorMessage, setErrorMessage] = useState('');
+
     const CheckDuplicateUserId = useCallback(
         debounce(async (userId) => {
             console.log(userId); // userId 확인
@@ -142,6 +148,13 @@ const Login = () => {
         validation.usersPasswordValid &&
         validation.passwordMatch;
 
+
+    const isAllValid = (validation, excludedKeys) => {
+        return Object.entries(validation)
+            .filter(([key]) => !excludedKeys.includes(key)) // 제외할 변수
+            .every(([, value]) => value === true);
+    };
+
     // useCallback
     // Handler
     const InputJoinChange = useCallback(e => {
@@ -194,6 +207,7 @@ const Login = () => {
             navigate('/');
         } catch (error) {
             console.error('로그인 오류:', error);
+            setErrorMessage('로그인에 실패했습니다. 아이디와 비밀번호를 확인하세요.'); // 오류 메시지 설정
         }
     }, [loginData, navigate, setUser]);
 
@@ -352,6 +366,12 @@ const Login = () => {
                         </div>
 
                         <div className="text-center text-lg-start mt-4 pt-2 mb-0">
+                            {/* 에러 메시지 */}
+                            {errorMessage && (
+                                <div className="alert alert-danger text-center mb-4">
+                                    {errorMessage}
+                                </div>
+                            )}
                             <button
                                 type="button"
                                 className="btn btn-primary btn-lg"
@@ -1262,44 +1282,100 @@ const Login = () => {
                             )}
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-primary" onClick={() => {
-                                if (userType === 'MEMBER') {
-                                    // 제외할 변수들
-                                    const excludedKeys = ['airlineIdValid', 'airlineNameValid'];
+                            <button type="button" className="btn btn-primary" data-bs-dismiss={isAllValid(validation, excludedKeys) ? "modal" : undefined} // 조건부로 data-bs-dismiss 추가
+                                aria-label="Close" onClick={() => {
+                                    if (userType === 'MEMBER') {
+                                        // 제외할 변수들
+                                        excludedKeys = ['airlineIdValid', 'airlineNameValid'];
 
-                                    // 모든 유효성 검사 상태가 true인지 확인 (제외할 변수 포함)
-                                    const isAllValid = Object.entries(validation)
-                                        .filter(([key]) => !excludedKeys.includes(key)) // 제외할 변수
-                                        .every(([, value]) => value === true);
+                                        // 모든 유효성 검사 상태가 true인지 확인 (제외할 변수 포함)
+                                        const isAllValid = Object.entries(validation)
+                                            .filter(([key]) => !excludedKeys.includes(key)) // 제외할 변수
+                                            .every(([, value]) => value === true);
 
-                                    if (isAllValid) {
-                                        sendData(); // 모든 필드가 유효할 경우 데이터 전송
-                                        alert("MEMBER 타입의 가입 요청을 처리합니다!");
+                                        if (isAllValid) {
+                                            sendData(); // 모든 필드가 유효할 경우 데이터 전송
+                                            // 상태 초기화 작업 (필요시)
+                                            setJoinData({
+                                                usersId: '',
+                                                usersPassword: '',
+                                                usersName: '',
+                                                usersEmail: '',
+                                                usersContact: '',
+                                                usersType: '',
+                                                memberEngName: '',
+                                                memberBirth: '',
+                                                memberGender: '',
+                                                airlineName: '',
+                                                airlineNo: '',
+                                            });
+                                            setValidation({
+                                                usersIdValid: null,
+                                                usersPasswordValid: null,
+                                                passwordMatch: null,
+                                                memberNameValid: null,
+                                                memberEngNameValid: null,
+                                                usersContactValid: null,
+                                                usersEmailValid: null,
+                                                memberGenderValid: null,
+                                                memberBirthValid: null,
+                                                airlineIdValid: null,
+                                                airlineNameValid: null,
+                                            });
+                                            setCurrentPage(0);
+                                            setPwCheck('');
+                                            setEmailId('');
+                                            setDomain('');
+                                            toast.success('가입완료!', {
+                                                onClose: () => {
+                                                    setTimeout(() => {
+                                                    }, 500); // 500ms (0.5초) 대기
+                                                },
+                                            });
+                                        } else {
+                                            toast.error('유효하지 않은 필드가 있습니다. 확인해 주세요.', {
+                                                onClose: () => {
+                                                    setTimeout(() => {
+                                                    }, 500); // 500ms (0.5초) 대기
 
-                                    } else {
-                                        alert("유효하지 않은 필드가 있습니다. 확인해 주세요.");
+                                                },
+                                            });
+                                        }
                                     }
-                                }
-                                else if (userType === 'AIRLINE') {
-                                    // 제외할 변수들
-                                    const excludedKeys = ['memberGenderValid', 'memberBirthValid', 'memberNameValid', 'memberEngNameValid', 'airlineIdValid', 'airlineNameValid'];
+                                    else if (userType === 'AIRLINE') {
+                                        // 제외할 변수들
+                                        excludedKeys = ['memberGenderValid', 'memberBirthValid', 'memberNameValid', 'memberEngNameValid', 'airlineIdValid', 'airlineNameValid'];
 
-                                    // 모든 유효성 검사 상태가 true인지 확인 (제외할 변수 포함)
-                                    const isAllValid = Object.entries(validation)
-                                        .filter(([key]) => !excludedKeys.includes(key)) // 제외할 변수
-                                        .every(([, value]) => value === true);
+                                        // 모든 유효성 검사 상태가 true인지 확인 (제외할 변수 포함)
+                                        const isAllValid = isAllValid();
 
-                                    if (isAllValid) {
-                                        sendData(); // 모든 필드가 유효할 경우 데이터 전송
-                                        alert("AIRLINE 타입의 가입 요청을 처리합니다!");
+                                        if (isAllValid) {
+                                            sendData(); // 모든 필드가 유효할 경우 데이터 전송
+                                            toast.success('가입완료!', {
+                                                onClose: () => {
+                                                    setTimeout(() => {
+                                                        // 여기서 모달을꺼야한다
 
+                                                    }, 500); // 500ms (0.5초) 대기
+                                                },
+                                            });
+                                        } else {
+                                            toast.error('유효하지 않은 필드가 있습니다. 확인해 주세요.', {
+                                                onClose: () => {
+                                                    setTimeout(() => {
+                                                    }, 500); // 500ms (0.5초) 대기
+                                                },
+                                            });
+                                        }
                                     } else {
-                                        alert("유효하지 않은 필드가 있습니다. 확인해 주세요.");
+                                        toast.error('전송이 유효하지 않습니다 다시 확인해 주세요', {
+                                            onClose: () => {
+                                                setTimeout(() => {
+                                                }, 500); // 500ms (0.5초) 대기
+                                            },
+                                        });
                                     }
-                                } else {
-                                    alert("전송이 유효하지 않습니다 다시 확인해 주세요");
-                                }
-                            }}>가입하기</button>
+                                }}>가입하기</button>
                         </div>
                     </div>
                 </div>
