@@ -71,7 +71,9 @@ const NoticeBoard = () => {
         }
 
         const newNotice = {
-            noticeTitle: input.noticeTitle, // 제목 필드 이름 변경
+
+
+           noticeTitle: input.noticeTitle, // 제목 필드 이름 변경
             noticeContent: input.noticeContent, // 내용 필드 이름 변경
             noticeAuthor: `${user.userId} (${user.userType})`, // 작성자 필드 이름 변경
             noticeCreatedAt: new Date().toLocaleString('ko-KR', { 
@@ -84,6 +86,7 @@ const NoticeBoard = () => {
                 hour12: false
             }),
         };
+
 
         try {
             await axios.post("http://localhost:8080/notice/", newNotice);
