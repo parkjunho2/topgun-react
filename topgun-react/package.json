@@ -5,6 +5,8 @@
   "dependencies": {
     "@amcharts/amcharts4": "^4.10.39",
     "@amcharts/amcharts4-geodata": "^4.1.30",
+    "@amcharts/amcharts5": "^5.10.7",
+    "@amcharts/amcharts5-geodata": "^5.1.4",
     "@fawazahmed0/currency-api": "^2024.10.1",
     "@nivo/geo": "^0.87.0",
     "@stomp/stompjs": "^7.0.0",
