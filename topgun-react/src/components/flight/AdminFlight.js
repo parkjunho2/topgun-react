@@ -12,7 +12,15 @@ const AdminFlight = () => {
 
     const loadList = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/admin/");
-        setFlightList(resp.data);
+
+         // 현재 시간 (오늘 날짜)
+    const now = new Date();
+
+        const filteredFlights = resp.data.filter(flight => {
+        const arrivalTime = new Date(flight.arrivalTime);
+        return arrivalTime >= now;
+    });
+        setFlightList(filteredFlights);
     }, []);
 
     const updateFlight = useCallback(async (flightId, status) => {
