@@ -74,7 +74,15 @@ const NoticeBoard = () => {
             noticeTitle: input.noticeTitle, // 제목 필드 이름 변경
             noticeContent: input.noticeContent, // 내용 필드 이름 변경
             noticeAuthor: `${user.userId} (${user.userType})`, // 작성자 필드 이름 변경
-            noticeCreatedAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+            noticeCreatedAt: new Date().toLocaleString('ko-KR', { 
+                timeZone: 'Asia/Seoul',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            }),
         };
 
         try {
@@ -88,13 +96,25 @@ const NoticeBoard = () => {
     }, [input, loadList, login, user]);
 
     const clearInput = useCallback(() => {
+        const now = new Date();
+        
+        // 수동으로 날짜 및 시간 포맷팅
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+        const date = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+        const formattedDate = `${year}-${month}-${date} ${hours}:${minutes}`; // 원하는 형식으로 조합
+        
         setInput({
             noticeTitle: "", // 제목 필드 이름 변경
             noticeContent: "", // 내용 필드 이름 변경
             noticeAuthor: "", // 작성자 필드 이름 변경
-            noticeCreatedAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+            noticeCreatedAt: formattedDate, // 포맷된 날짜
         });
     }, []);
+    
 
     const handleImageUpload = () => {
         const input = document.createElement('input');
@@ -163,7 +183,7 @@ const NoticeBoard = () => {
                                 <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeAuthor}</td> {/* 작성자 필드 이름 변경 */}
                                 <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeCreatedAt}</td> {/* 생성일 필드 이름 변경 */}
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
-                                    {login && ( // 로그인 상태일 때만 쓰레기통 아이콘 표시
+                                {user.userType === 'ADMIN' && ( 
                                         <FaTrash
                                             className="text-danger trash-icon"
                                             style={{ color: '#ec7393', fill: '#ec7393', fontSize: '1em' }}
@@ -176,7 +196,7 @@ const NoticeBoard = () => {
                     </tbody>
 
                     <tfoot>
-                        {login && ( // 로그인한 사용자만 입력 폼 표시
+                    {user.userType === 'ADMIN' && ( 
                             <>
                                 <tr>
                                     <td style={{ textAlign: 'center' }}></td>
@@ -208,14 +228,14 @@ const NoticeBoard = () => {
                                 </tr>
                                 <tr>
                                     <td colSpan="5">
-                                    <ReactQuill
-                                    ref={quillRef} // ref 추가
-                                    value={input.content}
-                                    onChange={handleContentChange}
-                                    modules={modules}
-                                    placeholder="오른쪽 아래 선택자로 에디터 크기를 자유롭게 조절하세요!"
-                                    style={{ height: '290px', width: '110%', resize: 'vertical', overflowY: 'auto' }} // 너비를 100%로 설정
-                                />
+                                        <ReactQuill
+                                            ref={quillRef}
+                                            value={input.noticeContent} // 내용 필드 이름 변경
+                                            onChange={handleContentChange}
+                                            modules={modules}
+                                            placeholder="오른쪽 아래 선택자로 에디터 크기를 자유롭게 조절하세요!"
+                                            style={{ height: '290px', width: '110%', resize: 'vertical', overflowY: 'auto' }} // 너비를 100%로 설정
+                                        />
                                     </td>
                                 </tr>
                             </>

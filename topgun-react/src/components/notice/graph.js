@@ -33,18 +33,36 @@ function WorldMapWithGraphs(props) {
       max: am4core.color("#ec7393") // 핑크톤 강조
     });
 
-    // Add travel data to countries
+    // 국가에 대한 여행 데이터 추가 (추가 정보 포함)
     polygonSeries.data = [
-      { id: "US", value: 1000 }, 
-      { id: "CN", value: 850 }, 
-      { id: "RU", value: 700 },
-      { id: "IN", value: 600 },
-      { id: "BR", value: 400 },
+      { id: "US", value: 1000, revenue: 100000, description: "최고의 여행지." },
+      { id: "CN", value: 850, revenue: 85000, description: "급성장하는 관광지." },
+      { id: "RU", value: 700, revenue: 70000, description: "다양한 문화 경험." },
+      { id: "IN", value: 600, revenue: 60000, description: "풍부한 역사적 유적지." },
+      { id: "BR", value: 400, revenue: 40000, description: "카니발로 유명." },
       // ... 더미 데이터 추가
     ];
 
-    polygonSeries.mapPolygons.template.tooltipText = "{name}: {value} trips";
+    // Tooltip 설정
+    polygonSeries.mapPolygons.template.tooltipText = "{name}: {value} trips\nRevenue: ${revenue}\n{description}";
     polygonSeries.mapPolygons.template.fill = am4core.color("#74B266");
+
+    // Hover 애니메이션 추가
+    polygonSeries.mapPolygons.template.events.on("over", function (event) {
+      event.target.animate(
+        { property: "fill", to: am4core.color("#ff4081") }, // 호버 시 색상 변경
+        400, // 애니메이션 시간
+        am4core.ease.circleInOut // 애니메이션 효과
+      );
+    });
+
+    polygonSeries.mapPolygons.template.events.on("out", function (event) {
+      event.target.animate(
+        { property: "fill", to: event.target.dataItem.dataContext.color || am4core.color("#74B266") }, // 원래 색상으로 복원
+        400,
+        am4core.ease.circleInOut
+      );
+    });
 
     return () => {
       map.dispose();
@@ -57,9 +75,11 @@ function WorldMapWithGraphs(props) {
     datasets: [{
       label: "Travel Count",
       data: [1000, 850, 700, 600, 400],
-      backgroundColor: "rgba(236, 115, 147, 0.7)", // 핑크톤 강조 색상
+      backgroundColor: "rgba(236, 115, 147, 0.8)", // 핑크톤 강조 색상
       borderColor: "rgba(236, 115, 147, 1)",
       borderWidth: 2,
+      borderRadius: 8, // 둥근 모서리
+      hoverBackgroundColor: "rgba(236, 115, 147, 1)", // 호버 시 색상 변경
     }]
   };
 
@@ -68,9 +88,11 @@ function WorldMapWithGraphs(props) {
     datasets: [{
       label: "Revenue ($)",
       data: [100000, 85000, 70000, 60000, 40000],
-      backgroundColor: "rgba(75, 192, 192, 0.7)",
+      backgroundColor: "rgba(75, 192, 192, 0.8)",
       borderColor: "rgba(75, 192, 192, 1)",
       borderWidth: 2,
+      borderRadius: 8, // 둥근 모서리
+      hoverBackgroundColor: "rgba(75, 192, 192, 1)", // 호버 시 색상 변경
     }]
   };
 
@@ -91,12 +113,18 @@ function WorldMapWithGraphs(props) {
     },
     plugins: {
       legend: {
-        display: false // 범례 제거 (필요 시 true로 변경 가능)
+        display: true, // 범례 표시
+        position: 'top', // 범례 위치
+        labels: {
+          fontColor: '#333', // 범례 텍스트 색상
+          fontSize: 14, // 범례 텍스트 크기
+        }
       }
     },
     elements: {
       line: {
-        tension: 0.4 // 부드러운 곡선으로 그래프 표현
+        tension: 0.4, // 부드러운 곡선으로 그래프 표현
+        borderWidth: 3, // 라인 두께
       }
     }
   };
@@ -107,11 +135,11 @@ function WorldMapWithGraphs(props) {
 
       <div style={styles.graphContainer}>
         <div style={styles.graph}>
-          <h3>Travel Count by Country</h3>
+          <h3 style={styles.graphTitle}>Travel Count by Country</h3>
           <Bar data={travelData} options={graphOptions} />
         </div>
         <div style={styles.graph}>
-          <h3>Revenue by Country</h3>
+          <h3 style={styles.graphTitle}>Revenue by Country</h3>
           <Line data={revenueData} options={graphOptions} />
         </div>
       </div>
@@ -139,11 +167,16 @@ const styles = {
     gap: "20px",
   },
   graph: {
-    border: "none", // 테두리 제거
     borderRadius: "10px",
-    padding: "20px",
+    padding: "12px",
     backgroundColor: "#f9f9f9",
     height: "300px", // 그래프 크기 조정
+    boxShadow: "0 4px 8px rgba(0, 0, 1, 0)", // 그림자 추가
+  },
+  graphTitle: {
+    marginBottom: "10px",
+    fontSize: "18px",
+    color: "#333",
   }
 };
 
