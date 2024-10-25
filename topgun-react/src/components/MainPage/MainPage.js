@@ -591,11 +591,11 @@ const handleNextClick = () => {
                     {destinationInputClick && ( // 도착지 입력창 클릭 시에만 보여주기
                         // 검색창 기능
                         <div className="flight-select-div mt-2 ms-3 me-3">
-                            <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
+                            <div className="d-flex ms-3 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
                                 <h4 className="mt-3" style={{ fontWeight: "bold" }}>도착지 선택</h4>
                                 <button className="btn btn-danger mt-3" onClick={CloseSetting}><IoClose /></button>
                             </div>
-                            <div className="flights_list_national row mt-3">
+                            <div className="flights_list_national row mt-3 ms-1">
                                 <div className="nation col-2">
                                     <ul className="list-group nation-group-box">
                                         <li className="nation-list">
