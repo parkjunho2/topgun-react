@@ -40,11 +40,9 @@ const AdminFlightDetail = () => {
             <div className="container mt-4">
                 <h1>항공편 상세 정보</h1>
                 <div className="row">
-                    {Array(7).fill().map((_, index) => (
-                        <div className="col-sm-3" key={index}>
+                        <div className="col-sm-3">
                             <span className="placeholder col-6"></span>
                         </div>
-                    ))}
                 </div>
                 <div className="text-center mt-4">
                     <button className="btn btn-secondary placeholder col-2">목록보기</button>
