@@ -71,14 +71,12 @@ const PaymentSuccess=()=>{
                         <th>좌석번호</th>
                         <th>좌석등급</th>
                         <th>가격</th>
-                        <th>여권번호</th>
                     </tr>
                         {seatsList.map(seats=>(
                             <tr key={seats.seatsNo}>
                                 <td>{seats.seatsNo}</td>
                                 <td>{seats.seatsRank}</td>
                                 <td>{seats.seatsPrice}원</td>
-                                <td><input type="text"/></td>{/* 업데이트 필요 detail 정보 */}
                             </tr>
                         ))}
                     </tbody>
@@ -96,7 +94,7 @@ const PaymentSuccess=()=>{
         }
         else{
             return(<>
-            <h1>결제 승인 실패</h1>
+            <h1 className="text-center mt-5">결제 승인 실패</h1>
             </>);
         }
         
