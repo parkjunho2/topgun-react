@@ -1,124 +1,164 @@
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react"
 
-const Payment=()=>{
-   //state
-   //리스트 초기 값 불러오기
-   const[seatsList, setSeatsList] =useState([]);
+    const Payment=()=>{
+    //state
+    //리스트 초기 값 불러오기
+    const[seatsList, setSeatsList] =useState([]);
 
     //effect
-    ;//좌석 리스트 callback에 있는거 갖고옴
+    //좌석 리스트 callback에 있는거 갖고옴
     useEffect(()=>{
         loadSeatsList()
     },[]);
 
-   //callback
-   //좌석 리스트 백엔드에 불러옴
-   const loadSeatsList= useCallback(async()=>{ 
-        const resp = await axios.get("http://localhost:8080/seats/");
-        setSeatsList(resp.data.map(seats=>{
-            return{
-                ...seats,
-                select:false,
-                qty:1//고정
+    //callback
+    //좌석 리스트 백엔드에 불러옴
+    const loadSeatsList= useCallback(async()=>{ 
+            const resp = await axios.get("http://localhost:8080/seats/");
+            setSeatsList(resp.data.map(seats=>{
+                return{
+                    ...seats,
+                    select:false,
+                    qty:1//고정
+                }
+            }));
+    }, []);
+    
+    //좌석선택
+    const selectSeats = useCallback((target, checked)=>{ 
+        setSeatsList(seatsList.map(seats=>{
+            if(seats.seatsNo === target.seatsNo){
+                return {...seats, select:checked};
             }
+            return {...seats};
         }));
-   }, []);
- 
-   //좌석선택
-   const selectSeats = useCallback((target, checked)=>{ 
-    setSeatsList(seatsList.map(seats=>{
-        if(seats.seatsNo === target.seatsNo){
-            return {...seats, select:checked};
-        }
-        return {...seats};
-    }));
-   }, [seatsList]);
+    }, [seatsList]);
 
 
-   //memo 
-   //체크된 도서 목록
-   const checkedSeatsList= useMemo(()=>{
-    return seatsList.filter(seats=>seats.select);//filter 원하는것만 추려서 사용하는 명령어
-   }, [seatsList]);
-   //체크된 총 계산된 금액
-   const checkedSeatsTotal = useMemo(()=>{
-    return checkedSeatsList.reduce((before, current)=>{//reduce 반복문 사용
-       return before + (current.seatsPrice * current.qty);
-    }, 0);
-   },[checkedSeatsList]);
-   
-   //결제 후 이동할 주소
-   const getCurrentUrl = useCallback(()=>{
-    return window.location.origin + window.location.pathname + (window.location.hash||'');
-   }, []);
-   //체크된 좌석 금액 결제
-   const sendPurchaseRequest = useCallback(async()=>{
-    if(checkedSeatsList.length===0) return;
-    const resp = await axios.post(
-        "http://localhost:8080/seats/purchase", 
-        {//백엔드 puchaseReqeustVO 로 전송
-            seatsList: checkedSeatsList, //seatNo,qty
-            approvalUrl: getCurrentUrl() + "/success",
-            cancelUrl: getCurrentUrl() + "/cancel",
-            failUrl: getCurrentUrl() + "/fail",
-        }
-    );//결제페이지로 전송
-        window.sessionStorage.setItem("tid", resp.data.tid);//pc_url 가기전 먼저 tid 전송
-        window.sessionStorage.setItem("checkedSeatsList", JSON.stringify(checkedSeatsList));//체크된 결제한 리스트 전송
-        window.location.href= resp.data.next_redirect_pc_url;//결제 페이지로 이동
-   }, [checkedSeatsList]);
+    //memo 
+    //체크된 좌석 목록
+    const checkedSeatsList= useMemo(()=>{
+        return seatsList.filter(seats=>seats.select);//filter 원하는것만 추려서 사용하는 명령어
+    }, [seatsList]);
 
-    //view
-    return(<>
-    <div className="container">
-        <h1>?월?일 ??공항 // ?월?일 ??공항 // ??항공사 </h1>
-        <div className="row mt-4">
-            <div className="col">
-                <div className="table">
-                    <thead>
-                        <tr>
-                            <th>선택</th>
-                            <th>번호(삭제)</th>
-                            <th>좌석번호</th>
-                            <th>등급</th>
-                            <th>가격</th>
-                        </tr>
-                    </thead>
-                    <tbody>{/* 컨테이너 2개로 나눠서 오른쪽에 */}
-                        {seatsList.map(seats=>(
-                            <tr key={seats.seatsNo}>
-                                <td>
-                                    <input type="checkbox" className="form-check-input"
-                                    checked={seats.select} onChange={e=>selectSeats(seats, e.target.checked)}
-                                    />
-                                </td>
-                                <td>{seats.seatsNo}</td>
-                                <td>{seats.seatsNumber}</td>
-                                <td>{seats.seatsRank}</td>
-                                <td>{seats.seatsPrice.toLocaleString()}</td>
-                        </tr>))}
-                    </tbody>
+    // 체크된 비즈니스 좌석 목록
+    const checkedBusinessSeatsList = useMemo(() => {
+        return checkedSeatsList.filter(seats => seats.seatsRank === "비즈니스");
+        }, [checkedSeatsList]);
+
+    // 체크된 이코노미 좌석 목록
+    const checkedEconomySeatsList = useMemo(() => {
+        return checkedSeatsList.filter(seats => seats.seatsRank === "이코노미");
+        }, [checkedSeatsList]);
+
+    //체크된 총 계산된 금액
+    const checkedSeatsTotal = useMemo(()=>{
+        return checkedSeatsList.reduce((before, current)=>{//reduce 반복문 사용
+        return before + (current.seatsPrice * current.qty);
+        }, 0);
+    },[checkedSeatsList]);
+    
+    //결제 후 이동할 주소
+    const getCurrentUrl = useCallback(()=>{
+        return window.location.origin + window.location.pathname + (window.location.hash||'');
+    }, []);
+    //체크된 좌석 금액 결제
+    const sendPurchaseRequest = useCallback(async()=>{
+        if(checkedSeatsList.length===0) return;
+        const resp = await axios.post(
+            "http://localhost:8080/seats/purchase", 
+            {//백엔드 puchaseReqeustVO 로 전송
+                seatsList: checkedSeatsList, //seatNo,qty
+                approvalUrl: getCurrentUrl() + "/success",
+                cancelUrl: getCurrentUrl() + "/cancel",
+                failUrl: getCurrentUrl() + "/fail",
+            }
+        );//결제페이지로 전송
+            window.sessionStorage.setItem("tid", resp.data.tid);//pc_url 가기전 먼저 tid 전송
+            window.sessionStorage.setItem("checkedSeatsList", JSON.stringify(checkedSeatsList));//체크된 결제한 리스트 전송
+            window.location.href= resp.data.next_redirect_pc_url;//결제 페이지로 이동
+    }, [checkedSeatsList]);
+
+        //view
+        return(<>
+        <div className="container">
+            <div className="row mt-3">
+                <div className="col mt-2">
+                    <div className="table" style={{width: '100%', whiteSpace: 'nowrap'}}>
+                        <thead>
+                            <tr>
+                                <th>선택</th>
+                                <th>번호</th>
+                                <th>좌석번호</th>
+                                <th>등급</th>
+                                <th>가격</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {seatsList.map(seats=>(
+                                <tr key={seats.seatsNo}>
+                                    <td>
+                                        <input type="checkbox" className="form-check-input"
+                                        checked={seats.select} onChange={e=>selectSeats(seats, e.target.checked)}
+                                        />
+                                    </td>
+                                    <td>{seats.seatsNo}</td>
+                                    <td>{seats.seatsNumber}</td>
+                                    <td>{seats.seatsRank}</td>
+                                    <td>{seats.seatsPrice.toLocaleString()}</td>
+                            </tr>))}
+                        </tbody>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <hr/>
-        <div className="row mt-4">
-            <div className="col">
-                {/* 비지니스 선택 금액 , 이코노미 선택 금액  */}
-                <h2>결제하실 총 금액은 {checkedSeatsTotal.toLocaleString()}원 입니다.</h2>{/* 총 금액 */}
-            </div>
-        </div>
-        <div className="row mt-4">
-            <div className="col">
-                <button className="btn btn-success w-100" 
-                onClick={sendPurchaseRequest}>
-                    구매하기
-                </button>
-            </div>
-        </div>
-        </div>
+                <div className="col mt-2">
+                    <table className="table" style={{ position: 'fixed', top: '205px', width: '30%', right:'100px', whiteSpace: 'nowrap'}}>
+                        <thead>
+                            <tr>
+                                <th>등급</th>
+                                <th>좌석 번호</th>
+                                <th className="text-end">가격</th>
+                            </tr>
+                        </thead>    
+                        <tbody>
+                            {checkedBusinessSeatsList.length > 0 && (<>
+                                    {checkedBusinessSeatsList.map(seat => (
+                                        <tr key={seat.seatsNo}>
+                                            <td>{seat.seatsRank}</td>
+                                            <td>{seat.seatsNumber}</td>
+                                            <td className="text-end">{seat.seatsPrice.toLocaleString()}원</td>
+                                        </tr>
+                                    ))}
+                            </>)}
+                            {checkedEconomySeatsList.length > 0 && (<>
+                                    {checkedEconomySeatsList.map(seat => (
+                                        <tr key={seat.seatsNo}>
+                                            <td>{seat.seatsRank}</td>
+                                            <td>{seat.seatsNumber}</td>
+                                            <td className="text-end">{seat.seatsPrice.toLocaleString()}원</td>
+                                        </tr>
+                                    ))}
+                            </>)}
+                            {checkedBusinessSeatsList.length === 0 && checkedEconomySeatsList.length === 0 && (
+                                <tr>
+                                    <td colSpan="3" className="text-center">선택된 좌석이 없습니다.</td>
+                                </tr>
+                            )}
+                            <tr>
+                                <td colSpan="2"><strong>결제하실 총 금액은</strong></td>
+                                <td className="text-end"><strong>{checkedSeatsTotal.toLocaleString()}원</strong></td>
+                            </tr>
+                        </tbody>
+                            <tfoot>
+                            <button className="btn btn-success w-100 my-3"
+                                onClick={sendPurchaseRequest}>
+                                    구매하기
+                                </button>
+                            </tfoot>
+                         </table>
+                    </div>
+                </div>
+         </div>
     </>);
 };
 export default Payment;

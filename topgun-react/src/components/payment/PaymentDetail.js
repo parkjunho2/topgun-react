@@ -215,7 +215,7 @@ const PaymentDetail=()=>{
                                 <div className="col-9">{action.payload}</div>
                             </div>
                             )}
-                            {action.amount === 0 &&(
+                            {action.amount === 0 && selectedDetailName.length !==0 &&(
                             <div className="row">
                                 <div className="col-3">취소된 좌석</div>
                                 <div className="col-9"><ul>

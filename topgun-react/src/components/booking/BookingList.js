@@ -28,7 +28,9 @@ const BookingList = () => {
         return `${ampm} ${hourIn12}:${minute === 0 ? '00' : '30'}`;
     };
 
-
+    const accessToken = axios.defaults.headers.common["Authorization"];
+    const refreshToken = window.localStorage.getItem("refreshToken")
+        || window.sessionStorage.getItem("refreshToken");
 
     //페이지 갱신 후 한번만 실행
     useEffect(()=>{
@@ -40,6 +42,15 @@ const BookingList = () => {
         setflightList(resp.data);
         // console.log(resp.data);
     },[flightList]);
+
+    const createRoom = useCallback(async(target)=>{
+        const resp = await axios.post("http://localhost:8080/room/createAndEnter",
+            {roomName : target.airlineDto.airlineName},
+            {params : {userId : target.userId}})
+        const newRoomNo = resp.data.roomNo;
+        navigate("/chat/"+newRoomNo);
+    });
+
 
     return (
         <>
@@ -143,10 +154,11 @@ const BookingList = () => {
                                             </div>
                                         </div>
                                     </div>
-                                            <div className="row flight-price-box" style={{width:"30%"}}>
-                                                    <span className="mt-3" style={{textAlign:"center"}}>412,000원</span>
-                                                    <button className="btn btn-primary ms-5" style={{width:"50%" , height:"30%"}}>선택하기</button>
-                                            </div>
+                                    <div className="row flight-price-box" style={{width:"30%"}}>
+                                            <span className="mt-3" style={{textAlign:"center"}}>412,000원</span>
+                                            <button className="btn btn-primary ms-5" style={{width:"50%" , height:"30%"}}>선택하기</button>
+                                            <button className="btn btn-secondary ms-5" style={{width:"50%" , height:"30%"}} onClick={() => createRoom(flight)}>문의하기</button>
+                                    </div>
                                 </div>
                             </NavLink>
                         ))}
