@@ -110,13 +110,13 @@ const Room = () => {
             <h3 className="room-title mt-4">채팅방 목록</h3>
             <div className="list-group">
                 {roomList.map(room => (
-                    <div className="list-group-item" key={room.roomNo} onClick={e => enterRoom(room)}>
+                    <div className="list-group-item" key={room.roomNo}>
                         <div className="room-item">
                             <div className="room-name">
                                 <span className="badge bg-primary me-2">{room.roomNo}번</span>
                                 <span> {room.roomName}({user.userType})</span>
-                                {/* <button className="btn btn-primary ms-2" onClick={e=>enterRoom(room)}>채팅방 입장</button> */}
-                                <button className="btn btn-danger ms-2" onClick={e=>deleteRoom(room)}></button>
+                                <button className="btn btn-primary ms-2" onClick={e=>enterRoom(room)}>채팅방 입장</button>
+                                <button className="btn btn-danger ms-2" onClick={e=>deleteRoom(room)}>채팅방 삭제</button>
                             </div>
                         </div>
                     </div>
