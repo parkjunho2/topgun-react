@@ -6,7 +6,7 @@ import am4geodata_worldLow from "@amcharts/amcharts4-geodata/worldLow";
 import { Bar, Line } from "react-chartjs-2";
 import { Chart, registerables } from 'chart.js';
 
-// Chart.js의 모든 등록 가능한 요소를 등록
+// Register all Chart.js components
 Chart.register(...registerables);
 
 function WorldMapWithGraphs(props) {
@@ -30,20 +30,26 @@ function WorldMapWithGraphs(props) {
       property: "fill",
       target: polygonSeries.mapPolygons.template,
       min: am4core.color("#ffccd5"),
-      max: am4core.color("#ec7393") // 핑크톤 강조
+      max: am4core.color("#ec7393") // Pink tone emphasis
     });
 
-    // Add travel data to countries
+    // Add detailed data for each country
     polygonSeries.data = [
-      { id: "US", value: 1000 }, 
-      { id: "CN", value: 850 }, 
-      { id: "RU", value: 700 },
-      { id: "IN", value: 600 },
-      { id: "BR", value: 400 },
-      // ... 더미 데이터 추가
+      { id: "US", value: 1000, gdp: "$21 trillion", population: "331 million" }, 
+      { id: "CN", value: 850, gdp: "$14 trillion", population: "1.4 billion" }, 
+      { id: "RU", value: 700, gdp: "$1.7 trillion", population: "146 million" },
+      { id: "IN", value: 600, gdp: "$2.7 trillion", population: "1.3 billion" },
+      { id: "BR", value: 400, gdp: "$2 trillion", population: "213 million" },
+      // ... Add more data as needed
     ];
 
-    polygonSeries.mapPolygons.template.tooltipText = "{name}: {value} trips";
+    // Configure tooltip to show additional data
+    polygonSeries.mapPolygons.template.tooltipText = 
+      "{name}:\n" +
+      "Travel Count: {value} trips\n" +
+      "GDP: {gdp}\n" +
+      "Population: {population}";
+
     polygonSeries.mapPolygons.template.fill = am4core.color("#74B266");
 
     return () => {
@@ -57,7 +63,7 @@ function WorldMapWithGraphs(props) {
     datasets: [{
       label: "Travel Count",
       data: [1000, 850, 700, 600, 400],
-      backgroundColor: "rgba(236, 115, 147, 0.7)", // 핑크톤 강조 색상
+      backgroundColor: "rgba(236, 115, 147, 0.7)", // Pink tone color
       borderColor: "rgba(236, 115, 147, 1)",
       borderWidth: 2,
     }]
@@ -80,23 +86,23 @@ function WorldMapWithGraphs(props) {
     scales: {
       x: {
         grid: {
-          display: false, // X축 구분선 제거
+          display: false, // Remove X-axis gridlines
         }
       },
       y: {
         grid: {
-          display: false, // Y축 구분선 제거
+          display: false, // Remove Y-axis gridlines
         }
       }
     },
     plugins: {
       legend: {
-        display: false // 범례 제거 (필요 시 true로 변경 가능)
+        display: false // Hide legend (set to true if needed)
       }
     },
     elements: {
       line: {
-        tension: 0.4 // 부드러운 곡선으로 그래프 표현
+        tension: 0.4 // Smooth curve
       }
     }
   };
@@ -130,7 +136,7 @@ const styles = {
   },
   map: {
     width: "65%",
-    height: "650px", // 지도를 조금 더 크게 조정
+    height: "650px", // Adjust map size
   },
   graphContainer: {
     display: "flex",
@@ -139,11 +145,11 @@ const styles = {
     gap: "20px",
   },
   graph: {
-    border: "none", // 테두리 제거
+    border: "none", // Remove border
     borderRadius: "10px",
     padding: "20px",
     backgroundColor: "#f9f9f9",
-    height: "300px", // 그래프 크기 조정
+    height: "300px", // Adjust graph size
   }
 };
 
