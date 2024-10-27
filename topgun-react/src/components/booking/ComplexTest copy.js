@@ -4,7 +4,6 @@ import { FaSearch } from "react-icons/fa";
 import axios from "axios";
 import { FaAngleDown } from "react-icons/fa";
 import { throttle } from "lodash";
-import moment from "moment";
 
 const ComplexTest = () => {
 
@@ -12,10 +11,10 @@ const ComplexTest = () => {
 
     // state
     const [input, setInput] = useState({
-        departureAirport: "",   // 출발 공항
-        arrivalAirport: "",     // 도착 공항
-        departureTime: "",         // 출발 날짜
-        passengers: ""
+        departureAirport: '',   // 출발 공항
+        arrivalAirport: '',     // 도착 공항
+        flightTime: '',         // 출발 날짜
+        passengers: ''
     });
 
     const [result , setResult] = useState({
@@ -56,36 +55,12 @@ const ComplexTest = () => {
                 [e.target.name] : e.target.value
             });
         }, [input]);
-        
-        const ChangeInputNumber = useCallback((e)=>{
-            setInput({
-                ...input, 
-                [e.target.name] : parseInt(e.target.value) || ""
-            });
-        } , [input]);
 
-        const changeInputArray = useCallback(e=>{
-            //console.log(e.target.name, e.target.value, e.target.checked);
-            const origin = input[e.target.name];//input의 항목을 하나 꺼낸다
-    
-            if(e.target.checked === true) {//추가
-                setInput({
-                    ...input,
-                    [e.target.name] : origin.concat(e.target.value)
-                });
-            }
-            else {//삭제
-                setInput({
-                    ...input,
-                    [e.target.name] : origin.filter(level=>level !== e.target.value)
-                });
-            }
-        }, [input]);
 
         //첫 목록을 불러올 때 사용
         const sendRequest = useCallback(async ()=>{
             loading.current = true; //시작지점
-            const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
+            const resp = await axios.post("http://localhost:8080/flight/complexSearch", input); 
             // console.log(resp.data);
 
             setResult(resp.data);
@@ -101,7 +76,6 @@ const ComplexTest = () => {
             setResult({
                 ...result,
                 last : resp.data.last,      //서버에서 준 응답 데이터에 있는 last로 갱신
-                //flightList : result.flightList.concat(resp.data.flightList),    //concat 사용
                 flightList : [...result.flightList , ...resp.data.flightList]   //전개연산자 사용
             });
             loading.current = false;    //종료지점
@@ -112,7 +86,7 @@ const ComplexTest = () => {
             setPage(prev=>null);
             setTimeout(()=>{
                 setPage(prev=>1);
-            }, 1);  //이 코드는 1ms 뒤에 실행해라!
+            }, 1);//이 코드는 1ms 뒤에 실행해라!
             
         }, [page]);
 
@@ -131,14 +105,18 @@ const ComplexTest = () => {
             } , 350);
 
             //윈도우에 resize 이벤트를 설정
+            // window.addEventListener("scroll" , 함수);
             window.addEventListener("scroll" , resizeHandler);
             // console.log("스크롤 관련 이펙트 실행");
 
             return ()=>{
                 //윈도우에 설정된 resize 이벤트를 해제
+                // window.addEventListener("scroll" , 함수);
                 window.addEventListener("scroll" , resizeHandler);
+                // console.log("사라질 때 실행");
             }
         });
+
                 //스크롤의 현재 위치를 퍼센트로 계산하는 함수
                 const getScrollPercent = useCallback(()=>{
                     const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -147,9 +125,6 @@ const ComplexTest = () => {
                     return scrollPercent;
                 });
 
-        // ※※  로딩중에 추가 로딩이 불가능하게 처리하기 위한 REF 사용 ※※
-        // 목록을 불러오기 시작하면 loading.current = true로 변경
-        // 목록을 불러오고 나면  loading.current = false로 변경
         const loading = useRef(false);
 
 
@@ -161,7 +136,7 @@ const ComplexTest = () => {
                 <label className="col-sm-3 col-form-label">출발공항</label>
                 <div className="col-sm-9">
                     <input type="text" className="form-control" 
-                                                            value={input.departureAirport}
+                                                            value={input.departure}
                                                             name="departureAirport"
                                                             onChange={changeInputString}/>
                 </div>
@@ -171,7 +146,7 @@ const ComplexTest = () => {
                 <div className="col-sm-9">
                     <input type="text" className="form-control" 
                                             name="arrivalAirport" 
-                                            value={input.arrivalAirport} 
+                                            value={input.destination} 
                                             onChange={changeInputString} />
                 </div>
             </div>
@@ -180,12 +155,9 @@ const ComplexTest = () => {
                 <label className="col-sm-3 col-form-label">출발날짜</label>
                 <div className="col-sm-9 d-flex">
                     <input type="date" className="form-control" 
-                                                name="departureTime" 
-                                                value={input.departureTime} 
+                                                name="flightTime" 
+                                                value={input.boardingDate} 
                                                 onChange={changeInputString}/>
-                    {/* <input type="date" className="form-control" 
-                                                name="endMemberJoin" value={input.endMemberJoin} 
-                                                onChange={changeInputString}/> */}
                 </div>
             </div>
 
@@ -210,7 +182,7 @@ const ComplexTest = () => {
                     <ul className="list-group">
                         {result.flightList.map(flight=>(
                         <li className="list-group-item" key={flight.flightId}>
-                                <h3>항공편 번호: {flight.flightId}</h3>
+                                <h3>{flight.flightId}</h3>
                                     <div className="row">
                                         <div className="col-3">출발지</div>
                                         <div className="col-9">{flight.departureAirport}</div>
@@ -221,7 +193,7 @@ const ComplexTest = () => {
                                     </div>
                                     <div className="row mt-2">
                                         <div className="col-3">출발일</div>
-                                        <div className="col-9">{moment(flight.departureTime).format("YYYY-MM-DD HH:mm")}</div>
+                                        <div className="col-9"></div>
                                     </div>
 
                             </li>
@@ -229,11 +201,6 @@ const ComplexTest = () => {
                     </ul>
                 </div>
             </div>
-
-            {/* 더보기 버튼 : result의 last가 false이면 ( 더 볼게 있다면) */}
-            {/* A ? : B : C */}
-            {/* A && B */}
-            {/* A || C */}
             {result.last === false && (
                 <div className="row mt-4">
                     <div className="col">

@@ -38,6 +38,7 @@ import PaymentDetail from "./components/payment/PaymentDetail.js";
 import FindPw from './components/ForgotPw/FindPw/FindPw';
 import ResetPw from './components/ForgotPw/ResetPw/ResetPw.js';
 import Seats from './components/flight/Seats/Seasts.js';
+import ComplexTest from './components/booking/ComplexTest.js';
 
 
 
@@ -75,7 +76,7 @@ const App = () => {
     axios.defaults.headers.common["Authorization"] = "Bearer " + refreshToken;
 
     //[6] 백엔드에 갱신 요청을 전송
-    const resp = await axios.post("http://localhost:8080/users/refresh");
+    const resp = await axios.get("http://localhost:8080/users/refresh");
 
     //[7] 갱신 성공 시 응답(resp)에 담긴 데이터들을 적절하게 분배하여 저장(로그인과 동일)
     setUser({
@@ -121,6 +122,9 @@ const App = () => {
         <Route path="/flight/booking/:flightId" element={<Booking />} />
         <Route path="/flight/booking/:flightId/seats" element={<Seats />} />
         <Route path="/flight/bookingList" element={<BookingList />} />
+        
+        {/* 복합검색 테스트용 지울 예정 */}
+        <Route path="/complexTest" element={<ComplexTest />} />
 
         {/* 로그인 되어야지만 볼 수 있는 페이지 */}
         <Route element={<PrivateRoute />}>
