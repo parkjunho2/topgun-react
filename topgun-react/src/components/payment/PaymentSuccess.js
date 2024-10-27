@@ -60,13 +60,20 @@ const PaymentSuccess=()=>{
 
         //view
         if(result===null){
-            return <h1>결제 진행중입니다...</h1>
+            return <>
+            <div className="container">
+                <h1>결제 진행중입니다...</h1>
+            </div>
+            </>
         }
 
         else if(result){
+            const flightId = seatsList.length > 0 ? seatsList[0].flightId : "알 수 없음";
         return(<>
+        <div className="container text-center">
         <div className="row mt-4">
             <div className="col">
+                <h1 className="text-center">{flightId}항공편</h1>
                 <table className="table">
                    <tbody>
                     <tr>
@@ -84,24 +91,24 @@ const PaymentSuccess=()=>{
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colSpan={3}>총 결제 금액</th>
+                            <th>총 결제 금액</th>
+                            <th></th>
                             <th>{total}원</th>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
-
+    </div>
         </>);
         }
         else{
             return(<>
+            <div className="container">
             <h1 className="text-center mt-5">결제 승인 실패</h1>
+            </div>
             </>);
         }
-        
-        
-      
 };
 
 export default PaymentSuccess;
