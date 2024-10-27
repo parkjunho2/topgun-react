@@ -5,11 +5,12 @@ import { useParams } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { loginState, memberLoadingState } from "../../util/recoil";
 const PaymentSuccess=()=>{
-        //static
-        const {partnerOrderId} = useParams();//수신
+        //수신
+        const {partnerOrderId} = useParams();
         //로그인 상태
         const login = useRecoilValue(loginState);
         const memberLoading = useRecoilValue(memberLoadingState);
+        //static
 
         //결제 승인 상태
         const [result, setResult] = useState(null);//결제 대기중
@@ -29,6 +30,7 @@ const PaymentSuccess=()=>{
         const sendApproveRequest = useCallback(async()=>{
             try{//approveRequestVO 에 전송
                 const resp = await axios.post("http://localhost:8080/seats/approve", {
+                    
                     //정보 전송 cid, userId, orderId, pg_token, tid
                     partnerOrderId: partnerOrderId,
                     pgToken:new URLSearchParams(window.location.search).get("pg_token"),
@@ -58,7 +60,7 @@ const PaymentSuccess=()=>{
 
         //view
         if(result===null){
-            <h1>결제 진행중입니다...</h1>
+            return <h1>결제 진행중입니다...</h1>
         }
 
         else if(result){
