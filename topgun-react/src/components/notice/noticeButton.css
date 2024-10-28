@@ -234,3 +234,22 @@
   background-color: #ffe5b4 !important; 
   transform: scale(1.02); 
 } 
+
+.notice-pagination-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.notice-pagination {
+  display: flex;
+  justify-content: center; 
+  margin: 0 auto; /* 강제로 가운데 정렬 */
+}
+
+.notice-pagination-item {
+  margin: 0 5px; /* 아이템 사이 간격 조정 */
+}
+
+
