@@ -15,50 +15,15 @@ const NoticeDetail = () => {
         noticeTitle: '',
         noticeContent: '',
         noticeAuthor: '',
-        noticeCreatedAt: ''
+        noticeCreatedAt: '',
+        mainNotice: 0, // 기본값 0으로 설정
+        urgentNotice: 0, // 기본값 0으로 설정
+        modifiedNotice: ""
     });
     const login = useRecoilValue(loginState);
     const user = useRecoilValue(userState);
 
     const quillRef = useRef(null);
-
-    useEffect(() => {
-        const loadNotice = async () => {
-            if (!id) {
-                alert("Invalid notice ID");
-                navigate('/notice');
-                return;
-            }
-            try {
-                const response = await axios.get(`http://localhost:8080/notice/${id}`);
-                setNotice(response.data);
-                setUpdatedNotice({
-                    noticeTitle: response.data.noticeTitle,
-                    noticeContent: response.data.noticeContent,
-                    noticeAuthor: response.data.noticeAuthor,
-                    noticeCreatedAt: response.data.noticeCreatedAt
-                });
-            } catch (error) {
-                console.error("Failed to load notice:", error);
-            }
-        };
-        loadNotice();
-    }, [id, navigate]);
-
-    const handleUpdate = async () => {
-        const content = quillRef.current ? quillRef.current.getEditor().root.innerHTML : '';
-        try {
-            await axios.put(`http://localhost:8080/notice/${id}`, { ...updatedNotice, noticeContent: content });
-            alert('공지사항이 수정되었습니다!');
-            setIsEditing(false);
-            
-            // 수정된 공지사항을 다시 불러오기
-            await loadNotice();
-        } catch (error) {
-            console.error("Failed to update notice:", error);
-            alert('수정 실패. 다시 시도해 주세요.');
-        }
-    };
 
     const loadNotice = async () => {
         if (!id) {
@@ -73,10 +38,32 @@ const NoticeDetail = () => {
                 noticeTitle: response.data.noticeTitle,
                 noticeContent: response.data.noticeContent,
                 noticeAuthor: response.data.noticeAuthor,
-                noticeCreatedAt: response.data.noticeCreatedAt
+                noticeCreatedAt: response.data.noticeCreatedAt,
+                mainNotice: response.data.mainNotice ? 1 : 0, // 서버로부터 가져온 값 설정
+                urgentNotice: response.data.urgentNotice ? 1 : 0 // 서버로부터 가져온 값 설정
             });
         } catch (error) {
             console.error("Failed to load notice:", error);
+        }
+    };
+
+    useEffect(() => {
+        loadNotice();
+    }, [id, navigate]);
+
+    const handleUpdate = async () => {
+        const content = quillRef.current ? quillRef.current.getEditor().root.innerHTML : '';
+        try {
+            // 공지사항이 수정되었으므로 modifiedNotice를 1로 설정
+            const updatedData = { ...updatedNotice, noticeContent: content, modifiedNotice: 1 };
+    
+            await axios.put(`http://localhost:8080/notice/${id}`, updatedData);
+            alert('공지사항이 수정되었습니다!');
+            setIsEditing(false);
+            await loadNotice(); // 수정된 공지사항을 다시 불러오기
+        } catch (error) {
+            console.error("Failed to update notice:", error);
+            alert('수정 실패. 다시 시도해 주세요.');
         }
     };
 
@@ -140,7 +127,31 @@ const NoticeDetail = () => {
                         modules={modules}
                         style={styles.quillEditor}
                     />
+             
+                    <div style={{ display: 'flex', alignItems: 'center', marginTop: '30px' }}>
+                    <div style={{ marginRight: '20px' ,marginTop: '10px'}}>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={updatedNotice.mainNotice === 1}
+                                onChange={(e) => setUpdatedNotice({ ...updatedNotice, mainNotice: e.target.checked ? 1 : 0 })}
+                            />
+                            Main
+                        </label>
+                    </div>
+
+                    <div style={{ marginRight: '20px' ,marginTop: '10px'}}>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={updatedNotice.urgentNotice === 1}
+                                onChange={(e) => setUpdatedNotice({ ...updatedNotice, urgentNotice: e.target.checked ? 1 : 0 })}
+                            />
+                            Emergency
+                        </label>
+                    </div>
                 </div>
+            </div>
             ) : (
                 <div style={styles.viewMode}>
                     <h1 style={styles.title}>{notice.noticeTitle}</h1>
@@ -208,49 +219,6 @@ const styles = {
         marginTop: '0',
         marginBottom: '0',
     },
-    primaryButton: {
-        padding: '10px 15px',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        backgroundColor: '#ec7393',
-        color: 'white',
-        marginRight: '10px',
-        transition: 'background-color 0.3s ease',
-        fontSize: '16px',
-    },
-    primaryButtonHover: {
-        backgroundColor: '#d6286b',
-    },
-    secondaryButton: {
-        padding: '10px 15px',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        backgroundColor: '#ccc',
-        color: 'black',
-        transition: 'background-color 0.3s ease',
-        fontSize: '16px',
-    },
-    secondaryButtonHover: {
-        backgroundColor: '#b3b3b3',
-    },
-    editButton: {
-        marginTop: '25px',
-        padding: '10px 15px',
-        borderRadius: '4px',
-        border: 'none',
-        cursor: 'pointer',
-        margin: '10px',
-        backgroundColor: '#ec7393',
-        color: 'white',
-        transition: 'background-color 0.3s ease',
-        fontSize: '16px',
-    },
-    noticeContent: {
-        margin: '20px 0',
-        lineHeight: '13',
-    },
     editMode: {
         marginTop: '20px',
     },
@@ -260,6 +228,10 @@ const styles = {
     quillEditor: {
         height: '500px',
         marginBottom: '40px',
+    },
+    noticeContent: {
+        margin: '20px 0',
+        lineHeight: '13',
     },
     divider: {
         border: '1px solid #e3305f',

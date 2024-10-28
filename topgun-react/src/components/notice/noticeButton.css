@@ -218,3 +218,19 @@
   transform: scale(1); /* 클릭할 때 다시 원래 크기로 복귀 */
   transition: transform 0.1s ease; /* 클릭 시 더 빠른 애니메이션 */
 }
+
+
+.highlight-notice {
+  background-color: #ffebcd !important; /* 주요 공지 강조 */
+  color: #333; /* 텍스트 색상 */
+  /*font-weight: bold; /* 두꺼운 글꼴 */
+
+
+
+  transition: background-color 0.3s ease, transform 0.3s ease; /* 배경색과 변환 효과 */
+}
+
+ .highlight-notice:hover {
+  background-color: #ffe5b4 !important; 
+  transform: scale(1.02); 
+} 
