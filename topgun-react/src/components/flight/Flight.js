@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect, useRef, useMemo } from "react";
 import axios from "axios";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { Modal } from "bootstrap";
-import { FaMagnifyingGlass } from "react-icons/fa6";
+import { FaMagnifyingGlass, FaPlus} from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { userState } from "../../util/recoil";
@@ -10,6 +10,7 @@ import { userState } from "../../util/recoil";
 const Flight = () => {
     const [flightList, setFlightList] = useState([]);
     const [input, setInput] = useState({
+        flightId: "",
         flightNumber: "",
         departureTime: "",
         arrivalTime: "",
@@ -21,7 +22,7 @@ const Flight = () => {
         flightStatus: "대기", // 기본 상태
     });
 
-    const modalRef = useRef();
+    const modal = useRef();
     const [user, setUser] = useRecoilState(userState);
     const currentDateTime = new Date().toISOString().slice(0, 16); // 현재 날짜와 시간을 ISO 형식으로 가져오기
 
@@ -94,6 +95,7 @@ const Flight = () => {
 
     const clearInput = useCallback(() => {
         setInput({
+            flightId: "",
             flightNumber: "",
             departureTime: "",
             arrivalTime: "",
@@ -104,9 +106,27 @@ const Flight = () => {
             flightPrice: "",
             flightStatus: "대기",
         });
-    }, []);
+    }, [input]);
 
-    const addInput = useCallback(() => {
+    
+    
+
+    const openModal = useCallback(() => {
+        setInput((prevInput) => ({
+            ...prevInput,
+            userId: user.userId, // 현재 로그인된 사용자 ID를 설정
+        }));
+        const target = Modal.getOrCreateInstance(modal.current);
+        target.show();
+    }, [user.userId, modal]);
+
+    const closeModal = useCallback(() => {
+        const target = Modal.getInstance(modal.current);
+        target.hide();
+        clearInput();
+    }, [modal]);
+
+    const saveFlight = useCallback(async () => {
         if (input.departureTime && input.arrivalTime) {
             const departure = new Date(input.departureTime);
             const arrival = new Date(input.arrivalTime);
@@ -142,52 +162,6 @@ const Flight = () => {
                 alert("도착 시간은 출발 시간보다 늦어야 합니다.");
                 return;
             }
-        }
-    
-        const flightData = {
-            ...input,
-            // 입력된 시간을 UTC로 변환하여 서버로 전송
-            departureTime: new Date(input.departureTime).toISOString(),
-            arrivalTime: new Date(input.arrivalTime).toISOString(),
-            userId: user.userId, // 현재 로그인된 사용자 ID 추가
-        };
-    
-        axios({
-            url: "http://localhost:8080/flight/",
-            method: "post",
-            data: flightData,
-        })
-        .then(resp => {
-            clearInput(); // 입력창 초기화
-            loadList(); // 목록 다시 불러오기
-        });
-    }, [input, user.userId, loadList, clearInput]);
-    
-
-    const openModal = useCallback(() => {
-        setInput((prevInput) => ({
-            ...prevInput,
-            userId: user.userId, // 현재 로그인된 사용자 ID를 설정
-        }));
-        const modal = Modal.getOrCreateInstance(modalRef.current);
-        modal.show();
-    }, [user.userId]);
-
-    const closeModal = useCallback(() => {
-        const modal = Modal.getInstance(modalRef.current);
-        modal.hide();
-        clearInput();
-    }, [clearInput]);
-
-    const saveFlight = useCallback(async () => {
-        if (input.departureTime && input.arrivalTime) {
-            const departure = new Date(input.departureTime);
-            const arrival = new Date(input.arrivalTime);
-    
-            if (arrival <= departure) {
-                alert("도착 시간은 출발 시간보다 늦어야 합니다.");
-                return;
-            }
     
             // 시간을 ISO 형식으로 변환하여 서버로 전송
             const flightData = {
@@ -196,8 +170,13 @@ const Flight = () => {
                 arrivalTime: arrival.toISOString(),
                 userId: user.userId, // 현재 로그인된 사용자 ID 추가
             };
-    
-            await axios.post("http://localhost:8080/flight/", flightData);
+
+            
+
+            const copy = {...input};
+            delete copy.flightId;
+
+            await axios.post("http://localhost:8080/flight/", flightData, copy);
             loadList();
             closeModal();
         }
@@ -219,10 +198,17 @@ const Flight = () => {
             return;
         }
         
+         // 현재 시간
+    const now = new Date();
+        
         const resp = await axios.get(`http://localhost:8080/flight/column/${column}/keyword/${encodeURIComponent(keyword)}`);
-       // 항공편 리스트에서 현재 로그인된 사용자 ID와 일치하는 항공편만 필터링
-       const filteredFlights = resp.data.filter(flight => flight.userId === user.userId);
-        setFlightList(filteredFlights);
+     // 항공편 리스트에서 현재 로그인된 사용자 ID와 도착 시간이 현재 시간보다 이후인 항공편만 필터링
+     const filteredFlights = resp.data.filter(flight => {
+        const arrivalTime = new Date(flight.arrivalTime);
+        return flight.userId === user.userId && arrivalTime >= now;
+    });
+    
+    setFlightList(filteredFlights);
     }, [column, keyword, flightList]);
 
     
@@ -260,97 +246,19 @@ const Flight = () => {
             </div>
         </div>
 
-
-
             <div className="row mt-4">
                 <div className="col">
                     <table className="table table-striped">
                         <thead>
                         <tr>
-                            <td>
-                                <input type="text" className="form-control"
-                                       placeholder="항공편 번호"
-                                       name="flightNumber"
-                                       value={input.flightNumber}
-                                       onChange={changeInput} />
-                            </td>
-                            <td>
-                                <input type="datetime-local" className="form-control"
-                                       name="departureTime"
-                                       value={input.departureTime}
-                                       onChange={changeInput}
-                                       min={currentDateTime} />
-                            </td>
-                            <td>
-                                <input type="datetime-local" className="form-control"
-                                       name="arrivalTime"
-                                       value={input.arrivalTime}
-                                       onChange={changeInput}
-                                       min={currentDateTime}/>
-                            </td>
-                            <td>
-                                <input type="text" className="form-control"
-                                placeholder="운항 시간"
-                                       name="flightTime"
-                                       value={input.flightTime}
-                                       onChange={changeInput} />
-                            </td>
-                            <td>
-                                <select name="departureAirport" className="form-control" value={input.departureAirport} onChange={changeInput}>
-                                    <option>출발 공항 선택</option>
-                                    <option>서울/인천(ICN)</option>
-                                    <option>서울/김포(GMP)</option>
-                                    <option>광주(KWJ)</option>
-                                    <option>대구(TAE)</option>
-                                    <option>제주(CJU)</option>
-                                    <option>여수(RSU)</option>
-                                    <option>도쿄/나리타(NRT)</option>
-                                    <option>오사카/간사이(KIX)</option>
-                                    <option>나트랑(CXR)</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="arrivalAirport" className="form-control" value={input.arrivalAirport} onChange={changeInput}>
-                                    <option>도착 공항 선택</option>
-                                    <option>서울/인천(ICN)</option>
-                                    <option>서울/김포(GMP)</option>
-                                    <option>광주(KWJ)</option>
-                                    <option>대구(TAE)</option>
-                                    <option>제주(CJU)</option>
-                                    <option>여수(RSU)</option>
-                                    <option>도쿄/나리타(NRT)</option>
-                                    <option>오사카/간사이(KIX)</option>
-                                    <option>나트랑(CXR)</option>
-                                </select>
-                            </td>
-
-                            <td>
-                                <input type="hidden" className="form-control"
-                                       placeholder="아이디"
-                                       name="userId"
-                                       value={user.userId} // userId는 비활성화
-                                       readOnly // 비활성화 설정
-                                       onChange={changeInput} />
-                            </td>
-                            <td>
-                                <input type="number" className="form-control"
-                                       placeholder="가격"
-                                       name="flightPrice"
-                                       value={input.flightPrice}
-                                       onChange={changeInput} />
-                            </td>
-                            <td>
-                                <span className="badge bg-secondary">
-                                    {input.flightStatus}
-                                </span>
-                            </td>
-                            <td>
-                                <button type="button"
-                                        className="btn btn-success"
-                                        onClick={addInput}>
-                                    신규 등록
-                                </button>
-                            </td>
+                        <div className="row mt-4">
+                        <div className="col">
+                            <button className="btn btn-success" onClick={openModal}>
+                            <FaPlus/>신규등록
+                         </button>
+                        </div>
+                        </div>  
+                        
                         </tr>
                         </thead>
                         <tbody className="table-dark">
@@ -413,13 +321,14 @@ const Flight = () => {
             </div>
 
             {/* 모달 */}
-            <div className="modal fade" tabIndex="-1" ref={modalRef} data-bs-backdrop="static">
+            <div className="modal fade" tabIndex="-1" ref={modal} data-bs-backdrop="static">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title">{input.flightNumber ? '항공편 수정' : '항공편 등록'}</h5>
+                            <h5 className="modal-title">{addMode ? '항공편 수정' : '항공편 등록'}</h5>
                             <button type="button" className="btn-close" onClick={closeModal}></button>
                         </div>
+
                         <div className="modal-body">
                             {/* 입력 필드들 */}
                             <div className="mb-3">
@@ -436,7 +345,7 @@ const Flight = () => {
                             </div>
                             <div className="mb-3">
                                 <label>운항 시간</label>
-                                <input type="text" name="flightTime" className="form-control" value={input.flightTime} onChange={changeInput} />
+                                <input type="text" name="flightTime" className="form-control" readOnly value={input.flightTime} onChange={changeInput} />
                             </div>
                             <div className="mb-3">
                                 <label>출발 공항</label>

@@ -23,6 +23,14 @@ const AdminFlightDetail = () => {
     }, [flightId]);
 
     const updateFlight = useCallback(async (status) => {
+
+         // 이미 처리된 상태인지 확인
+    if (flight.flightStatus === "승인" || flight.flightStatus === "거절") {
+        alert("이 항공편은 이미 처리되었습니다.");
+        return;
+    }
+
+    
         if (status === "승인" && !window.confirm("승인 처리하시겠습니까?")) return;
         if (status === "거절" && !window.confirm("거절 처리하시겠습니까?")) return;
 
@@ -30,6 +38,7 @@ const AdminFlightDetail = () => {
             ...flight,
             flightStatus: status,
         };
+
 
         await axios.put("http://localhost:8080/admin/update", updatedFlight);
         navigate("/admin/list");
@@ -95,8 +104,19 @@ const AdminFlightDetail = () => {
 
             {/* 버튼들 */}
             <div className="text-center mt-4">
-                <button className="btn btn-success ms-2" onClick={() => updateFlight("승인")}>승인</button>
-                <button className="btn btn-danger ms-2" onClick={() => updateFlight("거절")}>거절</button>
+                {/* 상태 값에 따른 버튼 */}
+                {flight.flightStatus === "대기" && (
+                    <>
+                        <button className="btn btn-success" onClick={() => updateFlight(flight.flightId, "승인")}>승인</button>
+                        <button className="btn btn-danger" onClick={() => updateFlight(flight.flightId, "거절")}>거절</button>
+                    </>
+                )}
+                {flight.flightStatus === "승인" && (
+                    <button className="btn btn-secondary" disabled>승인됨</button>
+                )}
+                {flight.flightStatus === "거절" && (
+                    <button className="btn btn-secondary" disabled>거절됨</button>
+                )}
                 <button className="btn btn-secondary ms-2" onClick={() => navigate("/admin/list")}>목록보기</button>
             </div>
         </div>
