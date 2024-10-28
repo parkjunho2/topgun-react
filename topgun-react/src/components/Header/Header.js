@@ -65,11 +65,11 @@ const Header = () => {
                                     AdminFlight
                                 </NavLink>
                             </li>
-                            <li>
+                            {/* <li>
                                 <NavLink to="/payment" className="nav-link px-2 text-white">
                                     payment
                                 </NavLink>
-                            </li>
+                            </li> */}
                             <li>
                                 <NavLink to="/payment/alllist" className="nav-link px-2 text-white">
                                     paymentlist
