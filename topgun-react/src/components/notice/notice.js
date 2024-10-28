@@ -1,24 +1,27 @@
 import { useCallback, useState, useEffect, useMemo, useRef } from "react";
-import { FaTrash } from "react-icons/fa";
+import { FaStar, FaExclamationTriangle, FaTrash, FaMeteor, FaDizzy } from 'react-icons/fa';
+
 import { Link } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
-import { useRecoilValue } from "recoil"; // Recoil 상태 불러오기
-import { loginState, userState } from "../../util/recoil"; // Recoil atoms
+import { useRecoilValue } from "recoil";
+import { loginState, userState } from "../../util/recoil";
 import 'react-quill/dist/quill.snow.css';
-import './noticeButton.css'; // 프레임 라인 버튼 스타일을 포함한 CSS 파일
+import './noticeButton.css';
 
 const NoticeBoard = () => {
     const [noticeList, setNoticeList] = useState([]);
     const [input, setInput] = useState({
-        noticeTitle: "", // 제목 필드 이름 변경
-        noticeContent: "", // 내용 필드 이름 변경
-        noticeAuthor: "", // 작성자 필드 이름 변경
+        noticeTitle: "",
+        noticeContent: "",
+        noticeAuthor: "",
         noticeCreatedAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+        mainNotice: "",
+        urgentNotice: "",
+        modifiedNotice: ""
     });
     const quillRef = useRef(null);
 
-    // 로그인 상태와 사용자 정보 가져오기
     const login = useRecoilValue(loginState);
     const user = useRecoilValue(userState);
 
@@ -29,7 +32,14 @@ const NoticeBoard = () => {
     const loadList = useCallback(async () => {
         try {
             const response = await axios.get("http://localhost:8080/notice/");
-            setNoticeList(response.data);
+            // mainNotice가 1인 항목을 우선으로, 긴급 공지 항목을 그 다음으로 정렬
+            const sortedList = response.data.sort((a, b) => {
+                if (a.mainNotice === b.mainNotice) {
+                    return b.urgentNotice - a.urgentNotice; // 긴급 공지가 먼저 오도록 정렬
+                }
+                return b.mainNotice - a.mainNotice; // 주요 공지가 먼저 오도록 정렬
+            });
+            setNoticeList(sortedList);
         } catch (error) {
             console.error("Failed to load notice list:", error);
             alert("공지사항 목록을 불러오는 데 실패했습니다.");
@@ -60,7 +70,7 @@ const NoticeBoard = () => {
     const handleContentChange = useCallback(value => {
         setInput(prevInput => ({
             ...prevInput,
-            noticeContent: value // 내용 필드 이름 변경
+            noticeContent: value
         }));
     }, []);
 
@@ -72,11 +82,11 @@ const NoticeBoard = () => {
 
         const newNotice = {
 
+            noticeTitle: input.noticeTitle,
+            noticeContent: input.noticeContent,
+            noticeAuthor: `${user.userId} (${user.userType})`,
+            noticeCreatedAt: new Date().toLocaleString('ko-KR', {
 
-           noticeTitle: input.noticeTitle, // 제목 필드 이름 변경
-            noticeContent: input.noticeContent, // 내용 필드 이름 변경
-            noticeAuthor: `${user.userId} (${user.userType})`, // 작성자 필드 이름 변경
-            noticeCreatedAt: new Date().toLocaleString('ko-KR', { 
                 timeZone: 'Asia/Seoul',
                 year: 'numeric',
                 month: '2-digit',
@@ -85,6 +95,9 @@ const NoticeBoard = () => {
                 minute: '2-digit',
                 hour12: false
             }),
+
+            mainNotice: input.mainNotice, // 체크박스 상태 추가
+            urgentNotice: input.urgentNotice, // 체크박스 상태 추가
         };
 
 
@@ -99,25 +112,16 @@ const NoticeBoard = () => {
     }, [input, loadList, login, user]);
 
     const clearInput = useCallback(() => {
-        const now = new Date();
-        
-        // 수동으로 날짜 및 시간 포맷팅
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
-        const date = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-    
-        const formattedDate = `${year}-${month}-${date} ${hours}:${minutes}`; // 원하는 형식으로 조합
-        
         setInput({
-            noticeTitle: "", // 제목 필드 이름 변경
-            noticeContent: "", // 내용 필드 이름 변경
-            noticeAuthor: "", // 작성자 필드 이름 변경
-            noticeCreatedAt: formattedDate, // 포맷된 날짜
+            noticeTitle: "",
+            noticeContent: "",
+            noticeAuthor: "",
+            noticeCreatedAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+            mainNotice: "",
+            urgentNotice: "",
+            modifiedNotice: ""
         });
     }, []);
-    
 
     const handleImageUpload = () => {
         const input = document.createElement('input');
@@ -141,6 +145,18 @@ const NoticeBoard = () => {
             }
         };
     };
+
+    const toggleCheckbox = (name) => {
+        setInput(prevInput => ({
+            ...prevInput,
+            [name]: prevInput[name] === 0 ? 1 : 0 // 체크박스 상태 토글
+        }));
+    };
+
+
+
+
+
 
     const modules = useMemo(() => ({
         toolbar: {
@@ -167,26 +183,48 @@ const NoticeBoard = () => {
                 <table className="table" style={{ width: '80%', tableLayout: 'fixed' }}>
                     <thead>
                         <tr>
-                            <th style={{ padding: '15px', textAlign: 'center', width: '10%' }}>NO.</th>
+                            <th style={{ padding: '15px', textAlign: 'center', width: '20%' }}>NO.</th>
                             <th style={{ padding: '15px', textAlign: 'center', width: '30%' }}>TITLE</th>
-                            <th style={{ padding: '15px', textAlign: 'center', width: '20%' }}>AUTHOR</th>
+                            <th style={{ padding: '15px', textAlign: 'center', width: '13%' }}>AUTHOR</th>
                             <th style={{ padding: '15px', textAlign: 'center', width: '35%' }}>DATE</th>
-                            <th style={{ padding: '15px', textAlign: 'center', width: '5%' }}></th>
+                            <th style={{ padding: '15px', textAlign: 'center', width: '2%' }}></th>
                         </tr>
                     </thead>
                     <tbody>
                         {noticeList.map((notice) => (
-                            <tr key={notice.noticeId}>
-                                <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeId}</td>
+                            <tr
+                                key={notice.noticeId}
+                                className={notice.mainNotice === 1 ? 'highlight-notice' : ''}
+                                style={{
+                                    padding: '15px',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                <td style={{ padding: '15px', textAlign: 'center' }}>
+                                    {notice.noticeId}
+                                    {notice.urgentNotice === 1 && (
+                                        <span style={{ marginBottom: '15px', marginLeft: '5px', color: '#e63946' }}>
+                                            <FaDizzy title="긴급 공지" style={{ fontSize: '1em' }} />
+                                            Danger
+                                        </span>
+                                    )}
+                                    {/* 메인 공지인 경우 아이콘과 텍스트 추가 */}
+                                    {notice.mainNotice === 1 && (
+                                        <span style={{ marginLeft: '10px', color: '#ec7393' }}>
+                                            <FaMeteor style={{ fontSize: '1em' }} title="주요 공지" />
+                                            main
+                                        </span>
+                                    )}
+                                </td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
                                     <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                        {notice.noticeTitle} {/* 제목 필드 이름 변경 */}
+                                        {notice.noticeTitle}
                                     </Link>
                                 </td>
-                                <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeAuthor}</td> {/* 작성자 필드 이름 변경 */}
-                                <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeCreatedAt}</td> {/* 생성일 필드 이름 변경 */}
+                                <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeAuthor}</td>
+                                <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeCreatedAt}</td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
-                                {user.userType === 'ADMIN' && ( 
+                                    {user.userType === 'ADMIN' && (
                                         <FaTrash
                                             className="text-danger trash-icon"
                                             style={{ color: '#ec7393', fill: '#ec7393', fontSize: '1em' }}
@@ -199,15 +237,15 @@ const NoticeBoard = () => {
                     </tbody>
 
                     <tfoot>
-                    {user.userType === 'ADMIN' && ( 
+                        {user.userType === 'ADMIN' && (
                             <>
                                 <tr>
                                     <td style={{ textAlign: 'center' }}></td>
                                     <td>
                                         <input type="text" className="form-control"
                                             placeholder="제목"
-                                            name="noticeTitle" // 제목 필드 이름 변경
-                                            value={input.noticeTitle} // 제목 필드 이름 변경
+                                            name="noticeTitle"
+                                            value={input.noticeTitle}
                                             onChange={changeInput} />
                                     </td>
                                     <td></td>
@@ -233,12 +271,30 @@ const NoticeBoard = () => {
                                     <td colSpan="5">
                                         <ReactQuill
                                             ref={quillRef}
-                                            value={input.noticeContent} // 내용 필드 이름 변경
+                                            value={input.noticeContent}
                                             onChange={handleContentChange}
                                             modules={modules}
                                             placeholder="오른쪽 아래 선택자로 에디터 크기를 자유롭게 조절하세요!"
-                                            style={{ height: '290px', width: '110%', resize: 'vertical', overflowY: 'auto' }} // 너비를 100%로 설정
+                                            style={{ height: '290px', width: '110%', resize: 'vertical', overflowY: 'auto' }}
                                         />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colSpan="5" style={{ textAlign: 'left', marginTop: '10px' }}>
+                                        <label style={{ marginRight: '10px' }}>
+                                            <input
+                                                type="checkbox" style={{ marginRight: '5px' }}
+                                                checked={input.mainNotice === 1}
+                                                onChange={() => toggleCheckbox('mainNotice')}
+                                            /> Main
+                                        </label>
+                                        <label style={{ marginRight: '10px' }}>
+                                            <input
+                                                type="checkbox" style={{ marginRight: '5px' }}
+                                                checked={input.urgentNotice === 1}
+                                                onChange={() => toggleCheckbox('urgentNotice')}
+                                            /> Emergency
+                                        </label>
                                     </td>
                                 </tr>
                             </>
