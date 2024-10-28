@@ -9,8 +9,14 @@ import { loginState, userState } from "../../util/recoil";
 import 'react-quill/dist/quill.snow.css';
 import './noticeButton.css';
 
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
+
 const NoticeBoard = () => {
+
     const [noticeList, setNoticeList] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [noticesPerPage, setNoticesPerPage] = useState(6);
     const [input, setInput] = useState({
         noticeTitle: "",
         noticeContent: "",
@@ -20,6 +26,14 @@ const NoticeBoard = () => {
         urgentNotice: "",
         modifiedNotice: ""
     });
+
+
+    const indexOfLastNotice = currentPage * noticesPerPage;
+    const indexOfFirstNotice = indexOfLastNotice - noticesPerPage;
+    const currentNotices = noticeList.slice(indexOfFirstNotice, indexOfLastNotice);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
     const quillRef = useRef(null);
 
     const login = useRecoilValue(loginState);
@@ -191,7 +205,7 @@ const NoticeBoard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {noticeList.map((notice) => (
+                        {currentNotices.map((notice) => (
                             <tr
                                 key={notice.noticeId}
                                 className={notice.mainNotice === 1 ? 'highlight-notice' : ''}
@@ -235,6 +249,19 @@ const NoticeBoard = () => {
                             </tr>
                         ))}
                     </tbody>
+
+                   {/* 페이지네이션 추가 */}
+<div style={{ display: 'flex', justifyContent: 'center', width: '500%', marginTop: '5px' }}>
+    <Stack spacing={2}>
+        <Pagination
+            count={Math.ceil(noticeList.length / noticesPerPage)}
+            page={currentPage}
+            onChange={(event, page) => paginate(page)}
+            variant=""
+            color="primary"
+        />
+    </Stack>
+</div>
 
                     <tfoot>
                         {user.userType === 'ADMIN' && (
