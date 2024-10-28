@@ -147,7 +147,7 @@ const App = () => {
         {/* 관리자만 봐야하는 페이지 */}
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/list" element={<AdminFlight />} />
+          {/* <Route path="/admin/list" element={<AdminFlight />} /> */}
           <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
         </Route>
 

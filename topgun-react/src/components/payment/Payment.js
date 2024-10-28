@@ -104,6 +104,7 @@ import { useParams } from "react-router";
                                     <td>
                                         <input type="checkbox" className="form-check-input"
                                         checked={seats.select} onChange={e=>selectSeats(seats, e.target.checked)}
+                                        disabled={seats.status === "사용"} // 사용된 좌석은 선택 불가
                                         />
                                     </td>
                                     <td>{seats.seatsNo}</td>
