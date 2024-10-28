@@ -139,7 +139,6 @@ const App = () => {
           <Route path='/payment/alllist' element={<PaymentAllList />} />
           <Route path="/chat/:roomNo" element={<Chat />} />
           <Route path="/room" element={<Room />} />
-          <Route path='/payment/list' element={<PaymentList />} />
           <Route path='/payment/detail/:paymentNo' element={<PaymentDetail />} />
         </Route>
 
@@ -147,7 +146,7 @@ const App = () => {
         {/* 관리자만 봐야하는 페이지 */}
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<Admin />} />
-          {/* <Route path="/admin/list" element={<AdminFlight />} /> */}
+          <Route path="/admin/list" element={<AdminFlight />} />
           <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
         </Route>
 
