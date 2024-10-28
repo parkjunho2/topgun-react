@@ -4,6 +4,10 @@ import { useNavigate } from "react-router";
 import './Room.css'; // CSS 파일 import
 import { useRecoilValue } from "recoil";
 import { loginState, memberLoadingState, userState } from "../../util/recoil";
+import { IoEnterOutline } from "react-icons/io5";
+import { MdDeleteOutline } from "react-icons/md";
+import { IoLogoWechat } from "react-icons/io5";
+import { FaPlus } from "react-icons/fa";
 
 const Room = () => {
     //navigator
@@ -102,7 +106,7 @@ const Room = () => {
                                 ))}
                             </select>
 
-                            <button className="btn btn-success" onClick={saveInput}>등록</button>
+                            <button className="btn btn-success" onClick={saveInput}><FaPlus /></button>
                         </div>
                     </div>
                 </div>
@@ -114,10 +118,10 @@ const Room = () => {
                     <div className="list-group-item" key={room.roomNo}>
                         <div className="room-item">
                             <div className="room-name">
-                                <span className="badge bg-primary me-2">{room.roomNo}번</span>
-                                <span> {room.roomName}({user.userType})</span>
-                                <button className="btn btn-primary ms-2" onClick={e=>enterRoom(room)}>채팅방 입장</button>
-                                <button className="btn btn-danger ms-2" onClick={e=>deleteRoom(room)}>채팅방 삭제</button>
+                                {/* <span className="badge bg-primary me-2">{room.roomNo}번</span> */}
+                                <span><IoLogoWechat /> {room.roomName}({user.userType})</span>
+                                <button className="btn btn-primary ms-2" onClick={e=>enterRoom(room)}><IoEnterOutline style={{ fontSize: '1.5rem' }} /></button>
+                                <button className="btn btn-danger ms-2" onClick={e=>deleteRoom(room)}><MdDeleteOutline style={{ fontSize: '1.5rem' }} /></button>
                             </div>
                         </div>
                     </div>

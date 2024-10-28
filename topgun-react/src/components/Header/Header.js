@@ -35,55 +35,50 @@ const Header = () => {
                                     홈
                                 </NavLink>
                             </li>
-                            <li>
-                                <a href="#" className="nav-link px-2 text-white">
-                                    Features
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="nav-link px-2 text-white">
-                                    Pricing
-                                </a>
-                            </li>
+                            {login && ( //로그인 회원
                             <li>
                                 <NavLink to="/room" className="nav-link px-2 text-white">
-                                    Chat
+                                    문의
                                 </NavLink>
                             </li>
-                            <li>
-                                <a href="#" className="nav-link px-2 text-white">
-                                    About
-                                </a>
-                            </li>
+                            )}
+                            {login && user.userType==="AIRLINE" && ( //로그인 상태, AIRLINE만
                             <li>
                                 <NavLink to="/flight" className="nav-link px-2 text-white">
-                                    flight
+                                    항공편
+                                </NavLink>
+                            </li>
+                            )}
+                            {login && user.userType === "ADMIN" && ( //로그인 상태, ADMIN만
+                            <>
+                            <li>
+                                <NavLink to="/admin/list" className="nav-link px-2 text-white">
+                                    항공편
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="/admin/list" className="nav-link px-2 text-white">
-                                    AdminFlight
+                                <NavLink to="/graph" className="nav-link px-2 text-white">
+                                    데이터차트
                                 </NavLink>
                             </li>
+                            </>
+                            )}
                             {/* <li>
                                 <NavLink to="/payment" className="nav-link px-2 text-white">
                                     payment
                                 </NavLink>
                             </li> */}
+                            {login && user.userType === "MEMBER" && (
                             <li>
                                 <NavLink to="/payment/alllist" className="nav-link px-2 text-white">
-                                    paymentlist
+                                    예약내역
                                 </NavLink>
                             </li>
+                            )}
                             <li>
-                                <a href="/notice" className="nav-link px-2 text-white">
-                                    notice
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/graph" className="nav-link px-2 text-white">
-                                    graph
-                                </a>
+                                <NavLink to="/notice" className="nav-link px-2 text-white">
+                                    공지사항
+                                </NavLink>
                             </li>
                         </ul>
                         <div className="text-end">
