@@ -129,9 +129,9 @@ const App = () => {
         {/* 로그인 되어야지만 볼 수 있는 페이지 */}
         <Route element={<PrivateRoute />}>
           <Route path="/payment/:flightId" element={<Payment />} />
-          <Route path="/payment/success/:partnerOrderId" element={<PaymentSuccess />} />
-          <Route path="/payment/cancel" element={<PaymentCancel />} />
-          <Route path="/payment/fail" element={<PaymentFail />} />
+          <Route path="/payment/:flightId/success/:partnerOrderId" element={<PaymentSuccess />} />
+          <Route path="/payment/:flightId/cancel" element={<PaymentCancel />} />
+          <Route path="/payment/:flightId/fail" element={<PaymentFail />} />
           <Route path="/test" element={<Test />} />
           <Route path="/chat" element={<Chat />} />
           <Route path='/mypage' element={<MyPage />} />
