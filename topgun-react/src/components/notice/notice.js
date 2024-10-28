@@ -81,10 +81,12 @@ const NoticeBoard = () => {
         }
 
         const newNotice = {
+
             noticeTitle: input.noticeTitle,
             noticeContent: input.noticeContent,
             noticeAuthor: `${user.userId} (${user.userType})`,
             noticeCreatedAt: new Date().toLocaleString('ko-KR', {
+
                 timeZone: 'Asia/Seoul',
                 year: 'numeric',
                 month: '2-digit',
@@ -93,9 +95,11 @@ const NoticeBoard = () => {
                 minute: '2-digit',
                 hour12: false
             }),
+
             mainNotice: input.mainNotice, // 체크박스 상태 추가
             urgentNotice: input.urgentNotice, // 체크박스 상태 추가
         };
+
 
         try {
             await axios.post("http://localhost:8080/notice/", newNotice);

@@ -5,11 +5,12 @@ import { useParams } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { loginState, memberLoadingState } from "../../util/recoil";
 const PaymentSuccess=()=>{
-        //static
-        const {partnerOrderId} = useParams();//수신
+        //수신
+        const {partnerOrderId} = useParams();
         //로그인 상태
         const login = useRecoilValue(loginState);
         const memberLoading = useRecoilValue(memberLoadingState);
+        //static
 
         //결제 승인 상태
         const [result, setResult] = useState(null);//결제 대기중
@@ -29,6 +30,7 @@ const PaymentSuccess=()=>{
         const sendApproveRequest = useCallback(async()=>{
             try{//approveRequestVO 에 전송
                 const resp = await axios.post("http://localhost:8080/seats/approve", {
+                    
                     //정보 전송 cid, userId, orderId, pg_token, tid
                     partnerOrderId: partnerOrderId,
                     pgToken:new URLSearchParams(window.location.search).get("pg_token"),
@@ -58,13 +60,20 @@ const PaymentSuccess=()=>{
 
         //view
         if(result===null){
-            <h1>결제 진행중입니다...</h1>
+            return <>
+            <div className="container">
+                <h1>결제 진행중입니다...</h1>
+            </div>
+            </>
         }
 
         else if(result){
+            const flightId = seatsList.length > 0 ? seatsList[0].flightId : "알 수 없음";
         return(<>
+        <div className="container text-center">
         <div className="row mt-4">
             <div className="col">
+                <h1 className="text-center">{flightId}항공편</h1>
                 <table className="table">
                    <tbody>
                     <tr>
@@ -82,24 +91,24 @@ const PaymentSuccess=()=>{
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colSpan={3}>총 결제 금액</th>
+                            <th>총 결제 금액</th>
+                            <th></th>
                             <th>{total}원</th>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
-
+    </div>
         </>);
         }
         else{
             return(<>
+            <div className="container">
             <h1 className="text-center mt-5">결제 승인 실패</h1>
+            </div>
             </>);
         }
-        
-        
-      
 };
 
 export default PaymentSuccess;

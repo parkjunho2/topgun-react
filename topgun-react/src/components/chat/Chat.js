@@ -21,6 +21,7 @@ const Chat = () => {
     const [client, setClient] = useState(null);
     const [connect, setConnect] = useState(false);
     const [more, setMore] = useState(false);
+    const [roomName, setRoomName] = useState("");
 
     //memo
     const firstMessageNo = useMemo(() => {
@@ -29,7 +30,7 @@ const Chat = () => {
         const message = messageList[0];
         return message.no || null; //메세지 번호 반환 or 없으면 null
     }, [messageList]);
-    console.log("첫 번호 : ", firstMessageNo);
+    // console.log("첫 메세지 번호 : ",firstMessageNo);
 
     //recoil
     const user = useRecoilValue(userState);
@@ -84,7 +85,7 @@ const Chat = () => {
             onDisconnect: () => {
                 setConnect(false); //연결상태 갱신
             },
-            debug : (str) => {
+            debug: (str) => {
                 console.log(str);
             }
         });
@@ -108,13 +109,13 @@ const Chat = () => {
         //     return;
         // }
 
-        // const message = {
-        //     content: input,
-        //     senderUsersId: user.userId,
-        //     senderUsersType: user.userType,
-        //     receiverUsersId: receiverUsersId,
-        //     time: new Date().toISOString()
-        // };
+        const message = {
+            content: input,
+            senderUsersId: user.userId,
+            senderUsersType: user.userType,
+            // receiverUsersId: receiverUsersId,
+            time: new Date().toISOString()
+        };
 
         client.publish({
             destination: "/app/room/" + roomNo,
@@ -124,29 +125,14 @@ const Chat = () => {
             },
             body: JSON.stringify({ content: input })
         });
+        setMessageList(prev => [...prev, message]);
         setInput(""); // 입력창 초기화
     }, [input, client, connect]);
 
-    // const sendDM = useCallback(() => {
-    //     const convertStr = input.substring(2);
-    //     const firstSpace = convertStr.indexOf(" ");
-    //     const receiverId = convertStr.substring(0, firstSpace); //아이디
-    //     const content = convertStr.substring(firstSpace + 1); //보낼 메세지 내용
-
-    //     const json = {
-    //         content: content
-    //     };
-    //     const message = {
-    //         destination: "/app/room/" + roomNo + "/dm/" + receiverId,
-    //         body: JSON.stringify(json),
-    //         headers: {
-    //             accessToken: accessToken,
-    //             refreshToken: refreshToken
-    //         }
-    //     }
-    //     client.publish(message);
-    //     setInput("");
-    // }, [input, client, connect]);
+    const deleteMessage = useCallback(async (roomMessageNo)=>{
+        await axios.delete(`http://localhost:8080/room/chat/${roomMessageNo}`)
+        setMessageList(prev=>prev.filter(message => message.no != roomMessageNo));
+    },[]);
 
     const checkRoom = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/room/check/" + roomNo);
@@ -170,122 +156,69 @@ const Chat = () => {
     // 자동 스크롤 함수
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth" }); // 부드럽게 스크롤
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end"}); // 부드럽게 스크롤
         }
     };
 
-    // const filteredMessages = messageList.filter(message => {
-    //     if (roomNo === "1") {
-    //         if (user.userType === "ADMIN") {
-    //             return true; // ADMIN은 모든 메시지 보기
-    //         }
-    //         else {
-    //             return (message.senderUsersType === "ADMIN" ||  // MEMBER/AIRLINE은 ADMIN의 메시지만 보기
-    //                 message.senderUsersId === user.userId // 본인의 메시지
-    //             );
-    //         }
-    //     }
-    //     else if (roomNo === "2" || roomNo === "3") {
-    //         if (user.userType === "AIRLINE") {
-    //             return true;
-    //         }
-    //         else {
-    //             return (message.senderUsersType == "AIRLINE" ||
-    //                 message.senderUsersId === user.userId
-    //             );
-    //         }
-    //     }
-    // });
-
-    // const handleUserClick = (userId) => {
-    //     setInput(`@ ${userId} `); //입력창에 클릭한 ID 추가
-    // }
-
-    const loadMoreMessageList = useCallback(async ()=>{
-        const resp = await axios.get("http://localhost:8080/message/more/"+firstMessageNo);
-        setMessageList(prev=>[...resp.data.messageList, ...prev]);
-        setMore(resp.data.last === false);//더보기 여부 설정
-    },[messageList, firstMessageNo, more]);
-
+    const loadMoreMessageList = useCallback(async () => {
+        console.log("첫 메세지 번호 : ", firstMessageNo);
+        const resp = await axios.get("http://localhost:8080/message/more/" + firstMessageNo, {
+            params: { roomNo }
+        });
+        setMessageList(prev => [...prev, ...resp.data.messageList]);
+        setMore(resp.data.last === true);//더보기 여부 설정
+    }, [messageList, firstMessageNo, more]);
 
     return (<>
-        {/* <h3>{"현재 연결 상태 = " + (connect ? "연결됨" : "종료됨")}</h3> */}
-        <div className="row mt-4">
-            {/* 메세지 목록 */}
-            <div className="col">
-                {/* 더보기 버튼(firstMessageNo가 null이 아니면) */}
-                {more === true && (
-                    <button className="btn btn-outline-success w-100" onClick={loadMoreMessageList}>
-                        더보기
-                    </button>
-                )}
-                <div className="chat-container mt-3">
-                    <ul className="list-group">
-                        {messageList.map((message, index) => (
-                            <li className="list-group-item" key={index}>
-                                {/* 일반 채팅일 경우(type === chat) */}
-                                {message.type === "chat" && (
-                                    <div className={`chat-message ${login && user.userId === message.senderUsersId ? "my-message" : "other-message"}`}>
-                                        <div className="chat-bubble">
-                                            {/* 발신자 정보 */}
-                                            {login && user.userId !== message.senderUsersId && (
-                                                <div className="message-header">
-                                                    <h5>
-                                                        {message.senderUsersId}
-                                                        <small className="text-muted"> ({message.senderUsersType})</small>
-                                                    </h5>
-                                                </div>
-                                            )}
-                                            <p className="message-content">{message.content}</p>
-                                            <p className="text-muted message-time">{moment(message.time).format("a h:mm")}</p>
+        <div className="container">
+            <div className="row mt-4">
+                <div className="col">
+                    {/* {more === true && (
+                        <button className="btn btn-outline-success w-100" onClick={() => loadMoreMessageList(roomNo)}>
+                            더보기
+                        </button>
+                    )} */}
+                    <div className="chat-container mt-3">
+                        <ul className="list-group">
+                            {messageList.map((message, index) => (
+                                <li className="list-group-item" key={index}  style={{border : "none"}}>
+                                    {/* 일반 채팅일 경우(type === chat) */}
+                                    {message.type === "chat" && (
+                                        <div className={`chat-message ${login && user.userId === message.senderUsersId ? "my-message" : "other-message"}`}>
+                                            <div className="chat-bubble">
+                                                {/* 발신자 정보 */}
+                                                {login && user.userId !== message.senderUsersId && (
+                                                    <div className="message-header">
+                                                        <h5>
+                                                            {message.senderUsersId}
+                                                            <small className="text-muted"> ({message.senderUsersType})</small>
+                                                        </h5>
+                                                    </div>
+                                                )}
+                                                <p className="message-content">{message.content}</p>
+                                                <p className="text-muted message-time">{moment(message.time).format("a h:mm")}</p>
+                                                <button className="btn btn-danger btn-sm" onClick={()=>deleteMessage(message.no)}>삭제</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                                {message.type === "dm" && (
-                                    <div className={`chat-message ${login && user.userId === message.senderUsersId ? "my-message" : "other-message"}`}>
-                                        <div className="chat-bubble">
-                                            {/* 수신자일 경우 '회원등급' 님으로부터 온 메세지 형태로 출력 */}
-                                            {(user.userId === message.receiverUsersId) && (
-                                                <div className="message-header">
-                                                    <p>
-                                                        {message.senderUsersType} 님으로부터 온 메세지
-                                                    </p>
-                                                </div>
-                                            )}
-                                            {/* 발신자일 경우 ooo님에게 보낸 메세지 형태로 출력 */}
-                                            {(user.userId === message.senderUsersId) && (
-                                                <div className="message-header">
-                                                    <p className="text-danger">
-                                                        {message.receiverUsersId} 님에게 보낸 메세지
-                                                    </p>
-                                                </div>
-                                            )}
-                                            {/* 사용자가 보낸 메세지 본문 */}
-                                            <p className="message-content">{message.content}</p>
-                                            <p className="text-muted message-time">{moment(message.time).format("a h:mm")}</p>
-                                        </div>
-                                    </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                    {/* 입력창 */}
-                    <div className="row mt-4">
-                        <div className='col'>
-                            <div className="input-group">
-                                <input type="text" className="form-control"
-                                    value={input} onChange={e => setInput(e.target.value)}
-                                    onKeyUp={e => {
-                                        if (e.key === 'Enter' && login) {
-                                            sendMessage();
-                                        }
-                                    }} disabled={login === false} />
-                                <button className="btn btn-success" disabled={login === false}
-                                    onClick={sendMessage}>보내기</button>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                        {/* 입력창 */}
+                        <div className="input-container mb-3">
+                            <div className='col'>
+                                <div className="input-group">
+                                    <input type="text" className="form-control"
+                                        value={input} onChange={e => setInput(e.target.value)}
+                                        onKeyUp={e => {
+                                            if (e.key === 'Enter' && login) { sendMessage(); }
+                                        }} disabled={login === false} />
+                                    <button className="btn btn-success" disabled={login === false} onClick={sendMessage}>보내기</button>
+                                </div>
                             </div>
                         </div>
+                        <div ref={messagesEndRef} />
                     </div>
-                    <div ref={messagesEndRef} />
                 </div>
             </div>
         </div>

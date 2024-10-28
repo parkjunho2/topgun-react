@@ -1,0 +1,11 @@
+.seat {
+    width: 100%; /* 버튼이 열을 꽉 채우도록 설정 */
+    height: 50px; /* 버튼 높이 설정 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+}
+
+.empty {
+    background-color: #f0f0f0; /* 비어있는 좌석의 배경색 */
+    color: #888; /* 비어있는 좌석의 텍스트 색상 */
+    cursor: not-allowed; /* 비활성 상태 커서 */
+}

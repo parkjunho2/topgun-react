@@ -8,7 +8,7 @@ const PaymentFail=()=>{
     },[]);
 
    return(<>
-    <h1 className="text-center">결제승인 시간초과 입니다.</h1>    
+    <h1 className="text-center mt-5">결제승인 시간초과 입니다.</h1>    
     </>);
 };
 

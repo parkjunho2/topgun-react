@@ -1,7 +1,10 @@
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { useParams } from "react-router";
 
     const Payment=()=>{
+    //params
+    const{flightId} = useParams();
     //state
     //리스트 초기 값 불러오기
     const[seatsList, setSeatsList] =useState([]);
@@ -15,7 +18,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
     //callback
     //좌석 리스트 백엔드에 불러옴
     const loadSeatsList= useCallback(async()=>{ 
-            const resp = await axios.get("http://localhost:8080/seats/");
+        const resp=await axios.get(`http://localhost:8080/seats/${flightId}`);
             setSeatsList(resp.data.map(seats=>{
                 return{
                     ...seats,

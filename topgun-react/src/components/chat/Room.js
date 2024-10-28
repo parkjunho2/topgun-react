@@ -41,7 +41,7 @@ const Room = () => {
             filteredRooms = resp.data.filter(room => room.roomName === '관리자에게 문의'); // '관리자에게 문의'인 방만 표시
         }
         else if(user.userType === "AIRLINE"){
-            filteredRooms = resp.data.filter(room => room.roomCreatedBy === user.userId);
+            filteredRooms = resp.data.filter(room => room.roomCreatedBy === user.userId || room.join === 'Y');
         }
 
         setRoomList(filteredRooms);
@@ -59,6 +59,7 @@ const Room = () => {
 
     const deleteRoom = useCallback(async (target) => {
         const resp = await axios.delete("http://localhost:8080/room/" + target.roomNo);
+        window.alert("채팅방을 삭제하시겠습니까?");
         loadRoomList();
     }, [roomList]);
 
@@ -75,12 +76,11 @@ const Room = () => {
 
     const leaveRoom = useCallback(async (target) => {
         await axios.post("http://localhost:8080/room/leave", { roomNo: target.roomNo });
+        loadRoomList();
     }, [roomList]);
 
     const roomOptions = [
         { value: '관리자에게 문의', label: '관리자에게 문의' },
-        { value: 'A 항공사에게 문의', label: 'A 항공사에게 문의' },
-        { value: 'B 항공사에게 문의', label: 'B 항공사에게 문의' },
     ];
 
     const filteredRoomOptions = user.userType === "AIRLINE" 
@@ -88,6 +88,7 @@ const Room = () => {
     : roomOptions;
 
     return (
+        <div className="container">
         <div className="room-container">
              {/* 방 생성 화면 */}
              {user.userType !== "ADMIN" && (
@@ -122,6 +123,7 @@ const Room = () => {
                     </div>
                 ))}
             </div>
+        </div>
         </div>
     );
 };

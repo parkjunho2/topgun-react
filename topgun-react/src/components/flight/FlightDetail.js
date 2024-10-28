@@ -41,22 +41,50 @@ const FlightDetail = () => {
         modal.hide();
     }, []);
 
+    // 운항 시간 계산 함수
+    const calculateFlightTime = (departureTime, arrivalTime) => {
+        const depTime = new Date(departureTime);
+        const arrTime = new Date(arrivalTime);
+
+        const diffMs = arrTime - depTime; // 시간 차이 (밀리초)
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60)); // 시간
+        const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)); // 분
+
+        return `${diffHours}시간 ${diffMinutes}분`;
+    };
+
     const updateFlight = useCallback(async () => {
-        await axios.put("http://localhost:8080/flight/", input);
+        const updatedInput = {
+            ...input,
+            departureTime: new Date(input.departureTime).toISOString(),
+            arrivalTime: new Date(input.arrivalTime).toISOString(),
+        };
+        if (input.flightPrice <= 0) {  // 가격이 0 이하일 때 경고
+            alert("가격은 0원 이상이어야 합니다.");
+            return;
+        }
+
+        await axios.put("http://localhost:8080/flight/", updatedInput);
         loadFlight();
         closeModal();
     }, [input, loadFlight, closeModal]);
+
+    // 출발 시간 또는 도착 시간이 변경될 때 운항 시간 자동 계산
+    useEffect(() => {
+        if (input.departureTime && input.arrivalTime) {
+            const flightTime = calculateFlightTime(input.departureTime, input.arrivalTime);
+            setInput(prev => ({ ...prev, flightTime }));
+        }
+    }, [input.departureTime, input.arrivalTime]);
 
     if (!load) {
         return (
             <div className="container mt-4">
                 <h1>항공편 상세 정보</h1>
                 <div className="row">
-                    {Array(7).fill().map((_, index) => (
-                        <div className="col-sm-3" key={index}>
-                            <span className="placeholder col-6"></span>
-                        </div>
-                    ))}
+                    <div className="col-sm-3">
+                        <span className="placeholder col-6"></span>
+                    </div>
                 </div>
                 <div className="text-center mt-4">
                     <button className="btn btn-secondary placeholder col-2">목록보기</button>
@@ -77,20 +105,23 @@ const FlightDetail = () => {
                     <div className="col-sm-4"><strong>항공편 번호:</strong> {flight.flightNumber}</div>
                 </div>
                 <div className="row mb-3">
-                <div className="col-sm-4"><strong>출발 시간:</strong> {new Date(flight.departureTime).toLocaleString()}</div>
+                    <div className="col-sm-4"><strong>출발 시간:</strong> {new Date(flight.departureTime).toLocaleString()}</div>
                 </div>
                 <div className="row mb-3">
-                <div className="col-sm-4"><strong>도착 시간:</strong> {new Date(flight.arrivalTime).toLocaleString()}</div>
+                    <div className="col-sm-4"><strong>도착 시간:</strong> {new Date(flight.arrivalTime).toLocaleString()}</div>
+                </div>
+                <div className="row mb-3">
+                    <div className="col-sm-4"><strong>운항 시간:</strong> {flight.flightTime}</div>
                 </div>
                 <div className="row mb-3">
                     <div className="col-sm-4"><strong>출발 공항:</strong> {flight.departureAirport}</div>
                 </div>
                 <div className="row mb-3">
                     <div className="col-sm-4"><strong>도착 공항:</strong> {flight.arrivalAirport}</div>
-                    </div>
-                    <div className="row mb-3">
+                </div>
+                <div className="row mb-3">
                     <div className="col-sm-4"><strong>가격:</strong> {Number(flight.flightPrice).toLocaleString()}원</div>
-                    </div>
+                </div>
                 <div className="row mb-3">
                     <div className="col-sm-4"><strong>상태:</strong>
                     <span className="text-dark bg-warning border border-warning p-1 rounded">{flight.flightStatus}</span>
@@ -128,6 +159,10 @@ const FlightDetail = () => {
                                     <input type="datetime-local" name="arrivalTime" className="form-control" value={input.arrivalTime} onChange={e => setInput({ ...input, arrivalTime: e.target.value })} />
                                 </div>
                                 <div className="mb-3">
+                                    <label>운항 시간</label>
+                                    <input type="text" name="flightTime" className="form-control" value={input.flightTime} readOnly />
+                                </div>
+                                <div className="mb-3">
                                     <label>출발 공항</label>
                                     <select name="departureAirport" className="form-control" value={input.departureAirport} onChange={e => setInput({ ...input, departureAirport: e.target.value })}>
                                         <option>출발 공항 선택</option>
@@ -158,8 +193,8 @@ const FlightDetail = () => {
                                     </select>
                                 </div>
                                 <div className="mb-3">
-                                    <label>총 좌석 수</label>
-                                    <input type="number" name="flightTotalSeat" className="form-control" value={input.flightTotalSeat} onChange={e => setInput({ ...input, flightTotalSeat: e.target.value })} />
+                                    <label>가격</label>
+                                    <input type="number" name="flightPrice" className="form-control" value={input.flightPrice} onChange={e => setInput({ ...input, flightPrice: e.target.value })} />
                                 </div>
                                 <div className="mb-3">
                                     <label>상태</label>

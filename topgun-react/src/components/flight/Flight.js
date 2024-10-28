@@ -71,13 +71,16 @@ const Flight = () => {
         const updatedInput = {
             ...input,
             flightStatus: input.flightStatus === "거절" ? "대기" : input.flightStatus,
+            departureTime: new Date(input.departureTime).toISOString(),
+            arrivalTime: new Date(input.arrivalTime).toISOString(),
             userId: user.userId, // 수정할 때도 사용자 ID 설정
         };
-
+    
         await axios.put("http://localhost:8080/flight/", updatedInput);
         loadList();
         closeModal();
     }, [input, user.userId, loadList]);
+    
 
     // memo
     const addMode = useMemo(() => {
@@ -86,6 +89,7 @@ const Flight = () => {
 
     const changeInput = useCallback((e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
+        
     }, [input]);
 
     const clearInput = useCallback(() => {
@@ -106,43 +110,48 @@ const Flight = () => {
         if (input.departureTime && input.arrivalTime) {
             const departure = new Date(input.departureTime);
             const arrival = new Date(input.arrivalTime);
-
+    
             // 필드 검증
-    if (!input.flightNumber) {
-        alert("항공편 번호를 입력하세요.");
-        return;
-    }
-    if (!input.departureTime) {
-        alert("출발 시간을 입력하세요.");
-        return;
-    }
-    if (!input.arrivalTime) {
-        alert("도착 시간을 입력하세요.");
-        return;
-    }
-    if (!input.flightPrice) {
-        alert("가격을 입력 하세요.");
-        return;
-    }
-    if (!input.departureAirport) {
-        alert("출발 공항을 선택하세요.");
-        return;
-    }
-    if (!input.arrivalAirport) {
-        alert("도착 공항을 선택하세요.");
-        return;
-    }
+            if (!input.flightNumber) {
+                alert("항공편 번호를 입력하세요.");
+                return;
+            }
+            if (!input.departureTime) {
+                alert("출발 시간을 입력하세요.");
+                return;
+            }
+            if (!input.arrivalTime) {
+                alert("도착 시간을 입력하세요.");
+                return;
+            }
+            if (input.flightPrice <= 0) {  // 가격이 0 이하일 때 경고
+                alert("가격은 0원 이상이어야 합니다.");
+                return;
+            }
+            if (!input.departureAirport) {
+                alert("출발 공항을 선택하세요.");
+                return;
+            }
+            if (!input.arrivalAirport) {
+                alert("도착 공항을 선택하세요.");
+                return;
+            }
+    
+            // 도착 시간이 출발 시간보다 빠른지 확인
             if (arrival <= departure) {
                 alert("도착 시간은 출발 시간보다 늦어야 합니다.");
                 return;
             }
         }
-
+    
         const flightData = {
             ...input,
+            // 입력된 시간을 UTC로 변환하여 서버로 전송
+            departureTime: new Date(input.departureTime).toISOString(),
+            arrivalTime: new Date(input.arrivalTime).toISOString(),
             userId: user.userId, // 현재 로그인된 사용자 ID 추가
         };
-
+    
         axios({
             url: "http://localhost:8080/flight/",
             method: "post",
@@ -153,6 +162,7 @@ const Flight = () => {
             loadList(); // 목록 다시 불러오기
         });
     }, [input, user.userId, loadList, clearInput]);
+    
 
     const openModal = useCallback(() => {
         setInput((prevInput) => ({
@@ -173,22 +183,26 @@ const Flight = () => {
         if (input.departureTime && input.arrivalTime) {
             const departure = new Date(input.departureTime);
             const arrival = new Date(input.arrivalTime);
-
+    
             if (arrival <= departure) {
                 alert("도착 시간은 출발 시간보다 늦어야 합니다.");
                 return;
             }
+    
+            // 시간을 ISO 형식으로 변환하여 서버로 전송
+            const flightData = {
+                ...input,
+                departureTime: departure.toISOString(),
+                arrivalTime: arrival.toISOString(),
+                userId: user.userId, // 현재 로그인된 사용자 ID 추가
+            };
+    
+            await axios.post("http://localhost:8080/flight/", flightData);
+            loadList();
+            closeModal();
         }
-
-        const flightData = {
-            ...input,
-            userId: user.userId, // 현재 로그인된 사용자 ID 추가
-        };
-
-        await axios.post("http://localhost:8080/flight/", flightData);
-        loadList();
-        closeModal();
     }, [input, user.userId, loadList, closeModal]);
+    
 
     const editFlight = useCallback((flight) => {
         setInput({ ...flight });
@@ -200,37 +214,52 @@ const Flight = () => {
     const [keyword, setKeyword] = useState("");
 
     const searchFlightList = useCallback(async () => {
-        if (keyword.length === 0) return;
+        if (keyword.trim().length === 0) {
+            loadList()
+            return;
+        }
+        
         const resp = await axios.get(`http://localhost:8080/flight/column/${column}/keyword/${encodeURIComponent(keyword)}`);
        // 항공편 리스트에서 현재 로그인된 사용자 ID와 일치하는 항공편만 필터링
        const filteredFlights = resp.data.filter(flight => flight.userId === user.userId);
         setFlightList(filteredFlights);
-    }, [column, keyword]);
+    }, [column, keyword, flightList]);
+
+    
 
     // 뷰
     return (
         <>
          {/* 검색 화면 */}
-<div className="d-flex justify-content-center mt-2">
-    <div className="col-md-8 col-sm-10">
-        <div className="input-group shadow-sm">
-            <select name="column" className="form-select"
+         <div className="row mt-4">
+            <div className="col-md-8 offset-md-2">
+                
+                <div className="input-group">
+                    <div className="col-3">
+            <select className="form-select"
                 value={column} onChange={e => setColumn(e.target.value)}>
                 <option value="flight_number">항공편 번호</option>
                 <option value="departure_airport">출발공항</option>
                 <option value="arrival_airport">도착공항</option>
                 <option value="flight_status">결제상태</option>
             </select>
+            </div>
+            <div className="col-7">
             <input type="text" className="form-control"
-                value={keyword} onChange={e => setKeyword(e.target.value)} 
+                value={keyword} onChange={e =>setKeyword(e.target.value)} 
                 placeholder="검색어 입력" />
+                </div>
+                <div className="col-2">
             <button type="button" className="btn btn-secondary"
                 onClick={searchFlightList}>
                 <FaMagnifyingGlass />
             </button>
+            </div>
+                </div>
+                
+            </div>
         </div>
-    </div>
-</div>
+
 
 
             <div className="row mt-4">
@@ -257,7 +286,7 @@ const Flight = () => {
                                        name="arrivalTime"
                                        value={input.arrivalTime}
                                        onChange={changeInput}
-                                       min={currentDateTime} />
+                                       min={currentDateTime}/>
                             </td>
                             <td>
                                 <input type="text" className="form-control"

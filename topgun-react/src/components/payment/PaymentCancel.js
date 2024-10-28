@@ -8,7 +8,7 @@ const PaymentCancel=()=>{
     },[]);
 
     return(<>
-    <h1 text-center>결제 취소</h1>
+    <h1 className="text-center mt-5">결제 취소</h1>
     </>);
 };
 
