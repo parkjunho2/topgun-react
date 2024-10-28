@@ -158,12 +158,19 @@ const Chat = () => {
     const formatMessageTime = (time) => {
         const messageDate = moment(time);
         const today = moment();
-    
+
         if (messageDate.isSame(today, 'day')) {
             return messageDate.format("a h:mm");
         } else {
             return messageDate.format("MM월 DD일 a h:mm");
         }
+    };
+
+    // 사용자 ID 앞 3글자 외 * 처리
+    const maskUserId = (userId) => {
+        if (userId.length <= 3) return userId;
+        const maskedPart = '*'.repeat(userId.length - 3);
+        return userId.slice(0, 3) + maskedPart;
     };
 
     const loadMoreMessageList = useCallback(async () => {
@@ -175,7 +182,7 @@ const Chat = () => {
     }, [firstMessageNo, roomNo, messageList, more]);
 
     return (<>
-        <div className="container">
+        <div className="container"  style={{width : "700px"}}>
             <div className="row mt-4">
                 <div className="col">
                     {more === true && (
@@ -187,7 +194,6 @@ const Chat = () => {
                         <ul className="list-group">
                             {messageList.map((message, index) => (
                                 <li className="list-group-item" key={index} style={{ border: "none" }}>
-                                    {/* 일반 채팅일 경우(type === chat) */}
                                     {message.type === "chat" && (
                                         <div className={`chat-message ${login && user.userId === message.senderUsersId ? "my-message" : "other-message"}`}>
                                             <div className="chat-bubble">
@@ -195,7 +201,7 @@ const Chat = () => {
                                                 {login && user.userId !== message.senderUsersId && (
                                                     <div className="message-header">
                                                         <h5>
-                                                            {message.senderUsersId}
+                                                            {maskUserId(message.senderUsersId)}
                                                             <small className="text-muted"> ({message.senderUsersType})</small>
                                                         </h5>
                                                     </div>
