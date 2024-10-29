@@ -1,6 +1,6 @@
 import './BookingList.css';
 import { GiCommercialAirplane } from "react-icons/gi";
-import { useLocation, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
 import Lightpick from 'lightpick';
@@ -14,7 +14,6 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../../util/recoil';
 import { throttle } from 'lodash';
 import { FaAngleDown } from "react-icons/fa";
-import { FaSearch } from "react-icons/fa";
 
 const BookingList = () => {
     //const [flightList , setflightList] = useState([]);
@@ -23,42 +22,12 @@ const BookingList = () => {
 
     const [isSmallScreen, setIsSmallScreen] = useState(false);
 
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const sendDepartureAirport = queryParams.get("departureAirport");
-    const sendArrivalAirport = queryParams.get("arrivalAirport");
-    const sendDepartureTime = queryParams.get("departureTime");
-
-useEffect(() => {
-    // 쿼리 파라미터가 존재할 경우 input 상태를 업데이트
-    if (sendDepartureAirport) {
-        setInput((prev) => ({
-            ...prev,
-            departureAirport: sendDepartureAirport
-        }));
-    }
-
-    if (sendArrivalAirport) {
-        setInput((prev) => ({
-            ...prev,
-            arrivalAirport: sendArrivalAirport
-        }));
-    }
-
-    if (sendDepartureTime) {
-        setInput((prev) => ({
-            ...prev,
-            departureTime: sendDepartureTime
-        }));
-    }
-    setFirstPage();
-}, [sendDepartureAirport, sendArrivalAirport, sendDepartureTime]);
-
     // state
     const [input, setInput] = useState({
-        departureAirport: `${sendDepartureAirport}`,   // 출발 공항
-        arrivalAirport: `${sendArrivalAirport}`,     // 도착 공항
-        departureTime: `${sendDepartureTime}`,         // 출발 날짜
+        departureAirport: "",   // 출발 공항
+        arrivalAirport: "",     // 도착 공항
+        departureTime: "",         // 출발 날짜
+        passengers: 1
     });
 
     const [keyword, setKeyword] = useState("");
@@ -131,7 +100,7 @@ useEffect(() => {
     useEffect(()=>{
         if(page === null) return;   //초기상태 page 값이 null이라면 아무것도 동작 X
 
-    //    console.log("beginRow , endRow 변경 : " , input.beginRow , input.endRow);
+       console.log("beginRow , endRow 변경 : " , input.beginRow , input.endRow);
        if(page === 1  ) {
             sendRequest();
        }
@@ -198,11 +167,13 @@ useEffect(() => {
             loading.current = false;    //종료지점
         }, [input.beginRow , input.endRow]);
 
+        //하하호호
         const setFirstPage = useCallback(()=>{
             setPage(prev=>null);
             setTimeout(()=>{
                 setPage(prev=>1);
             }, 1);  //이 코드는 1ms 뒤에 실행해라!
+            
         }, [page]);
 
         //스크롤 관련된 처리
@@ -293,6 +264,12 @@ useEffect(() => {
         else if (input.departureTime.length === 0) {
             return window.alert("출발일자를 입력해주세요.");
         }
+        // else if (input.departureDate.length === 0) {
+        //     return window.alert("도착일자를 입력해주세요.");
+        // }
+        else if (adultNum === 0 && childNum === 0 && babyNum === 0) {
+            return window.alert("인원을 입력해주세요.");
+        }
         else {
             navigate("/flight/bookingList");   //위의 항목들이 모두 pass라면 이동
         }
@@ -333,6 +310,7 @@ useEffect(() => {
     const CloseSetting = () => {
         setDepartureInputClick(false); // 출발지 입력창을 닫도록 상태 변경
         setDestinationInputClick(false);    //도착지 입력창을 닫도록 상태 변경
+        setShowPassengerSettings(false);    //인원수 입력창을 닫도록 상태 변경
     };
 
     // 출발지 값이 선택된 도시로 설정되도록 useMemo로 메모이제이션
@@ -496,8 +474,17 @@ const handleNextClick = () => {
         }
     };
 
+    // 탑승객 및 좌석 등급 설정 UI 표시 여부
+    const [showPassengerSettings, setShowPassengerSettings] = useState(false);
+
+    // 탑승객 및 좌석 등급 클릭 시 UI 보여주기
+    const showPassengerClick = () => {
+        setShowPassengerSettings(!showPassengerSettings);
+    };
+
     // 다른 입력 필드 클릭 시 좌석 등급 설정 UI 숨기기
     const handleInputFocus = () => {
+        setShowPassengerSettings(false);
         setDepartureInputClick(false); // 출발지 입력창을 닫도록 상태 변경
         setDestinationInputClick(false);
     };
@@ -583,7 +570,7 @@ const handleNextClick = () => {
             <div className="row mt-4">
                 {/* 상단바에 대한 처리 구현 */}
                 <div className="d-flex" style={{justifyContent:"center", border:"1px solid black"}}>
-                    <div className="col-sm-3">
+                    <div className="col-sm-2">
                         <input
                             type="text"
                             name="departureAirport"
@@ -598,7 +585,7 @@ const handleNextClick = () => {
                         />
                     </div>
 
-                    <div className="col-sm-3">
+                    <div className="col-sm-2">
                         <input
                             type="text"
                             name="arrivalAirport"
@@ -609,34 +596,32 @@ const handleNextClick = () => {
                             onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                             onClick={destinationClick}
                             autoComplete="off"
-                            readOnly
                         />
                     </div>
 
-                    <div className="col-sm-3">
+                    <div className="col-sm-2">
                         <input
                             type="text"
                             name="departureTime"
                             className="form-control"
                             placeholder="출발일"
+                            readOnly
                             value={input.departureTime} 
                             onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
-                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                             ref={datePickerRef} // ref 추가
-                            readOnly
+                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                         />
                     </div>
 
                     <div className="row">
                         <div className="col">
-                            <button className="btn btn-primary" onClick={setFirstPage}
-                            onFocus={handleInputFocus}> <FaSearch />검색</button>
+                            <button className="btn btn-primary" onClick={setFirstPage}>검색</button>
                         </div>
                     </div>
                 </div>
 
-                    {/*   ☆☆☆☆ 출발지 입력창 기능 구현 ☆☆☆☆ */}
-                    {departureInputClick && ( // 출발지 입력창 클릭 시에만 보여주기
+                                    {/*   ☆☆☆☆ 출발지 입력창 기능 구현 ☆☆☆☆ */}
+                                    {departureInputClick && ( // 출발지 입력창 클릭 시에만 보여주기
                         <>
                             <div className="row mt-3 mb-1 ms-1 me-1">
                                 <div className="col">
