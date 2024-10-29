@@ -73,14 +73,14 @@ const Chat = () => {
                 client.subscribe("/private/chat/" + roomNo, (message) => {
                     const data = JSON.parse(message.body);
                     setMessageList(prev => [...prev, data]); //새 메세지를 list에 추가
-                    setMore(data.last === false); //더보기 여부
+                    //setMore(json.last === false); //더보기 여부
                 });
                 client.subscribe("/private/db/" + roomNo + "/" + user.userId, (message) => {
                     const data = JSON.parse(message.body);
                     console.log("마지막:", data.last);
                     setMessageList(data.messageList);
                     console.log("받은 데이터 : ", data);
-                    setMore(data.last === true);
+                    setMore(json.last === false);
                 });
                 setConnect(true); //연결상태 갱신
             },
@@ -174,12 +174,14 @@ const Chat = () => {
     };
 
     const loadMoreMessageList = useCallback(async () => {
-        console.log("더보기 클릭, 스크롤 방지 설정");
         setShouldScroll(false); // 더보기 클릭 시 스크롤 방지
         const resp = await axios.get("http://localhost:8080/room/" + roomNo + "/more/" + firstMessageNo);
         setMessageList(prev => [...resp.data.messageList, ...prev]);
         setMore(resp.data.last === false); //더보기 여부 설정
+        console.log("라스트", resp.data.last);
     }, [firstMessageNo, roomNo, messageList, more]);
+
+    console.log(more);
 
     return (<>
         <div className="container"  style={{width : "700px"}}>
