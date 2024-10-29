@@ -8,11 +8,12 @@ import { useParams } from "react-router";
     //state
     //리스트 초기 값 불러오기
     const[seatsList, setSeatsList] =useState([]);
-
+    const [flightInfo, setFlightInfo] = useState(null);
     //effect
     //좌석 리스트 callback에 있는거 갖고옴
     useEffect(()=>{
         loadSeatsList()
+        loadFlightInfo();
     },[]);
 
     //callback
@@ -22,11 +23,17 @@ import { useParams } from "react-router";
             setSeatsList(resp.data.map(seats=>{
                 return{
                     ...seats,
-                    select:false,
+                      select:false,
                     qty:1//고정
                 }
             }));
     }, []);
+    
+     // 항공편 정보 불러오기
+     const loadFlightInfo = useCallback(async () => {
+        const resp = await axios.get(`http://localhost:8080/seats/flightInfo`);
+        setFlightInfo(resp.data.find(info => info.flightId === flightId)); // 해당 flightId에 맞는 정보 찾기
+    }, [flightId]);
     
     //좌석선택
     const selectSeats = useCallback((target, checked)=>{ 
@@ -86,7 +93,21 @@ import { useParams } from "react-router";
         //view
         return(<>
         <div className="container">
-            <div className="row mt-3">
+            <div className="row mt-3 text-center">
+            {flightInfo && (
+                 <div className="flight-info">
+                 <h3>{flightInfo.airlineName}항공</h3>
+                <div>
+                        <h4>출발 공항: {flightInfo.departureAirport}</h4>
+                        <h4>도착 공항: {flightInfo.arrivalAirport}</h4>
+                </div>
+                <div>
+                 <h4>출발 시간: {flightInfo.departureTime}</h4>
+                 {/* <h4>비행 시간: {flightInfo.flightTime}</h4> */}
+                 <h4>도착 시간: {flightInfo.departureTime}</h4>
+                 </div>
+             </div>
+         )}
                 <div className="col mt-2">
                     <div className="table" style={{width: '100%', whiteSpace: 'nowrap'}}>
                         <thead>
@@ -110,7 +131,9 @@ import { useParams } from "react-router";
                                     <td>{seats.seatsNo}</td>
                                     <td>{seats.seatsNumber}</td>
                                     <td>{seats.seatsRank}</td>
-                                    <td>{seats.seatsPrice.toLocaleString()}</td>
+                                    <td>
+                                        {seats.seatsPrice === 0 ? `${seats.seatsPrice.toLocaleString()}원` : `+${seats.seatsPrice.toLocaleString()}원`}
+                                    </td>
                             </tr>))}
                         </tbody>
                     </div>
@@ -149,7 +172,7 @@ import { useParams } from "react-router";
                                 </tr>
                             )}
                             <tr>
-                                <td colSpan="2"><strong>결제하실 총 금액은</strong></td>
+                                <td colSpan="2"><strong>추가 금액</strong></td>
                                 <td className="text-end"><strong>{checkedSeatsTotal.toLocaleString()}원</strong></td>
                             </tr>
                         </tbody>
