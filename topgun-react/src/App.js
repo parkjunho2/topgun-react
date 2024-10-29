@@ -139,7 +139,6 @@ const App = () => {
           <Route path='/payment/alllist' element={<PaymentAllList />} />
           <Route path="/chat/:roomNo" element={<Chat />} />
           <Route path="/room" element={<Room />} />
-          <Route path='/payment/list' element={<PaymentList />} />
           <Route path='/payment/detail/:paymentNo' element={<PaymentDetail />} />
         </Route>
 

@@ -56,8 +56,10 @@ const FlightDetail = () => {
     const updateFlight = useCallback(async () => {
         const updatedInput = {
             ...input,
+            flightStatus: input.flightStatus === "거절" ? "대기" : input.flightStatus,
             departureTime: new Date(input.departureTime).toISOString(),
             arrivalTime: new Date(input.arrivalTime).toISOString(),
+            
         };
         if (input.flightPrice <= 0) {  // 가격이 0 이하일 때 경고
             alert("가격은 0원 이상이어야 합니다.");
@@ -131,8 +133,12 @@ const FlightDetail = () => {
 
             {/* 버튼들 */}
             <div className="text-center mt-4">
-                <button className="btn btn-warning ms-2" onClick={openModal}>수정하기</button>
-                <button className="btn btn-danger ms-2" onClick={deleteFlight}>삭제하기</button>
+            {flight.flightStatus !== "승인" && (
+        <>
+            <button className="btn btn-warning ms-2" onClick={openModal}>수정하기</button>
+            <button className="btn btn-danger ms-2" onClick={deleteFlight}>삭제하기</button>
+        </>
+    )}
                 <button className="btn btn-secondary ms-2" onClick={() => navigate("/flight")}>목록보기</button>
             </div>
 

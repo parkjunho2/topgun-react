@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from "react-router";
+import { json, useLocation, useNavigate, useParams } from "react-router";
 import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useLinkClickHandler } from "react-router-dom";
 import { loginState, memberLoadingState, userState } from "../../util/recoil";
@@ -20,17 +20,17 @@ const Chat = () => {
     const [messageList, setMessageList] = useState([]);
     const [client, setClient] = useState(null);
     const [connect, setConnect] = useState(false);
-    const [more, setMore] = useState(false);
-    const [roomName, setRoomName] = useState("");
+    const [shouldScroll, setShouldScroll] = useState(true);
 
     //memo
     const firstMessageNo = useMemo(() => {
-        if (messageList.length === 0) return false; //메세지 없음(첫메세지도 없음)
+        if (messageList.length === 0) return null; //메세지 없음(첫메세지도 없음)
         //제일 앞 메세지의 no를 조사
         const message = messageList[0];
         return message.no || null; //메세지 번호 반환 or 없으면 null
     }, [messageList]);
-    // console.log("첫 메세지 번호 : ",firstMessageNo);
+
+    const [more, setMore] = useState(false);
 
     //recoil
     const user = useRecoilValue(userState);
@@ -72,13 +72,15 @@ const Chat = () => {
                 //채널 구독 처리
                 client.subscribe("/private/chat/" + roomNo, (message) => {
                     const data = JSON.parse(message.body);
-                    console.log("보낸 메세지 : ", data);
                     setMessageList(prev => [...prev, data]); //새 메세지를 list에 추가
+                    setMore(data.last === false); //더보기 여부
                 });
                 client.subscribe("/private/db/" + roomNo + "/" + user.userId, (message) => {
                     const data = JSON.parse(message.body);
+                    console.log("마지막:", data.last);
                     setMessageList(data.messageList);
-                    //더보기 관련 설정 추가
+                    console.log("받은 데이터 : ", data);
+                    setMore(data.last === true);
                 });
                 setConnect(true); //연결상태 갱신
             },
@@ -86,10 +88,11 @@ const Chat = () => {
                 setConnect(false); //연결상태 갱신
             },
             debug: (str) => {
-                console.log(str);
+                console.log("[DEBUG] " + str);
             }
         });
         client.activate();
+        setClient(client);
         return client;
     }, [memberLoading]);
 
@@ -104,18 +107,14 @@ const Chat = () => {
         if (connect === false) return;
         if (input.length === 0) return;
 
-        // if (input.startsWith("@ ")) {
-        //     sendDM();
-        //     return;
-        // }
-
-        const message = {
-            content: input,
-            senderUsersId: user.userId,
-            senderUsersType: user.userType,
-            // receiverUsersId: receiverUsersId,
-            time: new Date().toISOString()
-        };
+        // const message = {
+        //     content: input,
+        //     senderUsersId: user.userId,
+        //     senderUsersType: user.userType,
+        //     time: new Date().toISOString()
+        //     destination : "/app/chat",
+        //     body : JSON.stringify(json),
+        // };
 
         client.publish({
             destination: "/app/room/" + roomNo,
@@ -125,14 +124,10 @@ const Chat = () => {
             },
             body: JSON.stringify({ content: input })
         });
-        setMessageList(prev => [...prev, message]);
+        // setMessageList(prev => [...prev, message]);
         setInput(""); // 입력창 초기화
+        setShouldScroll(true);
     }, [input, client, connect]);
-
-    const deleteMessage = useCallback(async (roomMessageNo)=>{
-        await axios.delete(`http://localhost:8080/room/chat/${roomMessageNo}`)
-        setMessageList(prev=>prev.filter(message => message.no != roomMessageNo));
-    },[]);
 
     const checkRoom = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/room/check/" + roomNo);
@@ -148,41 +143,57 @@ const Chat = () => {
 
     // 메시지 목록 업데이트 시 자동 스크롤
     useEffect(() => {
-        if (!isTyping) {    // 입력 중이 아닐 때만 스크롤
+        if (shouldScroll && !isTyping) {
             scrollToBottom();
         }
-    }, [messageList, isTyping]);
+    }, [messageList, isTyping, shouldScroll]);
 
     // 자동 스크롤 함수
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end"}); // 부드럽게 스크롤
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" }); // 부드럽게 스크롤
         }
     };
 
+    const formatMessageTime = (time) => {
+        const messageDate = moment(time);
+        const today = moment();
+
+        if (messageDate.isSame(today, 'day')) {
+            return messageDate.format("a h:mm");
+        } else {
+            return messageDate.format("MM월 DD일 a h:mm");
+        }
+    };
+
+    // 사용자 ID 앞 3글자 외 * 처리
+    const maskUserId = (userId) => {
+        if (userId.length <= 3) return userId;
+        const maskedPart = '*'.repeat(userId.length - 3);
+        return userId.slice(0, 3) + maskedPart;
+    };
+
     const loadMoreMessageList = useCallback(async () => {
-        console.log("첫 메세지 번호 : ", firstMessageNo);
-        const resp = await axios.get("http://localhost:8080/message/more/" + firstMessageNo, {
-            params: { roomNo }
-        });
-        setMessageList(prev => [...prev, ...resp.data.messageList]);
-        setMore(resp.data.last === true);//더보기 여부 설정
-    }, [messageList, firstMessageNo, more]);
+        console.log("더보기 클릭, 스크롤 방지 설정");
+        setShouldScroll(false); // 더보기 클릭 시 스크롤 방지
+        const resp = await axios.get("http://localhost:8080/room/" + roomNo + "/more/" + firstMessageNo);
+        setMessageList(prev => [...resp.data.messageList, ...prev]);
+        setMore(resp.data.last === false); //더보기 여부 설정
+    }, [firstMessageNo, roomNo, messageList, more]);
 
     return (<>
-        <div className="container">
+        <div className="container"  style={{width : "700px"}}>
             <div className="row mt-4">
                 <div className="col">
-                    {/* {more === true && (
-                        <button className="btn btn-outline-success w-100" onClick={() => loadMoreMessageList(roomNo)}>
+                    {more === true && (
+                        <button className="btn btn-outline-success w-100" onClick={loadMoreMessageList}>
                             더보기
                         </button>
-                    )} */}
+                    )}
                     <div className="chat-container mt-3">
                         <ul className="list-group">
                             {messageList.map((message, index) => (
-                                <li className="list-group-item" key={index}  style={{border : "none"}}>
-                                    {/* 일반 채팅일 경우(type === chat) */}
+                                <li className="list-group-item" key={index} style={{ border: "none" }}>
                                     {message.type === "chat" && (
                                         <div className={`chat-message ${login && user.userId === message.senderUsersId ? "my-message" : "other-message"}`}>
                                             <div className="chat-bubble">
@@ -190,34 +201,33 @@ const Chat = () => {
                                                 {login && user.userId !== message.senderUsersId && (
                                                     <div className="message-header">
                                                         <h5>
-                                                            {message.senderUsersId}
+                                                            {maskUserId(message.senderUsersId)}
                                                             <small className="text-muted"> ({message.senderUsersType})</small>
                                                         </h5>
                                                     </div>
                                                 )}
                                                 <p className="message-content">{message.content}</p>
-                                                <p className="text-muted message-time">{moment(message.time).format("a h:mm")}</p>
-                                                <button className="btn btn-danger btn-sm" onClick={()=>deleteMessage(message.no)}>삭제</button>
+                                                <p className="text-muted message-time">{formatMessageTime(message.time)}</p>
                                             </div>
                                         </div>
                                     )}
                                 </li>
                             ))}
                         </ul>
-                        {/* 입력창 */}
-                        <div className="input-container mb-3">
-                            <div className='col'>
-                                <div className="input-group">
-                                    <input type="text" className="form-control"
-                                        value={input} onChange={e => setInput(e.target.value)}
-                                        onKeyUp={e => {
-                                            if (e.key === 'Enter' && login) { sendMessage(); }
-                                        }} disabled={login === false} />
-                                    <button className="btn btn-success" disabled={login === false} onClick={sendMessage}>보내기</button>
-                                </div>
+                        <div ref={messagesEndRef} />
+                    </div>
+                    {/* 입력창 */}
+                    <div className="input-container mt-3">
+                        <div className='col'>
+                            <div className="input-group">
+                                <input type="text" className="form-control"
+                                    value={input} onChange={e => setInput(e.target.value)}
+                                    onKeyUp={e => {
+                                        if (e.key === 'Enter' && login) { sendMessage(); }
+                                    }} disabled={login === false} />
+                                <button className="btn btn-success" disabled={login === false} onClick={sendMessage}>보내기</button>
                             </div>
                         </div>
-                        <div ref={messagesEndRef} />
                     </div>
                 </div>
             </div>

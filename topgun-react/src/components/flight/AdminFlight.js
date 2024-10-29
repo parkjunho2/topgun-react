@@ -47,7 +47,17 @@ const AdminFlight = () => {
     const searchFlightList = useCallback(async () => {
         if (keyword.length === 0) return;
         const resp = await axios.get(`http://localhost:8080/flight/column/${column}/keyword/${encodeURIComponent(keyword)}`);
-        setFlightList(resp.data);
+
+          // 현재 시간 (오늘 날짜)
+    const now = new Date();
+
+    // 항공편 리스트에서 현재 로그인된 사용자 ID와 도착 시간이 현재 시간보다 이후인 항공편만 필터링
+const filteredFlights = resp.data.filter(flight => {
+    const arrivalTime = new Date(flight.arrivalTime);
+    return arrivalTime >= now;
+});
+
+        setFlightList(filteredFlights);
     }, [column, keyword]);
 
     return (
@@ -79,7 +89,7 @@ const AdminFlight = () => {
             <div className="row mt-4">
                 <div className="col">
                     <table className="table table-striped">
-                        <thead>
+                        <thead className="table-dark">
                             <tr>
                                 <th>항공편 번호</th>
                                 <th>출발 시간</th>
@@ -108,8 +118,19 @@ const AdminFlight = () => {
                                     <td>{Number(flight.flightPrice).toLocaleString()}원</td>
                                     <td>{flight.flightStatus}</td>
                                     <td>
-                                        <button className="btn btn-success" onClick={() => updateFlight(flight.flightId, "승인")}>승인</button>
-                                        <button className="btn btn-danger" onClick={() => updateFlight(flight.flightId, "거절")}>거절</button>
+                            {/* 상태 값에 따른 버튼 */}
+                    {flight.flightStatus === "대기" && (
+                    <>
+                        <button className="btn btn-success" onClick={() => updateFlight(flight.flightId, "승인")}>승인</button>
+                        <button className="btn btn-danger" onClick={() => updateFlight(flight.flightId, "거절")}>거절</button>
+                    </>
+                )}
+                {flight.flightStatus === "승인" && (
+                    <button className="btn btn-secondary" disabled>승인됨</button>
+                )}
+                {flight.flightStatus === "거절" && (
+                    <button className="btn btn-secondary" disabled>거절됨</button>
+                )}
                                     </td>
                                 </tr>
                             ))}

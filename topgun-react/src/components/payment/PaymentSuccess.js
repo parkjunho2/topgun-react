@@ -1,10 +1,11 @@
 
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { loginState, memberLoadingState } from "../../util/recoil";
 const PaymentSuccess=()=>{
+        const navigate = useNavigate();
         //수신
         const {partnerOrderId} = useParams();
         //로그인 상태
@@ -58,6 +59,10 @@ const PaymentSuccess=()=>{
             }, 0);
         }, [seatsList]);
 
+        const handleNavigate = () => {
+            navigate("/payment/alllist");
+        };
+
         //view
         if(result===null){
             return <>
@@ -97,6 +102,11 @@ const PaymentSuccess=()=>{
                         </tr>
                     </tfoot>
                 </table>
+                <div className="text-end">
+                <button className="btn btn-primary" onClick={handleNavigate}>
+                            여권정보 이동
+                </button>
+                </div>
             </div>
         </div>
     </div>

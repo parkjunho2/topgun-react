@@ -86,7 +86,7 @@ const ComplexTest = () => {
         const sendRequest = useCallback(async ()=>{
             loading.current = true; //시작지점
             const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
-            // console.log(resp.data);
+            console.log(resp.data);
 
             setResult(resp.data);
             loading.current = false;    //종료지점
@@ -190,9 +190,11 @@ const ComplexTest = () => {
             </div>
 
             <div className="row mt-4">
-                <label className="col-sm-3 col-form-label">정렬방식</label>
-                <div className="col-sm-9">
-                    <input type="text" className="form-control" />
+                <label className="col-sm-3 col-form-label">인원수</label>
+                <div className="col-sm-9 d-flex">
+                    <input type="text" className="form-control" 
+                                                name="passengers" value={input.passengers} 
+                                                onChange={ChangeInputNumber}/>
                 </div>
             </div>
 
@@ -208,9 +210,10 @@ const ComplexTest = () => {
             <div className="row mt-4">
                 <div className="col">
                     <ul className="list-group">
-                        {result.flightList.map(flight=>(
-                        <li className="list-group-item" key={flight.flightId}>
-                                <h3>항공편 번호: {flight.flightId}</h3>
+                        {result.flightList.length > 0 ? (
+                            result.flightList.map(flight => (
+                                <li className="list-group-item" key={flight.flightId}>
+                                    <h3>항공편 번호: {flight.flightId}</h3>
                                     <div className="row">
                                         <div className="col-3">출발지</div>
                                         <div className="col-9">{flight.departureAirport}</div>
@@ -221,14 +224,23 @@ const ComplexTest = () => {
                                     </div>
                                     <div className="row mt-2">
                                         <div className="col-3">출발일</div>
-                                        <div className="col-9">{moment(flight.departureTime).format("YYYY-MM-DD HH:mm")}</div>
+                                        <div className="col-9">{flight.departureTime}</div>
                                     </div>
-
+                                    <div className="row mt-2">
+                                        <div className="col-3">항공사 이름</div>
+                                        <div className="col-9">{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}</div>
+                                    </div>
+                                </li>
+                            ))
+                        ) : (
+                            <li className="list-group-item">
+                                <h3>검색 결과가 존재하지 않습니다.</h3>
                             </li>
-                        ))}
+                        )}
                     </ul>
                 </div>
             </div>
+
 
             {/* 더보기 버튼 : result의 last가 false이면 ( 더 볼게 있다면) */}
             {/* A ? : B : C */}

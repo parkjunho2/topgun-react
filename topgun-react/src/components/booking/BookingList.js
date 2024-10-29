@@ -13,6 +13,7 @@ import * as hangul from 'hangul-js';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../util/recoil';
 import { throttle } from 'lodash';
+import { FaAngleDown } from "react-icons/fa";
 
 const BookingList = () => {
     //const [flightList , setflightList] = useState([]);
@@ -20,6 +21,14 @@ const BookingList = () => {
     const [flightComplexList , setFlightComplexList] = useState([]);
 
     const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+    // state
+    const [input, setInput] = useState({
+        departureAirport: "",   // 출발 공항
+        arrivalAirport: "",     // 도착 공항
+        departureTime: "",         // 출발 날짜
+        passengers: 1
+    });
 
     const [keyword, setKeyword] = useState("");
     const [open, setOpen] = useState(false);
@@ -68,6 +77,140 @@ const BookingList = () => {
             navigate("/chat/"+newRoomNo);
     });
 
+    /*======================   복합검색을 위한 기능    =============================*/
+    const [result , setResult] = useState({
+        count : 0,
+        last : true,
+        flightList : []
+    });
+
+    //페이징 관련 state
+    const [page , setPage] = useState(null);
+    const [size , setSize] = useState(10);
+
+    // [2] effect로 계산 (권장하는 방법)
+    useEffect(()=> {
+        setInput({
+            ...input,
+            beginRow : page * size - (size-1),
+            endRow : page * size
+        })
+    } , [page,size]);
+
+    useEffect(()=>{
+        if(page === null) return;   //초기상태 page 값이 null이라면 아무것도 동작 X
+
+       console.log("beginRow , endRow 변경 : " , input.beginRow , input.endRow);
+       if(page === 1  ) {
+            sendRequest();
+       }
+       if(page >= 2) {
+           sendMoreRequest();
+       }
+    } , [input.beginRow , input.endRow]);
+
+        //callback
+        const changeInputString = useCallback(e=>{
+            setInput({
+                ...input, 
+                [e.target.name] : e.target.value
+            });
+        }, [input]);
+        
+        const ChangeInputNumber = useCallback((e)=>{
+            setInput({
+                ...input, 
+                [e.target.name] : parseInt(e.target.value) || ""
+            });
+        } , [input]);
+
+        const changeInputArray = useCallback(e=>{
+            //console.log(e.target.name, e.target.value, e.target.checked);
+            const origin = input[e.target.name];//input의 항목을 하나 꺼낸다
+    
+            if(e.target.checked === true) {//추가
+                setInput({
+                    ...input,
+                    [e.target.name] : origin.concat(e.target.value)
+                });
+            }
+            else {//삭제
+                setInput({
+                    ...input,
+                    [e.target.name] : origin.filter(level=>level !== e.target.value)
+                });
+            }
+        }, [input]);
+
+        //첫 목록을 불러올 때 사용
+        const sendRequest = useCallback(async ()=>{
+            loading.current = true; //시작지점
+            const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
+            // console.log(resp.data);
+
+            setResult(resp.data);
+            loading.current = false;    //종료지점
+        }, [input]);
+
+        //더보기 버튼을 눌렀을 때 사용
+        const sendMoreRequest = useCallback(async ()=>{
+            loading.current = true; //시작지점
+            const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
+            // console.log(resp.data);
+            //setResult(resp.data);     //덮어쓰기라 안됨
+            setResult({
+                ...result,
+                last : resp.data.last,      //서버에서 준 응답 데이터에 있는 last로 갱신
+                //flightList : result.flightList.concat(resp.data.flightList),    //concat 사용
+                flightList : [...result.flightList , ...resp.data.flightList]   //전개연산자 사용
+            });
+            loading.current = false;    //종료지점
+        }, [input.beginRow , input.endRow]);
+
+        //하하호호
+        const setFirstPage = useCallback(()=>{
+            setPage(prev=>null);
+            setTimeout(()=>{
+                setPage(prev=>1);
+            }, 1);  //이 코드는 1ms 뒤에 실행해라!
+            
+        }, [page]);
+
+        //스크롤 관련된 처리
+        useEffect(()=>{
+            if(page === null) return;   //결과를 검색하지 않았을 때
+            if(result.last === true) return;    //결과를 더이상 볼게 없을 때
+
+            //resize에 사용할 함수
+            const resizeHandler = throttle(()=>{
+                console.log("% : " , getScrollPercent()); //현재 스크롤의 퍼센트지를 확인 할 수 있음
+                const percent = getScrollPercent();
+                if(percent >= 70 && loading.current === false) {
+                    console.log("더보기를 실행");
+                }
+            } , 350);
+
+            //윈도우에 resize 이벤트를 설정
+            window.addEventListener("scroll" , resizeHandler);
+            // console.log("스크롤 관련 이펙트 실행");
+
+            return ()=>{
+                //윈도우에 설정된 resize 이벤트를 해제
+                window.addEventListener("scroll" , resizeHandler);
+            }
+        });
+                //스크롤의 현재 위치를 퍼센트로 계산하는 함수
+                const getScrollPercent = useCallback(()=>{
+                    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                    const documentHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    const scrollPercent = (scrollTop / documentHeight) * 100;
+                    return scrollPercent;
+                });
+
+        // ※※  로딩중에 추가 로딩이 불가능하게 처리하기 위한 REF 사용 ※※
+        // 목록을 불러오기 시작하면 loading.current = true로 변경
+        // 목록을 불러오고 나면  loading.current = false로 변경
+        const loading = useRef(false);
 
 
     // 창 크기 변화 감지
@@ -85,49 +228,40 @@ const BookingList = () => {
     };
   }, []);
 
-    // state
-    const [input, setInput] = useState({
-        departure: '',
-        destination: '',
-        boardingDate: '',
-        // departureDate: "",
-        passengers: ''
-    });
 
-
-    useEffect(()=>{
-        complexSearch();
-    } , []);
+    // useEffect(()=>{
+    //     complexSearch();
+    // } , []);
 
     //하히
-    const complexSearch = useCallback(async () => {
-        const requestData = {
-            departureAirport: "서울/인천(ICN)",
-            arrivalAirport: "광주(KWJ)",
-            departureTime: "2024-10-25", // 유효한 날짜 형식으로 입력
-            passengers: 1,
-            orderList: []
-        };
+    // const complexSearch = useCallback(async () => {
+    //     const requestData = {
+    //         departureAirport: "서울/인천(ICN)",
+    //         arrivalAirport: "광주(KWJ)",
+    //         departureTime: "2024-10-25", // 유효한 날짜 형식으로 입력
+    //         passengers: 1,
+    //         orderList: []
+    //     };
     
-        try {
-            const resp = await axios.post("http://localhost:8080/flight/complexSearch", requestData);
-            setFlightList(resp.data.flightList);
-            // console.log(resp.data);
-        } catch (error) {
-            console.error("Error fetching flight data:", error);
-        }
-    }, [flightList]);
+    //     try {
+    //         const resp = await axios.post("http://localhost:8080/flight/complexSearch", requestData);
+    //         setFlightList(resp.data.flightList);
+    //         // console.log(resp.data);
+    //     } catch (error) {
+    //         console.error("Error fetching flight data:", error);
+    //     }
+    // }, [flightList]);
 
     //조회 버튼에 대한 navigate 구현
     const checkInputEmpty = useCallback(() => {
         // e.preventDefault();
-        if (input.departure.length === 0) {
+        if (input.departureAirport.length === 0) {
             return window.alert("출발지를 입력해주세요.");
         }
-        else if (input.destination.length === 0) {
+        else if (input.arrivalAirport.length === 0) {
             return window.alert("도착지를 입력해주세요.");
         }
-        else if (input.boardingDate.length === 0) {
+        else if (input.departureTime.length === 0) {
             return window.alert("출발일자를 입력해주세요.");
         }
         // else if (input.departureDate.length === 0) {
@@ -190,14 +324,14 @@ const BookingList = () => {
     const departureText = useMemo(() => {
     // 우선적으로 keyword가 있으면 keyword를 반환, 그 다음 selectedDepCity를 반환
     // if (keyword) return keyword;
-        return selectedDepCity ? selectedDepCity : input.departure;     // selectedDepCity가 있으면 해당 도시를 반환, 없으면 기존 input.departure 값을 유지
-    }, [keyword, selectedDepCity, input.departure]);
+        return selectedDepCity ? selectedDepCity : input.departureAirport;     // selectedDepCity가 있으면 해당 도시를 반환, 없으면 기존 input.departureAirport 값을 유지
+    }, [keyword, selectedDepCity, input.departureAirport]);
 
     // 출발지 상태 변경 처리
     useEffect(() => {
         setInput((prev) => ({
             ...prev,
-            departure: selectedDepCity ? selectedDepCity : prev.departure // 선택된 도시가 있으면 해당 도시로 설정
+            departureAirport: selectedDepCity ? selectedDepCity : prev.departureAirport // 선택된 도시가 있으면 해당 도시로 설정
         }));
     }, [selectedDepCity]); // 선택된 도시가 변경될 때마다 업데이트
 
@@ -219,12 +353,12 @@ const handleNextClick = () => {
     if (selectedDepCity) { // selectedDepCity가 존재하면
         setInput(prev => ({
             ...prev,
-            departure: selectedDepCity // 선택된 도시로 설정
+            departureAirport: selectedDepCity // 선택된 도시로 설정
         }));
     } else if (keyword) {
         setInput(prev => ({
             ...prev,
-            departure: keyword // 키워드로 설정
+            departureAirport: keyword // 키워드로 설정
         }));
     }
     
@@ -232,7 +366,7 @@ const handleNextClick = () => {
 
     // 도착지 입력창으로 포커스 이동
     setTimeout(() => {
-        const destinationInput = document.querySelector('input[name="destination"]');
+        const destinationInput = document.querySelector('input[name="arrivalAirport"]');
         if (destinationInput) {
             destinationInput.focus(); // 도착지 입력창에 포커스
         }
@@ -249,11 +383,11 @@ const handleNextClick = () => {
 
     // 도착지 input 클릭 시 출발지 기능을 표시하는 함수
     const destinationClick = () => {
-        if (input.departure.length === 0) {
+        if (input.departureAirport.length === 0) {
             window.alert("출발지를 입력해주세요.");
             
             // 도착지 입력창의 포커스를 해제합니다.
-            const destinationInput = document.querySelector('input[name="destination"]');
+            const destinationInput = document.querySelector('input[name="arrivalAirport"]');
             if (destinationInput) {
                 destinationInput.blur(); // 포커스를 해제
             }
@@ -273,15 +407,15 @@ const handleNextClick = () => {
 
     // 도착지 값이 선택된 도시로 설정되도록 useMemo로 메모이제이션 
     const destinationText = useMemo(() => {
-        // selectedDesCity가 있으면 해당 도시를 반환, 없으면 기존 input.destination 값을 유지
-        return selectedDesCity ? selectedDesCity : input.destination;
-    }, [selectedDesCity, input.destination]);
+        // selectedDesCity가 있으면 해당 도시를 반환, 없으면 기존 input.arrivalAirport 값을 유지
+        return selectedDesCity ? selectedDesCity : input.arrivalAirport;
+    }, [selectedDesCity, input.arrivalAirport]);
 
     // 도착지 상태 변경 처리
     useEffect(() => {
         setInput((prev) => ({
             ...prev,
-            destination: destinationText // 선택된 도착지를 도착지 입력창에 설정
+            arrivalAirport: destinationText // 선택된 도착지를 도착지 입력창에 설정
         }));
     }, [destinationText]); // 선택된 도시가 변경될 때마다 업데이트
 
@@ -350,7 +484,7 @@ const handleNextClick = () => {
                     if (start) {
                         setInput((prev) => ({
                             ...prev,
-                            boardingDate: start.format('YYYY-MM-DD') // 가는편 날짜 설정
+                            departureTime: start.format('YYYY-MM-DD') // 가는편 날짜 설정
                         }));
                     }
                     // if (end) {
@@ -392,20 +526,35 @@ const handleNextClick = () => {
     };
 
     // 탑승객 문자열을 useMemo로 계산
-    const passengerText = useMemo(() => {
-        const text = `성인${adultNum}, 소아${childNum}, 유아${babyNum} `;
-        // 만약 텍스트가 설정값을 넘으면 ... 처리 (필요에 따라 길이 조정 필요)
-        const maxLength = 15; // 최대 길이 설정
-        return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
-    }, [adultNum, childNum, babyNum]); // adultNum, childNum, babyNum가 변경될 때마다 재계산
+    // const passengerText = useMemo(() => {
+    //     const text = `성인${adultNum}, 소아${childNum}, 유아${babyNum} `;
+    //     // 만약 텍스트가 설정값을 넘으면 ... 처리 (필요에 따라 길이 조정 필요)
+    //     const maxLength = 15; // 최대 길이 설정
+    //     return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+    //     // return adultNum+childNum+babyNum;
+    // }, [adultNum, childNum, babyNum]); // adultNum, childNum, babyNum가 변경될 때마다 재계산
+
+    // // useEffect를 사용하여 passengers 상태를 업데이트
+    // useEffect(() => {
+    //     setInput((prev) => ({
+    //         ...prev,
+    //         passengers: passengerText // passengers 필드를 새로 업데이트
+    //     }));
+    // }, [passengerText]); // passengerText가 변경될 때마다 업데이트
+
 
     // useEffect를 사용하여 passengers 상태를 업데이트
     useEffect(() => {
-        setInput((prev) => ({
-            ...prev,
-            passengers: passengerText // passengers 필드를 새로 업데이트
+    // 총 탑승객 수 계산
+    const totalPassengers = adultNum + childNum + babyNum;
+    // passengers 필드를 새로 업데이트
+    setInput((prev) => ({
+        ...prev,
+        passengers: totalPassengers // 총 탑승객 수를 숫자로 설정
         }));
-    }, [passengerText]); // passengerText가 변경될 때마다 업데이트
+        console.log(totalPassengers);
+    }, [adultNum, childNum, babyNum]); // adultNum, childNum, babyNum가 변경될 때마다 업데이트
+
 
 
     /* ================== 자동완성 기능 구현 ================== */
@@ -444,7 +593,7 @@ const handleNextClick = () => {
         setKeyword(text); // 키워드를 상태로 유지
         setInput(prev => ({
             ...prev,
-            departure: text // 출발지 입력창에 반영
+            departureAirport: text // 출발지 입력창에 반영
         }));
         setOpen(false); // 자동완성 리스트 닫기
     }, [setKeyword, setInput]);
@@ -483,160 +632,6 @@ const handleNextClick = () => {
     }, [open, selectedIndex, searchResult, selectKeyword]);
 
 
-
-
-    //================================더보기를 위한 기능 구현=========================================
-
-    const [result , setResult] = useState({
-        count : 0,
-        last : true,
-        flightList : []
-    });
-
-    //페이징 관련 state
-    const [page , setPage] = useState(null);
-    const [size , setSize] = useState(10);
-
-    // [2] effect로 계산 (권장하는 방법)
-    useEffect(()=> {
-        setInput({
-            ...input,
-            beginRow : page * size - (size-1),
-            endRow : page * size
-        })
-    } , [page,size]);
-
-    useEffect(()=>{
-        if(page === null) return;   //초기상태 page 값이 null이라면 아무것도 동작 X
-
-       console.log("beginRow , endRow 변경 : " , input.beginRow , input.endRow);
-       if(page === 1  ) {
-            sendRequest();
-       }
-       if(page >= 2) {
-           sendMoreRequest();
-       }
-    } , [input.beginRow , input.endRow]);
-
-        //callback
-        const changeInputString = useCallback(e=>{
-            setInput({
-                ...input, 
-                [e.target.name] : e.target.value
-            });
-        }, [input]);
-        
-        const ChangeInputNumber = useCallback((e)=>{
-            setInput({
-                ...input, 
-                [e.target.name] : parseInt(e.target.value) || ""
-            });
-        } , [input]);
-
-        const changeInputArray = useCallback(e=>{
-            //console.log(e.target.name, e.target.value, e.target.checked);
-            const origin = input[e.target.name];//input의 항목을 하나 꺼낸다
-    
-            if(e.target.checked === true) {//추가
-                setInput({
-                    ...input,
-                    [e.target.name] : origin.concat(e.target.value)
-                });
-            }
-            else {//삭제
-                setInput({
-                    ...input,
-                    [e.target.name] : origin.filter(level=>level !== e.target.value)
-                });
-            }
-        }, [input]);
-
-        //첫 목록을 불러올 때 사용
-        const sendRequest = useCallback(async ()=>{
-            loading.current = true; //시작지점
-            const resp = await axios.post("/flight/bookingList", input);
-            // console.log(resp.data);
-
-            setResult(resp.data);
-            loading.current = false;    //종료지점
-        }, [input]);
-
-        //더보기 버튼을 눌렀을 때 사용
-        const sendMoreRequest = useCallback(async ()=>{
-            loading.current = true; //시작지점
-            const resp = await axios.post("/flight/bookingList", input);
-            // console.log(resp.data);
-            //setResult(resp.data);     //덮어쓰기라 안됨
-            setResult({
-                ...result,
-                last : resp.data.last,      //서버에서 준 응답 데이터에 있는 last로 갱신
-                //flightList : result.flightList.concat(resp.data.flightList),    //concat 사용
-                flightList : [...result.flightList , ...resp.data.flightList]   //전개연산자 사용
-            });
-            loading.current = false;    //종료지점
-        }, [input.beginRow , input.endRow]);
-
-        // 지금까지의 구조가 만족스럽지만 1%의 아쉬움이 있다.
-        // effect는 같은 값으로 변경될 때 인지하지 못한다.
-        // 어떤 항목을 연속적으로 검색하면 계속 1페이지여서 반영이 안된다.
-        // 시간차를 두고 1--->1이 아니라 1===null--->
-        // JS의 setTimeout(함수 , 시간)을 이용하여 약간의 시간차를 부여
-
-        const setFirstPage = useCallback(()=>{
-
-            //아래 명령은 어느게 먼저 실행된다고 장담할 수 없다(비동기)
-            //setPage(null);
-            //setPage(1);
-    
-            //useState에서 제공하는 set 메소드에 동기로 처리할 수 있는 코드가 존재
-            //setPage(prev=>?);
-            setPage(prev=>null);
-            setTimeout(()=>{
-                setPage(prev=>1);
-            }, 1);//이 코드는 1ms 뒤에 실행해라!
-            
-        }, [page]);
-
-        //스크롤 관련된 처리
-        // - useEffect(함수) - 화면이 변경될 때마다 실행됨
-        // - useEffect에서 함수를 반환하면 화면이 사라질 때 실행할 작업 지정 가능
-        useEffect(()=>{
-            if(page === null) return;   //결과를 검색하지 않았을 때
-            if(result.last === true) return;    //결과를 더이상 볼게 없을 때
-
-            //resize에 사용할 함수
-            const resizeHandler = throttle(()=>{
-                console.log("% : " , getScrollPercent()); //현재 스크롤의 퍼센트지를 확인 할 수 있음
-                const percent = getScrollPercent();
-                if(percent >= 70 && loading.current === false) {
-                    console.log("더보기를 실행");
-                }
-            } , 350);
-
-            //윈도우에 resize 이벤트를 설정
-            // window.addEventListener("scroll" , 함수);
-            window.addEventListener("scroll" , resizeHandler);
-            // console.log("스크롤 관련 이펙트 실행");
-
-            return ()=>{
-                //윈도우에 설정된 resize 이벤트를 해제
-                // window.addEventListener("scroll" , 함수);
-                window.addEventListener("scroll" , resizeHandler);
-                // console.log("사라질 때 실행");
-            }
-        });
-
-                //스크롤의 현재 위치를 퍼센트로 계산하는 함수
-                const getScrollPercent = useCallback(()=>{
-                    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-                    const documentHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-                    const scrollPercent = (scrollTop / documentHeight) * 100;
-                    return scrollPercent;
-                });
-
-        const loading = useRef(false);
-
-
     return (
         <>
         <div className="container">
@@ -646,10 +641,10 @@ const handleNextClick = () => {
                     <div className="col-sm-2">
                         <input
                             type="text"
-                            name="departure"
+                            name="departureAirport"
                             className="form-control"
                             placeholder="출발지"
-                            value={departureText}
+                            value={input.departureAirport}
                             onChange={changeInput}
                             onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                             onClick={DepartureClick}
@@ -661,10 +656,10 @@ const handleNextClick = () => {
                     <div className="col-sm-2">
                         <input
                             type="text"
-                            name="destination"
+                            name="arrivalAirport"
                             className="form-control"
                             placeholder="도착지"
-                            value={destinationText}
+                            value={input.arrivalAirport} 
                             onChange={changeInput}
                             onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                             onClick={destinationClick}
@@ -675,11 +670,11 @@ const handleNextClick = () => {
                     <div className="col-sm-2">
                         <input
                             type="text"
-                            name="boardingDate"
+                            name="departureTime"
                             className="form-control"
-                            placeholder="가는편"
+                            placeholder="출발일"
                             readOnly
-                            value={input.boardingDate}
+                            value={input.departureTime} 
                             onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
                             ref={datePickerRef} // ref 추가
                             onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
@@ -701,7 +696,7 @@ const handleNextClick = () => {
 
                     <div className="row">
                         <div className="col">
-                            <button className="btn btn-primary" onClick={complexSearch}>검색</button>
+                            <button className="btn btn-primary" onClick={setFirstPage}>검색</button>
                         </div>
                     </div>
                 </div>
@@ -965,55 +960,53 @@ const handleNextClick = () => {
 
 
 
-                                    <div className="row">
-                    {flightList.length === 0 ? (
-                        <div style={{ textAlign: "center", padding: "20px", color: "gray" }}>
-                            <h2>검색결과가 존재하지 않습니다.</h2>
-                        </div>
-                    ) : (
-                        flightList.map((flight) => (
-                            <NavLink to={`/flight/booking/${flight.flightId}`} style={{ textDecoration: "none" }} key={flight.flightId}>
-                                <div className="d-flex mt-3" style={{ border: "1px solid black", borderRadius: "1.5em", width: "100%" }}>
-                                    <div className="row mt-3 mb-3 ms-1" style={{ width: "70%" }}>
-                                        <h3 style={{ color: "black" }}>{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}<GiCommercialAirplane /></h3>
-                                        <div className="d-flex mb-2" style={{ justifyContent: "space-between" }}>
-                                            <div className="d-flex mt-3" style={{ width: "200px", justifyContent: "space-between" }}>
-                                                <span style={{ width: "100%", textAlign: "center" }}>
-                                                    {moment(flight.departureTime).format("a HH:mm")}
-                                                    <p>{flight.departureAirport.substring(
-                                                        flight.departureAirport.indexOf("(") + 1,
-                                                        flight.departureAirport.indexOf(")")
-                                                    )}</p>
-                                                </span>
-                                            </div>
-                                            <div className="row" style={{ width: "200px" }}>
-                                                <span style={{ textAlign: "center" }}>{flight.flightTime}</span>
-                                                <span style={{ textAlign: "center" }}>------------</span>
-                                                <span style={{ textAlign: "center" }}>직항</span>
-                                            </div>
-                                            <div className="d-flex mt-3" style={{ width: "200px", justifyContent: "space-between" }}>
-                                                <span style={{ width: "100%", textAlign: "center" }}>
-                                                    {moment(flight.arrivalTime).format("a HH:mm")}
-                                                    <p>{flight.arrivalAirport.substring(
-                                                        flight.arrivalAirport.indexOf("(") + 1,
-                                                        flight.arrivalAirport.indexOf(")")
-                                                    )}</p>
-                                                </span>
-                                            </div>
+                <div className="row">
+                {result.flightList.length > 0 ? (
+                    result.flightList.map((flight) => (
+                        <NavLink to={`/flight/booking/${flight.flightId}`} style={{ textDecoration: "none" }} key={flight.flightId}>
+                            <div className="d-flex mt-3" style={{ border: "1px solid black", borderRadius: "1.5em", width: "100%" }}>
+                                <div className="row mt-3 mb-3 ms-1" style={{ width: "70%" }}>
+                                    <h3 style={{ color: "black" }}>{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}<GiCommercialAirplane /></h3>
+                                    <div className="d-flex mb-2" style={{ justifyContent: "space-between" }}>
+                                        <div className="d-flex mt-3" style={{ width: "200px", justifyContent: "space-between" }}>
+                                            <span style={{ width: "100%", textAlign: "center" }}>
+                                                {moment(flight.departureTime).format("a HH:mm")}
+                                                <p>{flight.departureAirport.substring(
+                                                    flight.departureAirport.indexOf("(") + 1,
+                                                    flight.departureAirport.indexOf(")")
+                                                )}</p>
+                                            </span>
+                                        </div>
+                                        <div className="row" style={{ width: "200px" }}>
+                                            <span style={{ textAlign: "center" }}>{flight.flightTime}</span>
+                                            <span style={{ textAlign: "center" }}>------------</span>
+                                            <span style={{ textAlign: "center" }}>직항</span>
+                                        </div>
+                                        <div className="d-flex mt-3" style={{ width: "200px", justifyContent: "space-between" }}>
+                                            <span style={{ width: "100%", textAlign: "center" }}>
+                                                {moment(flight.arrivalTime).format("a HH:mm")}
+                                                <p>{flight.arrivalAirport.substring(
+                                                    flight.arrivalAirport.indexOf("(") + 1,
+                                                    flight.arrivalAirport.indexOf(")")
+                                                )}</p>
+                                            </span>
                                         </div>
                                     </div>
-                                    <div className="row flight-price-box" style={{ width: "30%" }}>
-                                        <span className="mt-3" style={{ textAlign: "center", color: "black", fontWeight: "bolder" }}>
-                                            {flight.flightPrice.toLocaleString()}원
-                                        </span>
-                                        <button className="btn btn-primary ms-5" style={{ width: "50%", height: "30%" }}>선택하기</button>
-                                        {user.userType === "MEMBER" && (
-                                            <button className="btn btn-secondary ms-5" style={{ width: "50%", height: "30%" }} onClick={() => createRoom(flight)}>문의하기</button>
-                                        )}
-                                    </div>
                                 </div>
-                            </NavLink>
-                        ))
+                                <div className="row flight-price-box" style={{ width: "30%" }}>
+                                    <span className="mt-3" style={{ textAlign: "center", color: "black", fontWeight: "bolder" }}>
+                                        {flight.flightPrice.toLocaleString()}원
+                                    </span>
+                                    <button className="btn btn-primary ms-5" style={{ width: "50%", height: "30%" }}>선택하기</button>
+                                    {user.userType === "MEMBER" && (
+                                        <button className="btn btn-secondary ms-5" style={{ width: "50%", height: "30%" }} onClick={() => createRoom(flight)}>문의하기</button>
+                                    )}
+                                </div>
+                            </div>
+                        </NavLink>
+                    ))
+                    ) : (
+                        <h3>검색 결과가 없습니다.</h3>
                     )}
                 </div>
 
@@ -1031,7 +1024,7 @@ const handleNextClick = () => {
                     <div className="col">
                         <button className="btn btn-success w-100"
                                     onClick={e=>setPage(page+1)}>
-                            더보기</button>
+                            더보기<FaAngleDown /></button>
                     </div>
                 </div>
             )}

@@ -411,19 +411,6 @@ const handleNextClick = () => {
 
     return (
         <>
-            {/* 캐러셀 */}
-                {/* 이미지1 */}
-            {/* <div className="row">
-                <div className="carousel-item active"> */}
-                    {/* <img
-                            src="https://picsum.photos/800/400"
-                            alt="Example image"
-                            className="bd-placeholder-img d-block w-100 h-100"
-                            aria-hidden="true"
-                            focusable="false"
-                            style={{ backgroundColor: 'var(--bs-secondary-color)', width: '100%', height: '100%' }} /> */}
-                {/* </div>
-            </div> */}
             {/* 가는편 오는편 기능 구현 */}
             <div className="flight-all-div mt-3" style={{        
                             marginLeft: isSmallScreen ? "0" : "20%"
