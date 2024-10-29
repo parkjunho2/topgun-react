@@ -9,7 +9,7 @@ import Oval from 'react-loading-icons/dist/esm/components/oval';
 const Header = () => {
     const navigate = useNavigate();
     const login = useRecoilValue(loginState);
-    const [loading, ] = useRecoilState(memberLoadingState);
+    const [loading,] = useRecoilState(memberLoadingState);
     const [user, setUser] = useRecoilState(userState);
 
     const logout = useCallback(() => {
@@ -50,11 +50,13 @@ const Header = () => {
                                     Chat
                                 </NavLink>
                             </li>
-                            <li>
-                                <a href="#" className="nav-link px-2 text-white">
-                                    About
-                                </a>
-                            </li>
+                            {user.userType === 'ADMIN' && (
+                                <li>
+                                    <NavLink to="/userlist" className="nav-link px-2 text-white">
+                                        UserList
+                                    </NavLink>
+                                </li>
+                            )}
                             <li>
                                 <NavLink to="/flight" className="nav-link px-2 text-white">
                                     flight
