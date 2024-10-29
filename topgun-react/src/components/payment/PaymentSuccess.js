@@ -54,8 +54,9 @@ const PaymentSuccess=()=>{
         const total = useMemo(() => {
             return seatsList.reduce((b, c) => {
                 const price = c.seatsPrice || 0; // 기본값을 0으로 설정
+                const flightPrice = c.flightPrice || 0; //기본값을 0으로 설정
                 const qty = c.qty || 0; // 기본값을 0으로 설정
-                return b + (price * qty);
+                return b + ((price+flightPrice) * qty);
             }, 0);
         }, [seatsList]);
 
@@ -88,9 +89,9 @@ const PaymentSuccess=()=>{
                     </tr>
                         {seatsList.map(seats=>(
                             <tr key={seats.seatsNo}>
-                                <td>{seats.seatsNo}</td>
+                                <td>{seats.seatsNumber}</td>
                                 <td>{seats.seatsRank}</td>
-                                <td>{seats.seatsPrice}원</td>
+                                <td>{seats.seatsPrice.toLocaleString()}원</td>
                             </tr>
                         ))}
                     </tbody>
@@ -98,7 +99,7 @@ const PaymentSuccess=()=>{
                         <tr>
                             <th>총 결제 금액</th>
                             <th></th>
-                            <th>{total}원</th>
+                            <th>{total.toLocaleString()}원</th>
                         </tr>
                     </tfoot>
                 </table>
