@@ -15,7 +15,7 @@ const MyPage = () => {
 
 
     // Recoil
-    const [baseduser, setBasedUser] = useRecoilState(userState);
+    const [, setBasedUser] = useRecoilState(userState);
 
     const user = useRecoilValue(userState);
 
@@ -46,6 +46,23 @@ const MyPage = () => {
         setIsHovered(false);
     };
 
+
+    // Callback
+    // 결제 내역 상세 정보 불러오기
+    // const loadMyPayment = useCallback(async () => {
+    //     if (!user || !user.userId || !user.userType) return; // user가 유효한지 확인
+
+    //     try {
+    //         const response = await axios.post('http://localhost:8080/users/myInfo', {
+    //             userId: user.userId,
+    //             userType: user.userType
+    //         });
+    //         setUserInfo(response.data); // 서버에서 받은 데이터 처리
+    //         setEditedUserInfo(response.data); // 서버에서 받은 데이터를 수정을 위한 state에 업데이트
+    //     } catch (error) {
+    //         console.error("Error loading my info:", error);
+    //     }
+    // }, [user]); // user를 의존성 배열에 추가
 
 
     // Callback
@@ -752,6 +769,8 @@ const MyPage = () => {
                                 </div>
                             </div>
                         </div>
+
+
                     </div>
                 </div>
             </div>

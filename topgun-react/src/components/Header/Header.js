@@ -9,7 +9,7 @@ import Oval from 'react-loading-icons/dist/esm/components/oval';
 const Header = () => {
     const navigate = useNavigate();
     const login = useRecoilValue(loginState);
-    const [loading, ] = useRecoilState(memberLoadingState);
+    const [loading,] = useRecoilState(memberLoadingState);
     const [user, setUser] = useRecoilState(userState);
 
     const logout = useCallback(() => {
@@ -36,32 +36,39 @@ const Header = () => {
                                 </NavLink>
                             </li>
                             {login && ( //로그인 회원
-                            <li>
-                                <NavLink to="/room" className="nav-link px-2 text-white">
-                                    문의
-                                </NavLink>
-                            </li>
+                                <li>
+                                    <NavLink to="/room" className="nav-link px-2 text-white">
+                                        문의
+                                    </NavLink>
+                                </li>
                             )}
-                            {login && user.userType==="AIRLINE" && ( //로그인 상태, AIRLINE만
-                            <li>
-                                <NavLink to="/flight" className="nav-link px-2 text-white">
-                                    항공편
-                                </NavLink>
-                            </li>
+                            {user.userType === 'ADMIN' && (
+                                <li>
+                                    <NavLink to="/userlist" className="nav-link px-2 text-white">
+                                        UserList
+                                    </NavLink>
+                                </li>
+                            )}
+                            {login && user.userType === "AIRLINE" && ( //로그인 상태, AIRLINE만
+                                <li>
+                                    <NavLink to="/flight" className="nav-link px-2 text-white">
+                                        항공편
+                                    </NavLink>
+                                </li>
                             )}
                             {login && user.userType === "ADMIN" && ( //로그인 상태, ADMIN만
-                            <>
-                            <li>
-                                <NavLink to="/admin/list" className="nav-link px-2 text-white">
-                                    항공편
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/graph" className="nav-link px-2 text-white">
-                                    데이터차트
-                                </NavLink>
-                            </li>
-                            </>
+                                <>
+                                    <li>
+                                        <NavLink to="/admin/list" className="nav-link px-2 text-white">
+                                            항공편
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink to="/graph" className="nav-link px-2 text-white">
+                                            데이터차트
+                                        </NavLink>
+                                    </li>
+                                </>
                             )}
                             {/* <li>
                                 <NavLink to="/payment" className="nav-link px-2 text-white">
@@ -69,11 +76,11 @@ const Header = () => {
                                 </NavLink>
                             </li> */}
                             {login && user.userType === "MEMBER" && (
-                            <li>
-                                <NavLink to="/payment/alllist" className="nav-link px-2 text-white">
-                                    예약내역
-                                </NavLink>
-                            </li>
+                                <li>
+                                    <NavLink to="/payment/alllist" className="nav-link px-2 text-white">
+                                        예약내역
+                                    </NavLink>
+                                </li>
                             )}
                             <li>
                                 <NavLink to="/notice" className="nav-link px-2 text-white">
