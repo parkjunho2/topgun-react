@@ -1,8 +1,6 @@
 import axios from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { NavLink } from 'react-router-dom';
 import { FaChevronDown } from "react-icons/fa";
-import { throttle } from "lodash";
 
 const UserList = () => {
 
@@ -19,8 +17,6 @@ const UserList = () => {
         last: true,
         userList: []
     });
-
-
 
     //페이징 관련 state
     const [page, setPage] = useState(1);
