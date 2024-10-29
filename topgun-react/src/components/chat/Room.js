@@ -8,6 +8,8 @@ import { IoEnterOutline } from "react-icons/io5";
 import { MdDeleteOutline } from "react-icons/md";
 import { IoLogoWechat } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
+import moment from "moment";
 
 const Room = () => {
     //navigator
@@ -68,7 +70,7 @@ const Room = () => {
     }, [roomList]);
 
     const enterRoom = useCallback(async (target) => {
-        if (target.join === 'Y') {
+        if (target.join === user.userId) {
             navigate("/chat/" + target.roomNo); //이미 참여중인 방으로 이동
         }
         else {
@@ -91,6 +93,17 @@ const Room = () => {
         ? [{ value: '관리자에게 문의', label: '관리자에게 문의' }]
         : roomOptions;
 
+    const formatMessageTime = (time) => {
+        const messageDate = moment(time);
+        const today = moment();
+
+        if (messageDate.isSame(today, 'day')) {
+            return messageDate.format("a h:mm");
+        } else {
+            return messageDate.format("MM월 DD일 a h:mm");
+        }
+    };
+
     return (
         <div className="container">
             <div className="room-container">
@@ -105,7 +118,6 @@ const Room = () => {
                                         <option key={option.value} value={option.value}>{option.label}</option>
                                     ))}
                                 </select>
-
                                 <button className="btn btn-success" onClick={saveInput}><FaPlus /></button>
                             </div>
                         </div>
@@ -121,14 +133,20 @@ const Room = () => {
                                     {login && user.userType === "ADMIN" && (
                                         <span className="badge bg-primary me-2">{room.roomNo}번</span>
                                     )}
-                                    <span><IoLogoWechat /> {room.roomName}</span>
-                                    <button className="btn btn-primary ms-2" onClick={e => enterRoom(room)}>
-                                        <IoEnterOutline style={{ fontSize: '1.5rem' }} />
-                                    </button>
-                                    <button className="btn btn-danger ms-2" onClick={e => deleteRoom(room)}>
-                                        <MdDeleteOutline style={{ fontSize: '1.5rem' }} />
-                                    </button>
+                                    <span onClick={e => enterRoom(room)}>{room.roomName}</span>
                                 </div>
+                                <div className="last-message-container">
+                                    <span className="last-message">{room.lastMessage}</span>
+                                    {room.lastMessageTime && (
+                                        <span className="last-message-time ms-5">{formatMessageTime(room.lastMessageTime)}</span>
+                                    )}
+                                </div>
+                                {/* <button className="btn btn-primary ms-2" onClick={e => enterRoom(room)}>
+                                    <IoEnterOutline style={{ fontSize: '1.5rem' }} />
+                                </button> */}
+                                <button className="btn btn-danger ms-2" onClick={e => deleteRoom(room)}>
+                                    <FaXmark style={{ fontSize: '1.5rem' }} />
+                                </button>
                             </div>
                         </div>
                     ))}
