@@ -9,6 +9,7 @@ import moment from "moment";
 import { useNavigate } from 'react-router';
 import { IoClose } from "react-icons/io5";
 import * as hangul from 'hangul-js';
+import { FaStar } from "react-icons/fa";
 
 const MainPage = () => {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -461,14 +462,13 @@ const handleNextClick = () => {
             selectKeyword(searchResult[selectedIndex].nationalName);
         }
     }, [open, selectedIndex, searchResult, selectKeyword]);
-
     return (
         <>
         <div className="container">
             {/* 가는편 오는편 기능 구현 */}
-            <div className="flight-all-div mt-3" >   {/* 전체 기능에 대한 div */}
+            <div className="flight-all-div mt-3">   {/* 전체 기능에 대한 div */}
                 <div className="flight-search-check row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
-                    <h5>항공권 조회 구현중..</h5>
+                    {/* <h5>항공권 조회 구현중..</h5> */}
                         <div className="col-sm-3">
                             <input
                                 type="text"
@@ -513,7 +513,7 @@ const handleNextClick = () => {
                             />
                         </div>
 
-                        <div className="col-sm-2">
+                        <div className="col-sm-3">
                             <button className="btn btn-primary" onClick={handleSearch}><FaSearch /> 항공권 검색</button>
                         </div>
                     </div>
@@ -657,18 +657,19 @@ const handleNextClick = () => {
 
             {/* Marketing messaging and featurettes
   ================================================== */}
-            {/* Wrap the rest of the page in another container to center all the content. */}
-
-            {/* 수정예정 */}
             <div className="container marketing">
-                {/* Three columns of text below the carousel */}
+                <div className="row">
+                    <div className="col">
+                        <h3 className="mb-3"> <FaStar className="mb-2 me-2"/>TopGun에서 추천하는 여행지<FaStar className="mb-2 ms-2"/>
+                        </h3>
+                    </div>
+                </div>
                 <div className="row">
                     <div className="col-lg-4">
                         <img
                             className="bd-placeholder-img rounded-circle"
                             width={200}
-                            height={200
-                            }
+                            height={200}
                             src="https://i.ibb.co/09T9VTT/image.jpg"                            
                         />
                             <title>Placeholder</title>
@@ -687,8 +688,7 @@ const handleNextClick = () => {
                     <img
                             className="bd-placeholder-img rounded-circle"
                             width={200}
-                            height={200
-                            }
+                            height={200}
                             src="https://i.ibb.co/qYVfVxq/image.jpg"                            
                         />
                             <title>Placeholder</title>
@@ -707,8 +707,7 @@ const handleNextClick = () => {
                     <img
                             className="bd-placeholder-img rounded-circle"
                             width={200}
-                            height={200
-                            }
+                            height={200}
                             src="https://i.ibb.co/7NtShdX/image.webp"                            
                         />
                             <title>Placeholder</title>
