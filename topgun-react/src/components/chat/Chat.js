@@ -187,11 +187,11 @@ const Chat = () => {
         <div className="container"  style={{width : "700px"}}>
             <div className="row mt-4">
                 <div className="col">
-                    {more === true && (
+                    {/* {more === true && (
                         <button className="btn btn-outline-success w-100" onClick={loadMoreMessageList}>
                             더보기
                         </button>
-                    )}
+                    )} */}
                     <div className="chat-container mt-3">
                         <ul className="list-group">
                             {messageList.map((message, index) => (
@@ -226,7 +226,7 @@ const Chat = () => {
                                     value={input} onChange={e => setInput(e.target.value)}
                                     onKeyUp={e => {
                                         if (e.key === 'Enter' && login) { sendMessage(); }
-                                    }} disabled={login === false} />
+                                    }} disabled={login === false} placeholder="메세지를 입력하세요"/>
                                 <button className="btn btn-success" disabled={login === false} onClick={sendMessage}>보내기</button>
                             </div>
                         </div>

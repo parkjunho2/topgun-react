@@ -464,8 +464,9 @@ const handleNextClick = () => {
 
     return (
         <>
+        <div className="container">
             {/* 가는편 오는편 기능 구현 */}
-            <div className="flight-all-div mt-3" style={{marginLeft: isSmallScreen ? "0" : "20%"}}>   {/* 전체 기능에 대한 div */}
+            <div className="flight-all-div mt-3" >   {/* 전체 기능에 대한 div */}
                 <div className="flight-search-check row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
                     <h5>항공권 조회 구현중..</h5>
                         <div className="col-sm-3">
@@ -652,7 +653,7 @@ const handleNextClick = () => {
                         </div>
                     )}
                 </div>
-
+                
 
             {/* Marketing messaging and featurettes
   ================================================== */}
@@ -663,80 +664,62 @@ const handleNextClick = () => {
                 {/* Three columns of text below the carousel */}
                 <div className="row">
                     <div className="col-lg-4">
-                        <svg
+                        <img
                             className="bd-placeholder-img rounded-circle"
-                            width={140}
-                            height={140}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
+                            width={200}
+                            height={200
+                            }
+                            src="https://i.ibb.co/09T9VTT/image.jpg"                            
+                        />
                             <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                        </svg>
-                        <h2 className="fw-normal">Heading</h2>
-                        <p>
-                            Some representative placeholder content for the three columns of
-                            text below the carousel. This is the first column.
-                        </p>
-                        <p>
-                            <a className="btn btn-secondary" href="#">
-                                View details »
-                            </a>
+                            <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />                       
+                        <h2 className="fw-normal mt-3">도쿄</h2>
+                        <p className="mb-0">
+                            다채로운 모습을 가진 도쿄 <br/>                   
+                            넓은 면적만큼이나 매력적인 지역들이 <br/> 
+                            여행자를 기다린다. <br/>                   
+                            어느 곳을 가더라도 멋진 시간을 선물하는 <br/> 
+                            도쿄를 추천합니다.
                         </p>
                     </div>
                     {/* /.col-lg-4 */}
                     <div className="col-lg-4">
-                        <svg
+                    <img
                             className="bd-placeholder-img rounded-circle"
-                            width={140}
-                            height={140}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
+                            width={200}
+                            height={200
+                            }
+                            src="https://i.ibb.co/qYVfVxq/image.jpg"                            
+                        />
                             <title>Placeholder</title>
                             <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                        </svg>
-                        <h2 className="fw-normal">Heading</h2>
+                        <h2 className="fw-normal mt-3">제주도</h2>
                         <p>
-                            Another exciting bit of representative placeholder content. This
-                            time, we've moved on to the second column.
-                        </p>
-                        <p>
-                            <a className="btn btn-secondary" href="#">
-                                View details »
-                            </a>
+                            서울에서 비행기로 1시간 거리에 있는 <br/> 
+                            한국에서 가장 큰 섬인 제주도 <br/>
+                            4계절 각각의 모습이 너무나 아름다운 섬입니다.<br/>
+                            특산물과 특산물로 만든 먹거리도 다양한 <br/>
+                            제주도를 추천합니다.
                         </p>
                     </div>
                     {/* /.col-lg-4 */}
                     <div className="col-lg-4">
-                        <svg
+                    <img
                             className="bd-placeholder-img rounded-circle"
-                            width={140}
-                            height={140}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
+                            width={200}
+                            height={200
+                            }
+                            src="https://i.ibb.co/7NtShdX/image.webp"                            
+                        />
                             <title>Placeholder</title>
                             <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                        </svg>
-                        <h2 className="fw-normal">Heading</h2>
+                        <h2 className="fw-normal mt-3">나트랑</h2>
                         <p>
-                            And lastly this, the third column of representative placeholder
-                            content.
-                        </p>
-                        <p>
-                            <a className="btn btn-secondary" href="#">
-                                View details »
-                            </a>
+                            맑고 푸른 바다와 <br/>
+                            황금빛 모래가 만나는 곳, 나트랑 <br/>
+                            이 해안 도시는 휴식과 모험을 모두 즐길 수 있는 <br/>
+                            이상적인 장소입니다.<br/>
+                            현지 음식을 맛보며, 다양한 수상 활동을 즐길 수 있는 나트랑을 추천합니다.
                         </p>
                     </div>
                     {/* /.col-lg-4 */}
@@ -844,6 +827,7 @@ const handleNextClick = () => {
                 <hr className="featurette-divider" />
                 {/* /END THE FEATURETTES */}
 
+            </div>
             </div>
             {/* /.container */}
         </>
