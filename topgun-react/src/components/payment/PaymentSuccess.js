@@ -87,11 +87,19 @@ const PaymentSuccess=()=>{
         <div className="container text-center">
         <div className="row mt-4">
             <div className="col">
-                <h1 className="text-center">{flightInfo.airlineName}</h1>
-                <p>{flightInfo.departureAirport}</p>
-                <p>{flightInfo.departureTime}</p>
-                <p>{flightInfo.arrivalAirport}</p>
-                <p>{flightInfo.arrivalTime}</p>
+                <h1 className="text-center">{flightInfo.airlineName}항공</h1>
+            <div className="row">
+                <div className="col">
+                    <div className="text-end"><strong>{flightInfo.departureAirport}</strong></div>
+                    <div className="text-end"><strong>{flightInfo.departureTime}</strong></div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                <div className="text-end"><strong>{flightInfo.arrivalAirport}</strong></div>
+                <div className="text-end"><strong>{flightInfo.arrivalTime}</strong></div>
+                </div>
+            </div>
                 <table className="table">
                    <tbody>
                     <tr>
