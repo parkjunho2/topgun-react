@@ -36,11 +36,11 @@ import { useParams } from "react-router";
         setFlightInfo(resp.data[0]); // 첫 번째 항공편 정보만 가져오기
     }, [flightId]);
     
-     // 항공편 정보 불러오기
-     const loadFlightInfo = useCallback(async () => {
-        const resp = await axios.get(`http://localhost:8080/seats/flightInfo`);
-        setFlightInfo(resp.data.find(info => info.flightId === flightId)); // 해당 flightId에 맞는 정보 찾기
-    }, [flightId]);
+    //  // 항공편 정보 불러오기
+    //  const loadFlightInfo = useCallback(async () => {
+    //     const resp = await axios.get(`http://localhost:8080/seats/flightInfo`);
+    //     setFlightInfo(resp.data.find(info => info.flightId === flightId)); // 해당 flightId에 맞는 정보 찾기
+    // }, [flightId]);
     
     //좌석선택
     const selectSeats = useCallback((target, checked)=>{ 
