@@ -199,8 +199,8 @@ const NoticeBoard = () => {
                         <tr>
                             <th style={{ padding: '15px', textAlign: 'center', width: '20%' }}>NO.</th>
                             <th style={{ padding: '15px', textAlign: 'center', width: '30%' }}>TITLE</th>
-                            <th style={{ padding: '15px', textAlign: 'center', width: '13%' }}>AUTHOR</th>
-                            <th style={{ padding: '15px', textAlign: 'center', width: '35%' }}>DATE</th>
+                            <th style={{ padding: '15px', textAlign: 'center', width: '18%' }}>AUTHOR</th>
+                            <th style={{ padding: '15px', textAlign: 'center', width: '40%' }}>DATE</th>
                             <th style={{ padding: '15px', textAlign: 'center', width: '2%' }}></th>
                         </tr>
                     </thead>
@@ -251,7 +251,7 @@ const NoticeBoard = () => {
                     </tbody>
 
                    {/* 페이지네이션 추가 */}
-<div style={{ display: 'flex', justifyContent: 'center', width: '500%', marginTop: '5px' }}>
+<div style={{ display: 'flex', justifyContent: 'center', width: '550%', marginTop: '5px' }}>
     <Stack spacing={2}>
         <Pagination
             count={Math.ceil(noticeList.length / noticesPerPage)}
