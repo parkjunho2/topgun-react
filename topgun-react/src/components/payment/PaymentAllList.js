@@ -72,7 +72,6 @@ const PaymentAllList=()=>{
                              <span/>
                              총 결제금액: {payment.paymentDto.paymentTotal.toLocaleString()}원
                          </h3>
-
         {/* 상세 결제 내용 */}
         {payment.paymentDetailList?.length > 0 && (
                         <ul className="list-group list-group-flush mt-4">

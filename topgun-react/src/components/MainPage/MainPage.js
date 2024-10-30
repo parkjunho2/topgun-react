@@ -2,8 +2,8 @@ import './FlightTicketSearch.css'
 import 'lightpick/css/lightpick.css';
 import './MainPage.css'
 import { useCallback, useRef, useEffect, useState, useMemo } from "react";
-import { FaPlus } from "react-icons/fa";
-import { FaMinus } from "react-icons/fa";
+import axios from 'axios';
+import { FaSearch } from "react-icons/fa";
 import Lightpick from 'lightpick';
 import moment from "moment";
 import { useNavigate } from 'react-router';
@@ -16,6 +16,107 @@ const MainPage = () => {
     const [keyword, setKeyword] = useState("");
     const [open, setOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1); // 선택된 항목의 인덱스
+
+        // state
+        const [input, setInput] = useState({
+            departureAirport: "",   // 출발 공항
+            arrivalAirport: "",     // 도착 공항
+            departureTime: "",         // 출발 날짜
+        });
+
+        const handleSearch = () => {
+            const {departureAirport, arrivalAirport, departureTime} = input;
+            // navigate를 사용하여 쿼리 파라미터를 설정합니다.
+            navigate(`/flight/bookingList?departureAirport=${departureAirport}&arrivalAirport=${arrivalAirport}&departureTime=${departureTime}`);
+        };
+
+      /*======================   복합검색을 위한 기능    =============================*/
+      const [result , setResult] = useState({
+        count : 0,
+        last : true,
+        flightList : []
+    });
+
+    //페이징 관련 state
+    const [page , setPage] = useState(null);
+    const [size , setSize] = useState(10);
+
+    // [2] effect로 계산 (권장하는 방법)
+    useEffect(()=> {
+        setInput({
+            ...input,
+            beginRow : page * size - (size-1),
+            endRow : page * size
+        })
+    } , [page,size]);
+
+    // useEffect(()=>{
+    //     if(page === null) return;   //초기상태 page 값이 null이라면 아무것도 동작 X
+
+    //    console.log("beginRow , endRow 변경 : " , input.beginRow , input.endRow);
+    //    if(page === 1  ) {
+    //         sendRequest();
+    //    }
+    //    if(page >= 2) {
+    //        sendMoreRequest();
+    //    }
+    // } , [input.beginRow , input.endRow]);
+
+        //callback
+        const changeInputString = useCallback(e=>{
+            setInput({
+                ...input, 
+                [e.target.name] : e.target.value
+            });
+        }, [input]);
+        
+        const ChangeInputNumber = useCallback((e)=>{
+            setInput({
+                ...input, 
+                [e.target.name] : parseInt(e.target.value) || ""
+            });
+        } , [input]);
+
+        const changeInputArray = useCallback(e=>{
+            //console.log(e.target.name, e.target.value, e.target.checked);
+            const origin = input[e.target.name];//input의 항목을 하나 꺼낸다
+    
+            if(e.target.checked === true) {//추가
+                setInput({
+                    ...input,
+                    [e.target.name] : origin.concat(e.target.value)
+                });
+            }
+            else {//삭제
+                setInput({
+                    ...input,
+                    [e.target.name] : origin.filter(level=>level !== e.target.value)
+                });
+            }
+        }, [input]);
+
+        //첫 목록을 불러올 때 사용
+        const sendRequest = useCallback(async ()=>{
+            loading.current = true; //시작지점
+            const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
+            // console.log(resp.data);
+
+            setResult(resp.data);
+            loading.current = false;    //종료지점
+        }, [input]);
+
+        const setFirstPage = useCallback(()=>{
+            setPage(prev=>null);
+            setTimeout(()=>{
+                setPage(prev=>1);
+            }, 1);  //이 코드는 1ms 뒤에 실행해라!
+            
+        }, [page]);
+        // ※※  로딩중에 추가 로딩이 불가능하게 처리하기 위한 REF 사용 ※※
+        // 목록을 불러오기 시작하면 loading.current = true로 변경
+        // 목록을 불러오고 나면  loading.current = false로 변경
+        const loading = useRef(false);
+
 
 
   // 창 크기 변화 감지
@@ -36,43 +137,27 @@ const MainPage = () => {
     //navigate
     const navigate = useNavigate();
 
-    // state
-    const [input, setInput] = useState({
-        departure: '',
-        destination: '',
-        boardingDate: '',
-        // departureDate: "",
-        passengers: ''
-    });
+
 
     //조회 버튼에 대한 navigate 구현
     const checkInputEmpty = useCallback(() => {
         // e.preventDefault();
-        if (input.departure.length === 0) {
+        if (input.departureAirport.length === 0) {
             return window.alert("출발지를 입력해주세요.");
         }
-        else if (input.destination.length === 0) {
+        else if (input.arrivalAirport.length === 0) {
             return window.alert("도착지를 입력해주세요.");
         }
-        else if (input.boardingDate.length === 0) {
+        else if (input.departureTime.length === 0) {
             return window.alert("출발일자를 입력해주세요.");
         }
         // else if (input.departureDate.length === 0) {
         //     return window.alert("도착일자를 입력해주세요.");
         // }
-        else if (adultNum === 0 && childNum === 0 && babyNum === 0) {
-            return window.alert("인원을 입력해주세요.");
-        }
         else {
             navigate("/flight/bookingList");   //위의 항목들이 모두 pass라면 이동
         }
     }, [input]);
-
-    // 인원수에 대한 state
-    const [adultNum, setAdultNum] = useState(0);       // 성인
-    const [childNum, setChildNum] = useState(0);      // 소아
-    const [babyNum, setBabyNum] = useState(0);     // 유아
-    const [selectedSeatClass, setSelectedSeatClass] = useState(''); // 좌석 등급
 
     /*                         ☆☆☆☆ 출발지에 대한 기능 state ☆☆☆☆                              */
     //출발지에 대한 state
@@ -117,14 +202,14 @@ const MainPage = () => {
     const departureText = useMemo(() => {
     // 우선적으로 keyword가 있으면 keyword를 반환, 그 다음 selectedDepCity를 반환
     // if (keyword) return keyword;
-        return selectedDepCity ? selectedDepCity : input.departure;     // selectedDepCity가 있으면 해당 도시를 반환, 없으면 기존 input.departure 값을 유지
-    }, [keyword, selectedDepCity, input.departure]);
+        return selectedDepCity ? selectedDepCity : input.departureAirport;     // selectedDepCity가 있으면 해당 도시를 반환, 없으면 기존 input.departureAirport 값을 유지
+    }, [keyword, selectedDepCity, input.departureAirport]);
 
     // 출발지 상태 변경 처리
     useEffect(() => {
         setInput((prev) => ({
             ...prev,
-            departure: selectedDepCity ? selectedDepCity : prev.departure // 선택된 도시가 있으면 해당 도시로 설정
+            departureAirport: selectedDepCity ? selectedDepCity : prev.departureAirport // 선택된 도시가 있으면 해당 도시로 설정
         }));
     }, [selectedDepCity]); // 선택된 도시가 변경될 때마다 업데이트
 
@@ -146,12 +231,12 @@ const handleNextClick = () => {
     if (selectedDepCity) { // selectedDepCity가 존재하면
         setInput(prev => ({
             ...prev,
-            departure: selectedDepCity // 선택된 도시로 설정
+            departureAirport: selectedDepCity // 선택된 도시로 설정
         }));
     } else if (keyword) {
         setInput(prev => ({
             ...prev,
-            departure: keyword // 키워드로 설정
+            departureAirport: keyword // 키워드로 설정
         }));
     }
     
@@ -159,7 +244,7 @@ const handleNextClick = () => {
 
     // 도착지 입력창으로 포커스 이동
     setTimeout(() => {
-        const destinationInput = document.querySelector('input[name="destination"]');
+        const destinationInput = document.querySelector('input[name="arrivalAirport"]');
         if (destinationInput) {
             destinationInput.focus(); // 도착지 입력창에 포커스
         }
@@ -176,11 +261,11 @@ const handleNextClick = () => {
 
     // 도착지 input 클릭 시 출발지 기능을 표시하는 함수
     const destinationClick = () => {
-        if (input.departure.length === 0) {
+        if (input.departureAirport.length === 0) {
             window.alert("출발지를 입력해주세요.");
             
             // 도착지 입력창의 포커스를 해제합니다.
-            const destinationInput = document.querySelector('input[name="destination"]');
+            const destinationInput = document.querySelector('input[name="arrivalAirport"]');
             if (destinationInput) {
                 destinationInput.blur(); // 포커스를 해제
             }
@@ -200,15 +285,15 @@ const handleNextClick = () => {
 
     // 도착지 값이 선택된 도시로 설정되도록 useMemo로 메모이제이션 
     const destinationText = useMemo(() => {
-        // selectedDesCity가 있으면 해당 도시를 반환, 없으면 기존 input.destination 값을 유지
-        return selectedDesCity ? selectedDesCity : input.destination;
-    }, [selectedDesCity, input.destination]);
+        // selectedDesCity가 있으면 해당 도시를 반환, 없으면 기존 input.arrivalAirport 값을 유지
+        return selectedDesCity ? selectedDesCity : input.arrivalAirport;
+    }, [selectedDesCity, input.arrivalAirport]);
 
     // 도착지 상태 변경 처리
     useEffect(() => {
         setInput((prev) => ({
             ...prev,
-            destination: destinationText // 선택된 도착지를 도착지 입력창에 설정
+            arrivalAirport: destinationText // 선택된 도착지를 도착지 입력창에 설정
         }));
     }, [destinationText]); // 선택된 도시가 변경될 때마다 업데이트
 
@@ -226,29 +311,6 @@ const handleNextClick = () => {
 
 
     /*                         ☆☆☆☆가는편/오는편 , 좌석에 대한 기능 구현☆☆☆☆                               */
-    // 공통 감소 함수
-    const decreaseCount = (type) => {
-        if (type === 'adult' && adultNum > 0) {
-            setAdultNum(adultNum - 1);
-        } else if (type === 'child' && childNum > 0) {
-            setChildNum(childNum - 1);
-        } else if (type === 'baby' && babyNum > 0) {
-            setBabyNum(babyNum - 1);
-        }
-    };
-
-    // 공통 증가 함수(총 인원은 9명으로 제한)
-    const increaseCount = (type) => {
-        const totalCountNum = adultNum + childNum + babyNum;
-        if (type === 'adult' && totalCountNum < 9) {
-            setAdultNum(adultNum + 1);
-        } else if (type === 'child' && totalCountNum < 9) {
-            setChildNum(childNum + 1);
-        } else if (type === 'baby' && adultNum > babyNum && totalCountNum < 9) {
-            setBabyNum(babyNum + 1);
-        }
-    };
-
     // callback
     const changeInput = useCallback((e) => {
         setInput({
@@ -277,15 +339,9 @@ const handleNextClick = () => {
                     if (start) {
                         setInput((prev) => ({
                             ...prev,
-                            boardingDate: start.format('YYYY-MM-DD') // 가는편 날짜 설정
+                            departureTime: start.format('YYYY-MM-DD') // 가는편 날짜 설정
                         }));
                     }
-                    // if (end) {
-                    //     setInput((prev) => ({
-                    //         ...prev,
-                    //         departureDate: end.format('YYYY-MM-DD') // 오는편 날짜 설정
-                    //     }));
-                    // }
                 }
             });
         }
@@ -318,23 +374,6 @@ const handleNextClick = () => {
         setDestinationInputClick(false);
     };
 
-    // 탑승객 문자열을 useMemo로 계산
-    const passengerText = useMemo(() => {
-        const text = `성인${adultNum}, 소아${childNum}, 유아${babyNum} `;
-        // 만약 텍스트가 설정값을 넘으면 ... 처리 (필요에 따라 길이 조정 필요)
-        const maxLength = 15; // 최대 길이 설정
-        return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
-    }, [adultNum, childNum, babyNum]); // adultNum, childNum, babyNum가 변경될 때마다 재계산
-
-    // useEffect를 사용하여 passengers 상태를 업데이트
-    useEffect(() => {
-        setInput((prev) => ({
-            ...prev,
-            passengers: passengerText // passengers 필드를 새로 업데이트
-        }));
-    }, [passengerText]); // passengerText가 변경될 때마다 업데이트
-
-
     /* ================== 자동완성 기능 구현 ================== */
     //state
     const [nationalList, setNationalList] = useState([
@@ -361,6 +400,20 @@ const handleNextClick = () => {
     //     setNationalList(resp.data);
     // }, [setNationalList])
 
+
+
+    //========================자동완성 기능 사용 시 백엔드와 연결하기 위한 코드================
+    // //effect
+    // useEffect(()=>{
+    //     loadNationalList();
+    // } , [])
+
+    // //callback
+    // const loadNationalList = useCallback(async()=>{
+    //     const resp = await axios.get("/경로/");
+    //     setNationalList(resp.data);
+    // }, [setNationalList])
+
     const changeKeyword = useCallback((e) => {
         setKeyword(e.target.value);
         setOpen(e.target.value.length > 0);   // 입력값이 있을 때만 자동완성 리스트를 보여줌
@@ -371,7 +424,7 @@ const handleNextClick = () => {
         setKeyword(text); // 키워드를 상태로 유지
         setInput(prev => ({
             ...prev,
-            departure: text // 출발지 입력창에 반영
+            departureAirport: text // 출발지 입력창에 반영
         }));
         setOpen(false); // 자동완성 리스트 닫기
     }, [setKeyword, setInput]);
@@ -412,18 +465,16 @@ const handleNextClick = () => {
     return (
         <>
             {/* 가는편 오는편 기능 구현 */}
-            <div className="flight-all-div mt-3" style={{        
-                            marginLeft: isSmallScreen ? "0" : "20%"
-                        }}>   {/* 전체 기능에 대한 div */}
-                <div className="row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
+            <div className="flight-all-div mt-3" style={{marginLeft: isSmallScreen ? "0" : "20%"}}>   {/* 전체 기능에 대한 div */}
+                <div className="flight-search-check row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
                     <h5>항공권 조회 구현중..</h5>
-                        <div className="col-sm-2">
+                        <div className="col-sm-3">
                             <input
                                 type="text"
-                                name="departure"
+                                name="departureAirport"
                                 className="form-control"
                                 placeholder="출발지"
-                                value={departureText}
+                                value={input.departureAirport}
                                 onChange={changeInput}
                                 onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                                 onClick={DepartureClick}
@@ -432,63 +483,37 @@ const handleNextClick = () => {
                             />
                         </div>
 
-                        <div className="col-sm-2">
+                        <div className="col-sm-3">
                             <input
                                 type="text"
-                                name="destination"
+                                name="arrivalAirport"
                                 className="form-control"
                                 placeholder="도착지"
-                                value={destinationText}
+                                value={input.arrivalAirport} 
                                 onChange={changeInput}
                                 onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                                 onClick={destinationClick}
                                 autoComplete="off"
+                                readOnly
                             />
                         </div>
 
                         <div className="col-sm-3">
                             <input
                                 type="text"
-                                name="boardingDate"
+                                name="departureTime"
                                 className="form-control"
-                                placeholder="가는편"
-                                readOnly
-                                value={input.boardingDate}
+                                placeholder="출발일"
+                                alue={input.departureTime} 
                                 onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
+                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                                 ref={datePickerRef} // ref 추가
-                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                            />
-                        </div>
-
-                        {/* <div className="col-sm-2">
-                            <input
-                                type="text"
-                                name="departureDate"
-                                className="form-control"
-                                placeholder="오는편"
                                 readOnly
-                                value={input.departureDate}
-                                onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
-                                ref={datePickerRef} // ref 추가
-                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                            />
-                        </div> */}
-
-                        <div className="col-sm-3">
-                            <input
-                                type="text"
-                                name="passengers"
-                                className="form-control"
-                                placeholder="탑승객 및 좌석등급"
-                                readOnly
-                                value={input.passengers}
-                                onClick={showPassengerClick} // 클릭 시 설정 기능 표시
-                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                             />
                         </div>
 
                         <div className="col-sm-2">
-                            <button className="btn btn-success" onClick={checkInputEmpty}>조회</button>
+                            <button className="btn btn-primary" onClick={handleSearch}><FaSearch /> 항공권 검색</button>
                         </div>
                     </div>
 
@@ -522,7 +547,7 @@ const handleNextClick = () => {
                             </div>
 
                             {/* 검색창 */}
-                            <div className="flight-select-div mt-2 ms-3 me-3">   
+                            <div className="flight-select-div mt-2 ms-3 me-3 mb-3">   
                                 <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between"}}>
                                     <h4 className="mt-3 ms-2" style={{ fontWeight: "bold" }}>출발지 선택</h4>
                                     <button className="btn btn-danger mt-3 me-2" onClick={CloseSetting}><IoClose /></button>
@@ -626,102 +651,6 @@ const handleNextClick = () => {
                             </div>
                         </div>
                     )}
-
-                        {/*    ☆☆☆☆    탑승객 및 좌석 등급 설정 기능 구현   ☆☆☆☆  */}
-                        {showPassengerSettings && (
-                            <div className="row mt-4" style={{ width: "600px", border: "1px solid skyblue", borderRadius: "0.5em",  marginLeft:"36%"}}>
-                                {/* <div className="row">
-                                <div className="col">
-                                    <h5 style={{fontWeight:"bold"}}>좌석 등급</h5>
-                                    <select className="select-seat form-select" value={selectedSeatClass} onChange={SeatClassChange}>
-                                        <option value="">좌석 등급을 선택해주세요.</option>
-                                        <option value="일반석">일반석</option>
-                                        <option value="비지니스석">비지니스석</option>
-                                    </select>
-                                </div>
-                            </div>*/}
-                                <div className="row mt-4">
-                                    <div className="d-flex" style={{display: "flex", justifyContent: "space-between" }}>
-                                        <h3 style={{ fontWeight: "bold" }}>승객 선택</h3>
-                                        <button className="btn btn-danger" onClick={CloseSetting}><IoClose /></button>
-                                    </div>
-                                    <div className="row mt-5">
-                                        <h5 style={{ fontWeight: "bold" }}>성인 (만 12세~)</h5>
-                                        <div className="col mt-1">
-                                            <button className="btn btn-primary" onClick={() => decreaseCount('adult')}
-                                                disabled={adultNum <= 0}>
-                                                <FaMinus />
-                                            </button>
-                                            <span className="ms-3 mx-3">{adultNum}</span>
-                                            <button className="btn btn-primary" onClick={() => increaseCount('adult')}
-                                                disabled={adultNum + childNum + babyNum >= 9}>
-                                                <FaPlus />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* 소아 설정 */}
-                                <div className="row mt-4">
-                                    <div className="col">
-                                        <h5 style={{ fontWeight: "bold" }}>소아 (만 2세 ~ 12세 미만)</h5>
-                                        <div className="col mt-1">
-                                            <button className="btn btn-primary" onClick={() => decreaseCount('child')}
-                                                disabled={childNum <= 0}>
-                                                <FaMinus />
-                                            </button>
-                                            <span className="ms-3 mx-3">{childNum}</span>
-                                            <button className="btn btn-primary" onClick={() => increaseCount('child')}
-                                                disabled={adultNum + childNum + babyNum >= 9}><FaPlus />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* 유아 설정 */}
-                                <div className="row mt-2">
-                                    <div className="row mt-4">
-                                        <div className="col">
-                                            <h5 style={{ fontWeight: "bold" }}>유아 (만 2세 미만)</h5>
-                                            <div className="col mt-1">
-                                                <button className="btn btn-primary" onClick={() => decreaseCount('baby')}
-                                                    disabled={babyNum <= 0}>
-                                                    <FaMinus />
-                                                </button>
-                                                <span className="ms-3 mx-3">{babyNum}</span>
-                                                <button className="btn btn-primary" onClick={() => increaseCount('baby')}
-                                                    disabled={adultNum + childNum + babyNum >= 9}><FaPlus />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <ul>
-                                    <li className="mt-3" style={{ marginLeft: "1em" }}>
-                                        <span style={{ color: "lightskyblue", fontWeight: "bold" }}>
-                                            만 14세 미만 승객은 예매 시 법정대리인의 동의 및 인증이 필요합니다. 로그인 후 예매를 진행하여 주시기 바랍니다.
-                                        </span>
-                                    </li>
-                                    <li style={{ marginLeft: "1em" }}>
-                                        <span>
-                                            2인 이상 예매 시 로그인 회원 본인의 마일리지만 사용 가능합니다.
-                                        </span>
-                                    </li>
-                                    <li style={{ marginLeft: "1em" }}>
-                                        <span>
-                                            예약인원은 성인, 소아, 유아를 포함하여 총 9명까지 선택 가능합니다.
-                                        </span>
-                                    </li>
-                                    <li style={{ marginLeft: "1em" }}>
-                                        <span>
-                                            유아는 탑승일 기준 만 2세 미만까지이며, 좌석을 점유하지 않습니다.
-                                        </span>
-                                    </li>
-                                </ul>
-                        </div>
-                    )}
-
-                    {/* 자동완성 기능을 구현 연습 중 */}
-                    <hr />
-
                 </div>
 
 

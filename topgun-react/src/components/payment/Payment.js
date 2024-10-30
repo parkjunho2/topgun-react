@@ -24,7 +24,7 @@ import { useParams } from "react-router";
             setSeatsList(resp.data.map(seats=>{
                 return{
                     ...seats,
-                    select:false,
+                      select:false,
                     qty:1//고정
                 }
             }));
@@ -34,6 +34,12 @@ import { useParams } from "react-router";
      const loadFlightInfo = useCallback(async () => {
         const resp = await axios.get(`http://localhost:8080/seats/info/${flightId}`);
         setFlightInfo(resp.data[0]); // 첫 번째 항공편 정보만 가져오기
+    }, [flightId]);
+    
+     // 항공편 정보 불러오기
+     const loadFlightInfo = useCallback(async () => {
+        const resp = await axios.get(`http://localhost:8080/seats/flightInfo`);
+        setFlightInfo(resp.data.find(info => info.flightId === flightId)); // 해당 flightId에 맞는 정보 찾기
     }, [flightId]);
     
     //좌석선택
@@ -106,7 +112,6 @@ import { useParams } from "react-router";
             입국공항 {flightInfo.arrivalAirport}
             입국시간 {flightInfo.arrivalTime}
             </div>
-
             <div className="row mt-3">
                 <div className="col mt-2">
                     <div className="table" style={{width: '100%', whiteSpace: 'nowrap'}}>
@@ -170,7 +175,8 @@ import { useParams } from "react-router";
                                 </tr>
                             )}
                             <tr>
-                                <td colSpan="2"><strong>결제하실 추가 금액</strong></td>
+
+                                <td colSpan="2"><strong>추가 금액</strong></td>
                                 <td className="text-end"><strong>{checkedSeatsTotal.toLocaleString()}원</strong></td>
                             </tr>
                         </tbody>
