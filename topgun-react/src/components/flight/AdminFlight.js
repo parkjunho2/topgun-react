@@ -26,7 +26,7 @@ const AdminFlight = () => {
     const updateFlight = useCallback(async (flightId, status) => {
 
          // 승인 시 알림창
-         if (status === "승인" && !window.confirm("승인 처리하시겠습니까?")) return;
+         if (status === "승인" && !window.confirm("승인 후 변경 불가합니다. 승인 처리하시겠습니까?")) return;
 
           // 반려 시 알림창
         if (status === "거절" && !window.confirm("거절 처리하시겠습니까?")) return;
