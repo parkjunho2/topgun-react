@@ -220,7 +220,7 @@ const styles = {
     margin: "40px auto",
   },
   map: {
-    width: "65%",
+    width: "70%",
     height: "650px", // 맵 크기 조정
   },
   graphContainer: {
@@ -234,7 +234,7 @@ const styles = {
     padding: "30px",
     height: "300px", // 그래프 크기 조정
     //background: "rgba(255, 255, 255, 0.9)", // 그래프 배경 색상
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    //boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
   },
   graphTitle: {
     margin: "0 0 10px 0",

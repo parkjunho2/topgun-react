@@ -193,14 +193,16 @@ const NoticeBoard = () => {
         <div className="row mt-4">
             <div className="col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <h1 style={{ textAlign: 'center', marginBottom: '10px' }}>NOTICE</h1>
-                <hr style={{ width: '80%', border: '1px solid #e3305f', marginBottom: '18px' }} />
+
+                <hr style={{ width: '80%', border: '1px solid #080808', marginBottom: '18px' }} />
+
                 <table className="table" style={{ width: '80%', tableLayout: 'fixed' }}>
                     <thead>
                         <tr>
                             <th style={{ padding: '15px', textAlign: 'center', width: '20%' }}>NO.</th>
                             <th style={{ padding: '15px', textAlign: 'center', width: '30%' }}>TITLE</th>
-                            <th style={{ padding: '15px', textAlign: 'center', width: '18%' }}>AUTHOR</th>
-                            <th style={{ padding: '15px', textAlign: 'center', width: '40%' }}>DATE</th>
+                            <th style={{ padding: '15px', textAlign: 'center', width: '13%' }}>AUTHOR</th>
+                            <th style={{ padding: '15px', textAlign: 'center', width: '35%' }}>DATE</th>
                             <th style={{ padding: '15px', textAlign: 'center', width: '2%' }}></th>
                         </tr>
                     </thead>
@@ -215,19 +217,26 @@ const NoticeBoard = () => {
                                 }}
                             >
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
+                                <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                                     {notice.noticeId}
+                                </Link>
                                     {notice.urgentNotice === 1 && (
                                         <span style={{ marginBottom: '15px', marginLeft: '5px', color: '#e63946' }}>
                                             <FaDizzy title="긴급 공지" style={{ fontSize: '1em' }} />
+                                            <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                                             Danger
+                                            </Link>
                                         </span>
                                     )}
                                     {/* 메인 공지인 경우 아이콘과 텍스트 추가 */}
                                     {notice.mainNotice === 1 && (
                                         <span style={{ marginLeft: '10px', color: '#ec7393' }}>
                                             <FaMeteor style={{ fontSize: '1em' }} title="주요 공지" />
+                                            <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                                             main
+                                            </Link>
                                         </span>
+                                        
                                     )}
                                 </td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
@@ -251,7 +260,7 @@ const NoticeBoard = () => {
                     </tbody>
 
                    {/* 페이지네이션 추가 */}
-<div style={{ display: 'flex', justifyContent: 'center', width: '550%', marginTop: '5px' }}>
+<div style={{ display: 'flex', justifyContent: 'center', width: '500%', marginTop: '5px' }}>
     <Stack spacing={2}>
         <Pagination
             count={Math.ceil(noticeList.length / noticesPerPage)}
