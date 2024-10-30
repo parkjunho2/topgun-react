@@ -234,7 +234,7 @@ const styles = {
         lineHeight: '13',
     },
     divider: {
-        border: '1px solid #e3305f',
+        border: '1px solid #080808',
         margin: '20px 0',
     },
 };
