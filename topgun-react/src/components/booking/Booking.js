@@ -72,91 +72,92 @@ const Booking = () => {
   return (
     <>
       {/* 일반석,비지니스석 버튼  */}
-      <h1>항공편 예약 페이지</h1>
-      <div className="row seat-set-row">
-        <div className="col-md-3 mt-3">
-          <button className="btn btn-success seat-normal-set" type="button" onClick={() => seatClassChange("economy")} 
-                        style={{backgroundColor:"#00256c", color:"white", borderColor:"#00256c"}}>
-            일반석
-          </button>
-        </div>
-        <div className="col-md-3 mt-3">
-          <button className="btn btn-success seat-business-set" type="button" onClick={() => seatClassChange("business")} 
-                      style={{backgroundColor:"#00256c", color:"white", borderColor:"#00256c"}}>
-            비지니스석
-          </button>
-        </div>
-      </div>
+      <div className="container">
+          <h1>항공편 예약 페이지</h1>
 
-      {selectedClass === "economy" && (
-        <>
-          {/* 일반석 항공권 리스트 */}
-              {flightList.map((flight)=>(
-                <div className="row mt-4" key={flight.flightId}>
-                  <div className="flight-list">
-                        <div className="col-md-3 booking-time"    style={{
-                                borderRight: isSmallScreen ? "1px solid black" : "none",  // 창이 좁아지면 borderRight 추가
-                                borderRadius: isSmallScreen ? "1em" : "0",
-                              }}>
-                          <span className="lowest-price">최저가</span>
-                            <div className="d-flex mt-5 ms-3 me-3" style={{ display: "flex", justifyContent: "space-between" }}>
-                              <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>{moment(flight.departureTime).format("HH:mm")}</span>
-                              <span className="mt-4">------------------<IoIosAirplane style={{ fontSize: "23px" }} />
-                              </span>
-                              <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>{moment(flight.arrivalTime).format("HH:mm ")}</span>
-                            </div>
-                            <div className="d-flex ms-4 me-4" style={{ display: "flex", justifyContent: "space-between" }}>
-                              <span>
-                                  {flight.departureAirport.substring(
-                                      flight.departureAirport.indexOf("(") + 1,  // 시작 인덱스: 괄호 다음
-                                      flight.departureAirport.indexOf(")")      // 종료 인덱스: 괄호 전
-                                  )}
-                              </span>
-                              <span>
-                                  {flight.arrivalAirport.substring(
-                                      flight.arrivalAirport.indexOf("(") + 1,  // 시작 인덱스: 괄호 다음
-                                      flight.arrivalAirport.indexOf(")")      // 종료 인덱스: 괄호 전
-                                  )}
-                              </span>
-                            </div>
-                            <div className="d-flex mt-4 ms-3" style={{ display: "flex", justifyContent: "space-between" }}>
-                              <span>{flight.flightNumber}<IoLogoReddit style={{ fontSize: "30px" }} /></span>
-                              <button type="button" className='btn btn-outline-primary me-2' style={{ borderRadius: "2em", fontSize: "13px" }} onClick={openInfoModal}>상세보기</button>
-                            </div>
-                        </div>
-                      <div className="col-md-3 seat-normal-discount">
-                            <button type="button" className="btn btn-outline-success seat-normal-discount w-100" style={{
-                                                                                          height:"100%",                            
-                                                                                          borderRight: isSmallScreen ? "1px solid black" : "none",  // 창이 좁아지면 borderRight 추가
-                                                                                          borderRadius: isSmallScreen ? "1em" : "0",
-                                                                                          marginTop: isSmallScreen ? "1em" : "0",}}>
-                              <span style={{
-                                display: "flex", justifyContent: "center", alignItems: "center", alignContent: "center",
-                                marginTop: isSmallScreen ? "1.5em" : "0"
-                              }}>일반석(할인운임)</span>
-                              <span className="mb-4 seat-noraml-price">250,000원</span>
-                            </button>
-                      </div>
+          {/* <div className="row seat-set-row">
+            <div className="col-md-3 mt-3">
+              <button className="btn btn-success seat-normal-set" type="button" onClick={() => seatClassChange("economy")} 
+                            style={{backgroundColor:"#00256c", color:"white", borderColor:"#00256c"}}>
+                일반석
+              </button>
+            </div>
+            <div className="col-md-3 mt-3">
+              <button className="btn btn-success seat-business-set" type="button" onClick={() => seatClassChange("business")} 
+                          style={{backgroundColor:"#00256c", color:"white", borderColor:"#00256c"}}>
+                비지니스석
+              </button>
+            </div>
+          </div> */}
 
-                      <div className="col-md-3 seat-normal">
-                            <button type="button" className="btn btn-outline-success seat-normal w-100" style={{height:"100%",                             
-                                                                                                                  borderRadius: isSmallScreen ? "1em" : "0",
-                                                                                                                  marginTop: isSmallScreen ? "1em" : "0",}}>
-                                <span className="seat-noraml-text" style={{
-                                      display: "flex", justifyContent: "center", alignItems: "center", alignContent: "center",
-                                      marginTop: isSmallScreen ? "1.5em" : "0",
-                                    }}>일반석(정상운임)
-                                </span>
-                                <span className="mb-4 seat-noraml-price">
-                                  360,000원
-                                </span>
-                            </button>
+          {selectedClass === "economy" && (
+            <>
+              {/* 일반석 항공권 리스트 */}
+                  {flightList.map((flight)=>(
+                    <div className="row mt-4" key={flight.flightId}>
+                      <div className="flight-list">
+                            <div className="col-md-3 booking-time"  style={{width:"50%"}}>
+                              {/* <span className="lowest-price">최저가</span> */}
+                                <div className="d-flex mt-5 ms-3 me-3" style={{ display: "flex", justifyContent: "space-between" }}>
+                                  <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>{moment(flight.departureTime).format("HH:mm")}</span>
+                                  <span className="mt-4">------------------<IoIosAirplane style={{ fontSize: "23px" }} />
+                                  </span>
+                                  <span className="mt-4" style={{ fontSize: "23px", fontWeight: "bolder", color: "black" }}>{moment(flight.arrivalTime).format("HH:mm ")}</span>
+                                </div>
+                                <div className="d-flex ms-4 me-4" style={{ display: "flex", justifyContent: "space-between" }}>
+                                  <span>
+                                      {flight.departureAirport.substring(
+                                          flight.departureAirport.indexOf("(") + 1,  // 시작 인덱스: 괄호 다음
+                                          flight.departureAirport.indexOf(")")      // 종료 인덱스: 괄호 전
+                                      )}
+                                  </span>
+                                  <span>
+                                      {flight.arrivalAirport.substring(
+                                          flight.arrivalAirport.indexOf("(") + 1,  // 시작 인덱스: 괄호 다음
+                                          flight.arrivalAirport.indexOf(")")      // 종료 인덱스: 괄호 전
+                                      )}
+                                  </span>
+                                </div>
+                                <div className="d-flex mt-4 ms-3" style={{ display: "flex", justifyContent: "space-between" }}>
+                                  <span>{flight.flightNumber}<IoLogoReddit style={{ fontSize: "30px" }} /></span>
+                                  <button type="button" className='btn btn-outline-primary me-2' style={{ borderRadius: "2em", fontSize: "13px" }} onClick={openInfoModal}>상세보기</button>
+                                </div>
+                            </div>
+                          {/* <div className="col-md-3 seat-normal-discount">
+                                <button type="button" className="btn btn-outline-success seat-normal-discount w-100" style={{
+                                                                                              height:"100%",                            
+                                                                                              borderRight: isSmallScreen ? "1px solid black" : "none",  // 창이 좁아지면 borderRight 추가
+                                                                                              borderRadius: isSmallScreen ? "1em" : "0",
+                                                                                              marginTop: isSmallScreen ? "1em" : "0",}}>
+                                  <span style={{
+                                    display: "flex", justifyContent: "center", alignItems: "center", alignContent: "center",
+                                    marginTop: isSmallScreen ? "1.5em" : "0"
+                                  }}>일반석(할인운임)</span>
+                                  <span className="mb-4 seat-noraml-price">250,000원</span>
+                                </button>
+                          </div> */}
+                          
+
+                          {/* <div className="col-md-3 seat-normal">
+                                <button type="button" className="btn btn-outline-success seat-normal w-100" style={{height:"100%",                             
+                                                                                                                      borderRadius: isSmallScreen ? "1em" : "0",
+                                                                                                                      marginTop: isSmallScreen ? "1em" : "0",}}>
+                                    <span className="seat-noraml-text" style={{
+                                          display: "flex", justifyContent: "center", alignItems: "center", alignContent: "center",
+                                          marginTop: isSmallScreen ? "1.5em" : "0",
+                                        }}>일반석(정상운임)
+                                    </span>
+                                    <span className="mb-4 seat-noraml-price">
+                                      360,000원
+                                    </span>
+                                </button>
+                          </div> */}
                       </div>
                   </div>
-              </div>
-              ))}
-        </>
-      )}
+                  ))}
+            </>
+          )}
+      </div>
 
       {/* 일반석 두번째 항공권 리스트 사용 안함 */}
       {/* <div>

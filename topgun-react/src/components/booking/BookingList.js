@@ -1,6 +1,6 @@
 import './BookingList.css';
 import { GiCommercialAirplane } from "react-icons/gi";
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
 import Lightpick from 'lightpick';
@@ -15,6 +15,11 @@ import { userState } from '../../util/recoil';
 import { throttle } from 'lodash';
 import { FaAngleDown } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
+import { BsChatDotsFill } from "react-icons/bs";
+import { Modal } from 'bootstrap';
+import { FaArrowDown } from "react-icons/fa";
+import { PiLineVerticalBold } from "react-icons/pi";
+import { AiOutlineSwapRight } from "react-icons/ai";
 
 const BookingList = () => {
     //const [flightList , setflightList] = useState([]);
@@ -59,6 +64,7 @@ useEffect(() => {
         departureAirport: `${sendDepartureAirport}`,   // 출발 공항
         arrivalAirport: `${sendArrivalAirport}`,     // 도착 공항
         departureTime: `${sendDepartureTime}`,         // 출발 날짜
+        order : "",
     });
 
     const [keyword, setKeyword] = useState("");
@@ -67,20 +73,7 @@ useEffect(() => {
 
     //navigate
     const navigate = useNavigate();
-    const [departureTime, setDepartureTime] = useState(12); // 출발 시간 초기 값 (시간.분 형태)
-    const [departureRightTime, setDepartureRightTime] = useState(12); // 출발 시간 초기 값 (시간.분 형태)
 
-    const [returnTime, setReturnTime] = useState(23.5); // 오는 편 시간 초기 값 (오후 11시 30분)
-    const [returnRightTime, setReturnRightTime] = useState(23.5); // 오는 편 시간 초기 값 (오후 11시 30분)
-
-    // 시간 포맷팅 함수 (24시간 -> 12시간 AM/PM, 분 포함)
-    const formatTime = (time) => {
-        const hour = Math.floor(time); // 정수부: 시간
-        const minute = (time % 1) === 0.5 ? 30 : 0; // 소수부 0.5는 30분
-        const hourIn12 = hour % 12 || 12;
-        const ampm = hour >= 12 ? '오후' : '오전';
-        return `${ampm} ${hourIn12}:${minute === 0 ? '00' : '30'}`;
-    };
 
     const accessToken = axios.defaults.headers.common["Authorization"];
     const refreshToken = window.localStorage.getItem("refreshToken")
@@ -100,7 +93,7 @@ useEffect(() => {
     },[flightList]);
 
     const createRoom = useCallback(async(target)=>{
-        window.alert("문의하시겠습니까?");
+        window.alert(target.airlineDto.airlineName+"에게 문의하시겠습니까?");
         const resp = await axios.post("http://localhost:8080/room/createAndEnter",
             {roomName : target.airlineDto.airlineName},
             {params : {userId : target.userId}})
@@ -200,10 +193,10 @@ useEffect(() => {
 
         const setFirstPage = useCallback(()=>{
             setPage(prev=>null);
-            setTimeout(()=>{
-                setPage(prev=>1);
-            }, 1);  //이 코드는 1ms 뒤에 실행해라!
-        }, [page]);
+                setTimeout(()=>{
+                    setPage(prev=>1);
+                }, 1);  //이 코드는 1ms 뒤에 실행해라!
+            }, [page]);
 
         //스크롤 관련된 처리
         useEffect(()=>{
@@ -212,10 +205,10 @@ useEffect(() => {
 
             //resize에 사용할 함수
             const resizeHandler = throttle(()=>{
-                console.log("% : " , getScrollPercent()); //현재 스크롤의 퍼센트지를 확인 할 수 있음
+                // console.log("% : " , getScrollPercent()); //현재 스크롤의 퍼센트지를 확인 할 수 있음
                 const percent = getScrollPercent();
                 if(percent >= 70 && loading.current === false) {
-                    console.log("더보기를 실행");
+                    // console.log("더보기를 실행");
                 }
             } , 350);
 
@@ -576,7 +569,6 @@ const handleNextClick = () => {
         }
     }, [open, selectedIndex, searchResult, selectKeyword]);
 
-
     return (
         <>
         <div className="container">
@@ -630,7 +622,7 @@ const handleNextClick = () => {
                     <div className="row">
                         <div className="col">
                             <button className="btn btn-primary" onClick={setFirstPage}
-                            onFocus={handleInputFocus}> <FaSearch />검색</button>
+                            onFocus={handleInputFocus}> <FaSearch />항공권 검색</button>
                         </div>
                     </div>
                 </div>
@@ -770,98 +762,88 @@ const handleNextClick = () => {
                         </div>
                     )}
 
-                {/* 항공권에 대한 리스트를 출력 */}
-                <div className="col-md-3">
-                    <div style={{ padding: '20px', width: "70%" }}>
-                        <h3>출발 시간대 설정</h3>
-                        {/* 가는 날 출발시간 */}
-                        <div>
-                            <span style={{display:"block"}}>가는 날 출발시간 :</span>
-                            <span>{formatTime(departureTime)} ~ {formatTime(departureRightTime)}</span>
-                            <input type="range" min="0" max="23.5" step="0.5" // 30분 단위로 조절 가능
-                                value={departureTime} onChange={(e) => setDepartureTime(Number(e.target.value))}
-                                style={{ width: '100%' }} />
 
-                            <input type="range" min="0" max="23.5" step="0.5" // 30분 단위로 조절 가능
-                                value={departureRightTime} onChange={(e) => setDepartureRightTime(Number(e.target.value))}
-                                style={{ width: '100%' }} />
-                        </div>
-                        {/* 오는 편 시간 */}
-                        <div>
-                            <p>오는 편: {formatTime(returnTime)} ~ {formatTime(23.5)}</p>
-                            <input
-                                type="range"
-                                min="0"
-                                max="23.5"
-                                step="0.5" // 30분 단위로 조절 가능
-                                value={returnTime}
-                                onChange={(e) => setReturnTime(Number(e.target.value))}
-                                style={{ width: '100%' }}
-                            />
-                        </div>
-                    </div>
-                </div>
                 {/* 항공편 리스트에 대한 기능 */}
-                <div className="col-md-6">
+                <div className="col mt-3">
                     <div className="d-flex mb-3">
                         <span className="me-2">출발시간순 |</span>
                         <span className="ms -2 me-2">도착시간순 |</span>
-                        <span className="ms -2 me-2">최저가순</span>
+                        <button className="ms -2 me-2" 
+    onClick={() => {
+        setInput(prevInput => ({
+            ...prevInput,
+            order: "flight_price" // 'order' 값을 업데이트
+        }));
+        sendRequest(); // 요청 보내기
+    }}
+>
+    최저가순
+</button>
+                        
                     </div>
-
-
-
-                <div className="row">
-                {result.flightList.length > 0 ? (
-                    result.flightList.map((flight) => (
-                        <NavLink to={`/flight/booking/${flight.flightId}`} style={{ textDecoration: "none" }} key={flight.flightId}>
-                            <div className="d-flex mt-3" style={{ border: "1px solid black", borderRadius: "1.5em", width: "100%" }}>
-                                <div className="row mt-3 mb-3 ms-1" style={{ width: "70%" }}>
-                                    <h3 style={{ color: "black" }}>{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}<GiCommercialAirplane /></h3>
-                                    <div className="d-flex mb-2" style={{ justifyContent: "space-between" }}>
-                                        <div className="d-flex mt-3" style={{ width: "200px", justifyContent: "space-between" }}>
-                                            <span style={{ width: "100%", textAlign: "center" }}>
-                                                {moment(flight.departureTime).format("a HH:mm")}
-                                                <p>{flight.departureAirport.substring(
-                                                    flight.departureAirport.indexOf("(") + 1,
-                                                    flight.departureAirport.indexOf(")")
-                                                )}</p>
-                                            </span>
-                                        </div>
-                                        <div className="row" style={{ width: "200px" }}>
-                                            <span style={{ textAlign: "center" }}>{flight.flightTime}</span>
-                                            <span style={{ textAlign: "center" }}>------------</span>
-                                            <span style={{ textAlign: "center" }}>직항</span>
-                                        </div>
-                                        <div className="d-flex mt-3" style={{ width: "200px", justifyContent: "space-between" }}>
-                                            <span style={{ width: "100%", textAlign: "center" }}>
-                                                {moment(flight.arrivalTime).format("a HH:mm")}
-                                                <p>{flight.arrivalAirport.substring(
-                                                    flight.arrivalAirport.indexOf("(") + 1,
-                                                    flight.arrivalAirport.indexOf(")")
-                                                )}</p>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row flight-price-box" style={{ width: "30%" }}>
-                                    <span className="mt-3" style={{ textAlign: "center", color: "black", fontWeight: "bolder" }}>
-                                        {flight.flightPrice.toLocaleString()}원
-                                    </span>
-                                    <button className="btn btn-primary ms-5" style={{ width: "50%", height: "30%" }}>선택하기</button>
-                                    {user.userType === "MEMBER" && (
-                                        <button className="btn btn-secondary ms-5" style={{ width: "50%", height: "30%" }} onClick={() => createRoom(flight)}>문의하기</button>
-                                    )}
-                                </div>
-                            </div>
-                        </NavLink>
-                    ))
-                    ) : (
-                        <h3>검색 결과가 없습니다.</h3>
-                    )}
-                </div>
-
-                </div>
+                        <div className="row" style={{width:"60%" , marginLeft:"20%"}}>
+                            {/* 항공권 리스트를 출력 */}
+                                {result.flightList.length > 0 ? (
+                                    result.flightList
+                                        .map((flight) => (
+                                            <NavLink to={`/flight/booking/${flight.flightId}`} style={{ textDecoration: "none"}} key={flight.flightId}>
+                                                <div className="col">
+                                                    <div className="d-flex mt-3" style={{ border: "1px solid lightgray", borderRadius: "1.5em", width: "100%" }}>
+                                                        <div className="row mt-3 mb-3 ms-1" style={{ width: "70%" }}>
+                                                            <h3 style={{ color: "black" }}>{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}<GiCommercialAirplane /></h3>
+                                                            <div className="d-flex mb-2" style={{ justifyContent: "space-between" }}>
+                                                                <div className="d-flex mt-3" style={{ width: "200px", justifyContent: "space-between" }}>
+                                                                    <span style={{ width: "100%", textAlign: "center" , color:"#626971", fontWeight:"bolder" }}>
+                                                                        {moment(flight.departureTime).format("a HH:mm")}
+                                                                        <p>{flight.departureAirport.substring(
+                                                                            flight.departureAirport.indexOf("(") + 1,
+                                                                            flight.departureAirport.indexOf(")")
+                                                                        )}</p>
+                                                                    </span>
+                                                                </div>
+                                                                <div className="row" style={{ width: "200px" }}>
+                                                                    <span style={{ textAlign: "center", color:"#626971"}}>{flight.flightTime}</span>
+                                                                    <span style={{ textAlign: "center", color:"#626971" }}>------------</span>
+                                                                    <span style={{ textAlign: "center", color:"#626971" }}>직항</span>
+                                                                </div>
+                                                                <div className="d-flex mt-3" style={{ width: "200px", justifyContent: "space-between" }}>
+                                                                    <span style={{ width: "100%", textAlign: "center", color:"#626971", fontWeight:"bolder" }}>
+                                                                        {moment(flight.arrivalTime).format("a HH:mm")}
+                                                                        <p>{flight.arrivalAirport.substring(
+                                                                            flight.arrivalAirport.indexOf("(") + 1,
+                                                                            flight.arrivalAirport.indexOf(")")
+                                                                        )}</p>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="row flight-price-box" style={{ width: "30%" }}>
+                                                            <span className="mt-4" style={{ textAlign: "center", color: "black", fontWeight: "bolder" }}>
+                                                                {flight.flightPrice.toLocaleString()}원
+                                                            </span>
+                                                            <div className="col" style={{display:"flex"}}>
+                                                            <button className="btn btn-primary ms-5" style={{ width: "50%", height: "50%", marginTop:"1em"}}>선택하기</button>
+                                                                {user.userType === "MEMBER" && (
+                                                                    <button className="btn ms-1" style={{ width: "15%", height: "25%", fontSize:"1.5em"}} onClick={() => createRoom(flight)}><BsChatDotsFill /></button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </NavLink>
+                                        ))
+                                        ) : (
+                                            <>
+                                            <div className="row mt-2">
+                                                <div className="flight-list-empty col">
+                                                    <span className="list-empty-text">선택하신 조건에 맞는 예약 가능 항공편이 없습니다.</span>
+                                                    <span className="list-empty-text-bottom">다른 여정을 선택하세요.</span>
+                                                </div>
+                                            </div>
+                                            </>
+                                        )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -879,6 +861,7 @@ const handleNextClick = () => {
                     </div>
                 </div>
             )}
+
         </>
     );
 };
