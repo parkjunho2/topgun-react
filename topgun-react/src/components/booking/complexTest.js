@@ -86,9 +86,8 @@ const ComplexTest = () => {
         const sendRequest = useCallback(async ()=>{
             loading.current = true; //시작지점
             const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
-            console.log(resp.data);
-
             setResult(resp.data);
+            console.log(resp.data);
             loading.current = false;    //종료지점
         }, [input]);
 

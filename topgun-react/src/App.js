@@ -39,6 +39,7 @@ import FindPw from './components/ForgotPw/FindPw/FindPw';
 import ResetPw from './components/ForgotPw/ResetPw/ResetPw.js';
 import Seats from './components/flight/Seats/Seasts.js';
 import ComplexTest from './components/booking/complexTest.js';
+import UserList from './components/UserList/UserList.js';
 
 
 
@@ -120,9 +121,8 @@ const App = () => {
 
         {/* 예약페이지 */}
         <Route path="/flight/booking/:flightId" element={<Booking />} />
-        <Route path="/flight/booking/:flightId/seats" element={<Seats />} />
         <Route path="/flight/bookingList" element={<BookingList />} />
-        
+
         {/* 복합검색 테스트용 지울 예정 */}
         <Route path="/complexTest" element={<ComplexTest />} />
 
@@ -148,6 +148,7 @@ const App = () => {
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/list" element={<AdminFlight />} />
           <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
+          <Route path="/userlist" element={<UserList />} />
         </Route>
 
         {/* 멤버만 못보는 페이지 -> ADMIN, AIRLINE만 가능 */}
@@ -161,7 +162,7 @@ const App = () => {
         {/* 공지사항 페이지 추가 */}
         <Route path="/notice" element={<Notice />} />  {/* Notice 페이지 경로 설정 */}
         <Route path="/notice/:id" element={<NoticeDetail />} />  {/* 공지사항 상세 페이지 경로 설정 */}
-        <Route path="/graph" element={<Graph />} /> // 대문자로 변경
+        <Route path="/graph" element={<Graph />} /> 
 
 
         <Route path="*" element={<NotFound />} /> {/* 모든 잘못된 경로 처리 */}

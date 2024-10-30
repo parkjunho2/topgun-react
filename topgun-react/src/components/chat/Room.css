@@ -10,24 +10,22 @@
     margin-bottom: 20px;
 }
 
-/* .list-group {
-    list-style: none;
-    padding: 0;
+.last-message-container {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    margin-top: 0.2rem; 
 }
 
-.list-group-item {
-    background-color: #fff;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    padding: 15px;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s;
-} */
+.last-message {
+    font-size: 0.8rem; 
+    color: gray; 
+}
 
-/* .list-group-item:hover {
-    background-color: #e9ecef;
-} */
+.last-message-time {
+    font-size: 0.7rem; 
+    color: darkgray; 
+}
 
 .room-item {
     display: flex;

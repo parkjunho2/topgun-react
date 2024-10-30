@@ -8,11 +8,13 @@ import { useParams } from "react-router";
     //state
     //리스트 초기 값 불러오기
     const[seatsList, setSeatsList] =useState([]);
+    const [flightInfo, setFlightInfo] = useState({});
 
     //effect
     //좌석 리스트 callback에 있는거 갖고옴
     useEffect(()=>{
-        loadSeatsList()
+        loadSeatsList();
+        loadFlightInfo();
     },[]);
 
     //callback
@@ -22,11 +24,23 @@ import { useParams } from "react-router";
             setSeatsList(resp.data.map(seats=>{
                 return{
                     ...seats,
-                    select:false,
+                      select:false,
                     qty:1//고정
                 }
             }));
     }, []);
+
+     // 항공편 정보 백엔드에 불러옴
+     const loadFlightInfo = useCallback(async () => {
+        const resp = await axios.get(`http://localhost:8080/seats/info/${flightId}`);
+        setFlightInfo(resp.data[0]); // 첫 번째 항공편 정보만 가져오기
+    }, [flightId]);
+    
+    //  // 항공편 정보 불러오기
+    //  const loadFlightInfo = useCallback(async () => {
+    //     const resp = await axios.get(`http://localhost:8080/seats/flightInfo`);
+    //     setFlightInfo(resp.data.find(info => info.flightId === flightId)); // 해당 flightId에 맞는 정보 찾기
+    // }, [flightId]);
     
     //좌석선택
     const selectSeats = useCallback((target, checked)=>{ 
@@ -86,6 +100,18 @@ import { useParams } from "react-router";
         //view
         return(<>
         <div className="container">
+            {/* 항공편 정보 표시 */}
+            <div>
+                {flightInfo.airlineName}
+            </div>
+            <div>
+            출국공항 {flightInfo.departureAirport}
+            출국시간 {flightInfo.departureTime}
+            </div>
+            <div>
+            입국공항 {flightInfo.arrivalAirport}
+            입국시간 {flightInfo.arrivalTime}
+            </div>
             <div className="row mt-3">
                 <div className="col mt-2">
                     <div className="table" style={{width: '100%', whiteSpace: 'nowrap'}}>
@@ -110,7 +136,7 @@ import { useParams } from "react-router";
                                     <td>{seats.seatsNo}</td>
                                     <td>{seats.seatsNumber}</td>
                                     <td>{seats.seatsRank}</td>
-                                    <td>{seats.seatsPrice.toLocaleString()}</td>
+                                    <td>{seats.seatsPrice.toLocaleString()}원</td>
                             </tr>))}
                         </tbody>
                     </div>
@@ -126,20 +152,20 @@ import { useParams } from "react-router";
                         </thead>    
                         <tbody>
                             {checkedBusinessSeatsList.length > 0 && (<>
-                                    {checkedBusinessSeatsList.map(seat => (
-                                        <tr key={seat.seatsNo}>
-                                            <td>{seat.seatsRank}</td>
-                                            <td>{seat.seatsNumber}</td>
-                                            <td className="text-end">{seat.seatsPrice.toLocaleString()}원</td>
+                                    {checkedBusinessSeatsList.map(seats => (
+                                        <tr key={seats.seatsNo}>
+                                            <td>{seats.seatsRank}</td>
+                                            <td>{seats.seatsNumber}</td>
+                                            <td className="text-end">{seats.seatsPrice.toLocaleString()}원</td>
                                         </tr>
                                     ))}
                             </>)}
                             {checkedEconomySeatsList.length > 0 && (<>
-                                    {checkedEconomySeatsList.map(seat => (
-                                        <tr key={seat.seatsNo}>
-                                            <td>{seat.seatsRank}</td>
-                                            <td>{seat.seatsNumber}</td>
-                                            <td className="text-end">{seat.seatsPrice.toLocaleString()}원</td>
+                                    {checkedEconomySeatsList.map(seats => (
+                                        <tr key={seats.seatsNo}>
+                                            <td>{seats.seatsRank}</td>
+                                            <td>{seats.seatsNumber}</td>
+                                            <td className="text-end">{seats.seatsPrice.toLocaleString()}원</td>
                                         </tr>
                                     ))}
                             </>)}
@@ -149,7 +175,8 @@ import { useParams } from "react-router";
                                 </tr>
                             )}
                             <tr>
-                                <td colSpan="2"><strong>결제하실 총 금액은</strong></td>
+
+                                <td colSpan="2"><strong>추가 금액</strong></td>
                                 <td className="text-end"><strong>{checkedSeatsTotal.toLocaleString()}원</strong></td>
                             </tr>
                         </tbody>
