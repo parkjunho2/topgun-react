@@ -618,7 +618,7 @@ const MyPage = () => {
 
                         {/* 하단카드 1 */}
                         <div className="row">
-                            <div className="col-md-6">
+                            {/* <div className="col-md-6">
                                 <div className="card border-0 mb-4 mb-md-0 shadow-sm">
                                     <div className="card-body">
                                         <p className="mb-4">
@@ -691,10 +691,10 @@ const MyPage = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* 두번째 하단 카드 2 */}
-                            <div className="col-md-6">
+                            {/* <div className="col-md-6">
                                 <div className="card border-0 mb-4 mb-md-0 shadow-sm">
                                     <div className="card-body">
                                         <p className="mb-4">
@@ -767,7 +767,7 @@ const MyPage = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
 
 
