@@ -31,7 +31,7 @@ const AdminFlightDetail = () => {
     }
 
     
-        if (status === "승인" && !window.confirm("승인 처리하시겠습니까?")) return;
+        if (status === "승인" && !window.confirm("승인 후 변경 불가합니다. 승인 처리하시겠습니까?")) return;
         if (status === "거절" && !window.confirm("거절 처리하시겠습니까?")) return;
 
         const updatedFlight = {
@@ -69,36 +69,37 @@ const AdminFlightDetail = () => {
             <h1 className="text-center mb-4">항공편 상세정보</h1>
             <div className="card p-4 shadow">
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>항공편 번호:</strong></div>
-                    <div className="col-sm-8">{flight.flightNumber}</div>
+                    <div className="col-sm-4"><strong>항공편 번호:</strong>{flight.flightNumber}</div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>출발 시간:</strong></div>
-                    <div className="col-sm-8">{new Date(flight.departureTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>
+                    <div className="col-sm-4"><strong>출발 시간:</strong>
+                    {new Date(flight.departureTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </div>
+
                 </div>
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>도착 시간:</strong></div>
-                    <div className="col-sm-8">{new Date(flight.arrivalTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</div>
+                    <div className="col-sm-4"><strong>도착 시간:</strong>
+                    {new Date(flight.arrivalTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}
+                    </div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>출발 공항:</strong></div>
-                    <div className="col-sm-8">{flight.departureAirport}</div>
+                    <div className="col-sm-4"><strong>출발 공항:</strong>{flight.departureAirport}</div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>도착 공항:</strong></div>
-                    <div className="col-sm-8">{flight.arrivalAirport}</div>
+                    <div className="col-sm-4"><strong>도착 공항:</strong>{flight.arrivalAirport}</div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>가격:</strong></div>
-                    <div className="col-sm-8">{Number(flight.flightPrice).toLocaleString()}원</div>
+                    <div className="col-sm-4"><strong>가격:</strong>
+                    {Number(flight.flightPrice).toLocaleString()}원
+                    </div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>항공사 ID:</strong></div>
-                    <div className="col-sm-8">{flight.userId}</div>
+                    <div className="col-sm-4"><strong>항공사 ID:</strong>{flight.userId}</div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>상태:</strong></div>
-                    <div className="col-sm-8"><span className="text-dark bg-warning border border-warning p-1 rounded">{flight.flightStatus}</span></div>
+                    <div className="col-sm-4"><strong>상태:</strong>
+                    <span className="text-dark bg-warning border border-warning p-1 rounded">{flight.flightStatus}</span>
+                    </div>
                 </div>
             </div>
 
