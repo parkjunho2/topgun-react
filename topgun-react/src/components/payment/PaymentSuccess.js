@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { loginState, memberLoadingState } from "../../util/recoil";
 const PaymentSuccess=()=>{
+        const{flightId} = useParams();
         const navigate = useNavigate();
         //수신
         const {partnerOrderId} = useParams();
@@ -15,7 +16,7 @@ const PaymentSuccess=()=>{
 
         //결제 승인 상태
         const [result, setResult] = useState(null);//결제 대기중
-
+        const [flightInfo, setFlightInfo] = useState({});
         //state
         //리스트 불러오기
         const [seatsList, setSeatsList] = useState([]);
@@ -25,6 +26,7 @@ const PaymentSuccess=()=>{
         useEffect(()=>{
             if(login && memberLoading)
                 sendApproveRequest();
+                loadFlightInfo();
         }, [login, memberLoading]);
 
         //callback
@@ -50,16 +52,22 @@ const PaymentSuccess=()=>{
             }
         }, [login, memberLoading]);
 
+          // 항공편 정보 백엔드에 불러옴
+     const loadFlightInfo = useCallback(async () => {
+        const resp = await axios.get(`http://localhost:8080/seats/info/${flightId}`);
+        setFlightInfo(resp.data[0]); // 첫 번째 항공편 정보만 가져오기
+    }, [flightId]);
+
         //memo
         const total = useMemo(() => {
             return seatsList.reduce((b, c) => {
                 const price = c.seatsPrice || 0; // 기본값을 0으로 설정
-                const flightPrice = c.flightPrice || 0; //기본값을 0으로 설정
+                const flightPrice = flightInfo.flightPrice || 0; // flightPrice에 접근
                 const qty = c.qty || 0; // 기본값을 0으로 설정
-                return b + ((price+flightPrice) * qty);
+                return b + ((price + flightPrice) * qty);
             }, 0);
-        }, [seatsList]);
-
+        }, [seatsList, flightInfo]);
+        
         const handleNavigate = () => {
             navigate("/payment/alllist");
         };
@@ -79,7 +87,11 @@ const PaymentSuccess=()=>{
         <div className="container text-center">
         <div className="row mt-4">
             <div className="col">
-                <h1 className="text-center">{flightId}항공편</h1>
+                <h1 className="text-center">{flightInfo.airlineName}</h1>
+                <p>{flightInfo.departureAirport}</p>
+                <p>{flightInfo.departureTime}</p>
+                <p>{flightInfo.arrivalAirport}</p>
+                <p>{flightInfo.arrivalTime}</p>
                 <table className="table">
                    <tbody>
                     <tr>
@@ -91,7 +103,7 @@ const PaymentSuccess=()=>{
                             <tr key={seats.seatsNo}>
                                 <td>{seats.seatsNumber}</td>
                                 <td>{seats.seatsRank}</td>
-                                <td>{seats.seatsPrice.toLocaleString()}원</td>
+                                <td>{(seats.seatsPrice+flightInfo.flightPrice).toLocaleString()}원</td>
                             </tr>
                         ))}
                     </tbody>
@@ -105,7 +117,7 @@ const PaymentSuccess=()=>{
                 </table>
                 <div className="text-end">
                 <button className="btn btn-primary" onClick={handleNavigate}>
-                            여권정보 입력
+                            여권정보 등록
                 </button>
                 </div>
             </div>

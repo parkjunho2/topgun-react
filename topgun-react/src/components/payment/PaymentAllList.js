@@ -7,9 +7,11 @@ const PaymentAllList=()=>{
      const [paymentList, setPaymentList] = useState([]); 
      const [selectedDetail, setSelectedDetail] = useState({});
      const [submittedDetails, setSubmittedDetails] = useState({}); // 등록된 정보를 저장
+
      //effect
      useEffect(()=>{
          loadPaymentList();
+ 
      }, []);
  
      //callback
@@ -66,10 +68,11 @@ const PaymentAllList=()=>{
              <ul className="list-group">
                  {paymentList.map(payment=>(
                      <li key={payment.paymentNo} className="list-group-item">
-                         <h2 className="text-center my-4">{payment.paymentDto.paymentTime}</h2> {/* 날짜 */}
-                         <h3 className="d-flex justify-content-between ">
+                         <h2 className="text-end my-4">결제일: {payment.paymentDto.paymentTime}</h2>
+                         <h3>
                              {payment.paymentDto.paymentName}    
-                             <span/>
+                         </h3>
+                         <h3 className="text-end">
                              총 결제금액: {payment.paymentDto.paymentTotal.toLocaleString()}원
                          </h3>
         {/* 상세 결제 내용 */}
@@ -77,11 +80,12 @@ const PaymentAllList=()=>{
                         <ul className="list-group list-group-flush mt-4">
                             {payment.paymentDetailList.map(detail => (
                                 <li className="list-group-item" key={detail.paymentDetailNo}>
-                                    <h3 className="d-flex justify-content-between">
+                                    {detail.flightId.airlineName}
+                                    <h4 className="d-flex justify-content-between">
                                         {detail.paymentDetailName}
                                         <span />
                                         금액: {detail.paymentDetailPrice.toLocaleString()}원
-                                    </h3>
+                                    </h4>
                                     {submittedDetails[detail.paymentDetailNo] ? ( // 등록된 정보가 있으면
                                         <div>
                                             <p>여권번호: {submittedDetails[detail.paymentDetailNo].paymentDetailPassport}</p>
@@ -98,29 +102,29 @@ const PaymentAllList=()=>{
                                         {detail.paymentDetailPassport === null ? ( // passport가 null인 경우 입력 필드 표시
                                             <>
                                             <div>
-                                                여권번호: 
-                                                <input
+                                                여권번호
+                                                <input className="w-25"
                                                     type="text"
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassport: e.target.value }))}
                                                 />
                                             </div>
                                             <div>
-                                                한글 이름: 
-                                                <input
+                                            <span>한글이름</span>
+                                                <input className="w-25"
                                                     type="text"
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassanger: e.target.value }))}
                                                 />
                                             </div>
                                             <div>
-                                                영문 이름: 
-                                                <input
+                                            <span>영문이름</span>
+                                                <input className="w-25"
                                                     type="text"
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailEnglish: e.target.value }))}
                                                 />
                                             </div>
                                                 <div>
-                                                    성별: 
-                                                    <select
+                                                <span style={{ marginRight: '21px' }}> 성 별 </span>
+                                                    <select className="w-25"
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailSex: e.target.value }))}>
                                                         <option value="">선택하세요</option>
                                                         <option value="M">남성</option>
@@ -128,14 +132,14 @@ const PaymentAllList=()=>{
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    생년월일: 
-                                                    <input
+                                                    생년월일
+                                                    <input className="w-25"
                                                         type="date"
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
                                                     />
                                                     <div>
-                                                        <label htmlFor="country">국적</label>
-                                                        <select
+                                                    <span style={{ marginRight: '21px' }}> 국 적 </span>
+                                                        <select className="w-25"
                                                             id="country"
                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailCountry: e.target.value }))}>
                                                             <option value="">국적을 선택하세요</option>
@@ -152,8 +156,8 @@ const PaymentAllList=()=>{
                                                         </select>
                                                     </div>
                                                     <div>
-                                                        <label htmlFor="visaType">여권 발행국</label>
-                                                        <select
+                                                    <span> 발 행 국 </span>
+                                                        <select className="w-25"
                                                             id="visaType"
                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailVisa: e.target.value }))}>
                                                             <option value="">국적을 선택하세요</option>
@@ -169,8 +173,8 @@ const PaymentAllList=()=>{
                                                             <option value="AU">호주</option>
                                                         </select>
                                                     </div>
-                                                    비자 만료일: 
-                                                    <input
+                                                    <span> 만 료 일 </span>
+                                                    <input className="w-25"
                                                         type="date"
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailExpire: e.target.value }))}
                                                     />
