@@ -5,6 +5,7 @@ import { loginState, memberLoadingState, userState } from "../../util/recoil";
 import axios from "axios";
 import { useCallback } from "react";
 import Oval from 'react-loading-icons/dist/esm/components/oval';
+import { AiFillHome } from "react-icons/ai";
 
 const Header = () => {
     const navigate = useNavigate();
@@ -27,14 +28,19 @@ const Header = () => {
                 <div className="container">
                     <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                         <span className="d-flex align-items-center mb-lg-0 text-white text-decoration-none fs-4">
-                            TopGun
+                        <NavLink to="/" className="nav-link px-2 text-white">
+                            <img src="https://i.ibb.co/82NtGDh/Black-and-Yellow-Illustrative-Travel-Agency-Logo-removebg-preview.png"   
+                            width={120}
+                            height={35}                        
+                            />
+                            </NavLink>
                         </span>
                         <ul className="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                            <li>
+                            {/* <li>
                                 <NavLink to="/" className="nav-link px-2 text-white">
-                                    홈
+                                    <AiFillHome />
                                 </NavLink>
-                            </li>
+                            </li> */}
                             {login && ( //로그인 회원
                                 <li>
                                     <NavLink to="/room" className="nav-link px-2 text-white">
@@ -45,7 +51,7 @@ const Header = () => {
                             {user.userType === 'ADMIN' && (
                                 <li>
                                     <NavLink to="/userlist" className="nav-link px-2 text-white">
-                                        UserList
+                                        사용자목록
                                     </NavLink>
                                 </li>
                             )}
