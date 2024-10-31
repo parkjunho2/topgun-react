@@ -13,11 +13,13 @@ import { FaStar } from "react-icons/fa";
 import { wmoCode } from '../../util/wmoCode/wmoCode';
 
 const MainPage = () => {
+    const [recentSearches, setRecentSearches] = useState([]); // recentSearches 상태 추가
     const [isSmallScreen, setIsSmallScreen] = useState(false);
 
     const [keyword, setKeyword] = useState("");
     const [open, setOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1); // 선택된 항목의 인덱스
+
 
     // state
     const [input, setInput] = useState({
@@ -25,12 +27,34 @@ const MainPage = () => {
         arrivalAirport: "",     // 도착 공항
         departureTime: "",         // 출발 날짜
     });
-
+    
     const handleSearch = () => {
         const { departureAirport, arrivalAirport, departureTime } = input;
-        // navigate를 사용하여 쿼리 파라미터를 설정합니다.
-        navigate(`/flight/bookingList?departureAirport=${departureAirport}&arrivalAirport=${arrivalAirport}&departureTime=${departureTime}`);
+        
+        if (departureAirport.length === 0) {
+            return window.alert("출발지를 입력해주세요.");
+        } else if (arrivalAirport.length === 0) {
+            return window.alert("도착지를 입력해주세요.");
+        } else if (departureTime.length === 0) {
+            return window.alert("출발일자를 입력해주세요.");
+        } else {
+            const recentSearch = { departureAirport, arrivalAirport };
+            // 최근 검색 항목을 LocalStorage에 저장
+            let recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
+            recentSearches.unshift(recentSearch); // 최근 검색을 맨 앞에 추가
+            recentSearches = recentSearches.slice(0, 5); // 최대 5개만 유지
+            localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
+    
+            // 이동
+            navigate(`/flight/bookingList?departureAirport=${departureAirport}&arrivalAirport=${arrivalAirport}&departureTime=${departureTime}`);
+        }
     };
+
+    // LocalStorage에서 최근 검색 항목을 불러와 화면에 표시
+    useEffect(() => {
+        const storedSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
+        setRecentSearches(storedSearches);
+    }, []);
 
     /*======================   복합검색을 위한 기능    =============================*/
     const [result, setResult] = useState({
@@ -679,9 +703,22 @@ const MainPage = () => {
                                             </ul>
                                         </div>
                                     </div>
-                                    <div className="col-3">
-                                        <h5 style={{ fontWeight: "bold" }}>최근 검색 목록</h5>
-                                        <button className="btn btn-success" onClick={handleNextClick}>다음</button>
+                                    <div className="col-4 ms-5">
+                                        <h5 style={{ fontWeight: "bold" }}>최근 검색 목록(최대5개)</h5>
+                                        <div className="row flight-add-text">
+                                            {recentSearches.length > 0 ? (
+                                                recentSearches.map((search, index) => (
+                                                    <div key={index}>
+                                                        <div className="row mt-2" style={{border:"1px solid lightGray", width:"80%", borderRadius:"0.5em"}}>
+                                                            <span>{search.departureAirport} → {search.arrivalAirport}</span>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <span>최근 검색 기록이 없습니다.</span>
+                                            )}
+                                        </div>
+                                        <button className="btn btn-success mt-3" onClick={handleNextClick}>다음</button>
                                     </div>
                                 </div>
                             </div>
