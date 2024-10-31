@@ -62,28 +62,36 @@ const filteredFlights = resp.data.filter(flight => {
 
     return (
         <>
-{/* 검색 화면 */}
-<div className="d-flex justify-content-center mt-2">
-    <div className="col-md-8 col-sm-10">
-        <div className="input-group">
-            <select name="column" className="form-select w-auto"
-                value={column} onChange={e => setColumn(e.target.value)}>
-                <option value="flight_number">항공편 번호</option>
-                <option value="departure_airport">출발공항</option>
-                <option value="arrival_airport">도착공항</option>
-                <option value="user_id">항공사 ID</option>
-                <option value="flight_status">결제상태</option>
+  {/* 검색 화면 */}
+  <div className="row mt-4">
+            <div className="col-md-8 offset-md-2">
+                
+                <div className="input-group">
+                    <div className="col-3">
+            <select className="form-select"
+     value={column} onChange={e => setColumn(e.target.value)}>
+     <option value="flight_number">항공편 번호</option>
+     <option value="departure_airport">출발공항</option>
+     <option value="arrival_airport">도착공항</option>
+     <option value="user_id">항공사 ID</option>
+     <option value="flight_status">결제상태</option>
             </select>
-            <input type="text" className="form-control w-auto"
-                value={keyword} onChange={e => setKeyword(e.target.value)} 
+            </div>
+            <div className="col-7">
+            <input type="text" className="form-control"
+                value={keyword} onChange={e =>setKeyword(e.target.value)} 
                 placeholder="검색어 입력" />
+                </div>
+                <div className="col-2">
             <button type="button" className="btn btn-secondary"
                 onClick={searchFlightList}>
                 <FaMagnifyingGlass />
             </button>
+            </div>
+                </div>
+                
+            </div>
         </div>
-    </div>
-</div>
 
 
             <div className="row mt-4">
@@ -92,15 +100,15 @@ const filteredFlights = resp.data.filter(flight => {
                         <thead className="table-dark">
                             <tr>
                                 <th>항공편 번호</th>
-                                <th>출발 시간</th>
-                                <th>도착 시간</th>
-                                <th>운항 시간</th>
-                                <th>출발 공항</th>
-                                <th>도착 공항</th>
+                                <th>출발시간</th>
+                                <th>도착시간</th>
+                                <th>운항시간</th>
+                                <th>출발공항</th>
+                                <th>도착공항</th>
                                 <th>ID</th>
                                 <th>가격</th>
                                 <th>상태</th>
-                                <th>승인 및 거절</th>
+                                <th>결제</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -109,8 +117,8 @@ const filteredFlights = resp.data.filter(flight => {
                                     <td><NavLink to={"/admin/detail/"+flight.flightId}>
                                     {flight.flightNumber}
                                     </NavLink></td>
-                                    <td>{new Date(flight.departureTime).toLocaleString()}</td>
-                                    <td>{new Date(flight.arrivalTime).toLocaleString()}</td>
+                                    <td>{new Date(flight.departureTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+                                    <td>{new Date(flight.arrivalTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
                                     <td>{flight.flightTime}</td>
                                     <td>{flight.departureAirport}</td>
                                     <td>{flight.arrivalAirport}</td>
