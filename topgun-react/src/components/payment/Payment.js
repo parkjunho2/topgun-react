@@ -70,11 +70,12 @@ import { useParams } from "react-router";
         }, [checkedSeatsList]);
 
     //체크된 총 계산된 금액
-    const checkedSeatsTotal = useMemo(()=>{
-        return checkedSeatsList.reduce((before, current)=>{//reduce 반복문 사용
-        return before + (current.seatsPrice * current.qty);
+    const checkedSeatsTotal = useMemo(() => {
+        return checkedSeatsList.reduce((before, current) => {
+            // 좌석 가격 + 항공편 가격 * 수량을 합산
+            return before + ((current.seatsPrice + (flightInfo.flightPrice || 0)) * current.qty);
         }, 0);
-    },[checkedSeatsList]);
+    }, [checkedSeatsList, flightInfo.flightPrice]);
     
     //결제 후 이동할 주소
     const getCurrentUrl = useCallback(()=>{
@@ -100,25 +101,14 @@ import { useParams } from "react-router";
         //view
         return(<>
         <div className="container">
-            {/* 항공편 정보 표시 */}
-            <div>
-                {flightInfo.airlineName}
-            </div>
-            <div>
-            출국공항 {flightInfo.departureAirport}
-            출국시간 {flightInfo.departureTime}
-            </div>
-            <div>
-            입국공항 {flightInfo.arrivalAirport}
-            입국시간 {flightInfo.arrivalTime}
-            </div>
             <div className="row mt-3">
                 <div className="col mt-2">
                     <div className="table" style={{width: '100%', whiteSpace: 'nowrap'}}>
                         <thead>
                             <tr>
                                 <th>선택</th>
-                                <th>번호</th>
+                                {/* <th>번호</th> */}
+                                <th></th>
                                 <th>좌석번호</th>
                                 <th>등급</th>
                                 <th>가격</th>
@@ -133,17 +123,45 @@ import { useParams } from "react-router";
                                         disabled={seats.status === "사용"} // 사용된 좌석은 선택 불가
                                         />
                                     </td>
-                                    <td>{seats.seatsNo}</td>
+                                    {/* <td>{seats.seatsNo}</td> */}
+                                    <td></td>
                                     <td>{seats.seatsNumber}</td>
                                     <td>{seats.seatsRank}</td>
-                                    <td>{seats.seatsPrice.toLocaleString()}원</td>
+                                    <td>+{seats.seatsPrice.toLocaleString()}원</td>
                             </tr>))}
                         </tbody>
                     </div>
                 </div>
+                
+                                    
                 <div className="col mt-2">
-                    <table className="table" style={{ position: 'fixed', top: '205px', width: '30%', right:'100px', whiteSpace: 'nowrap'}}>
+                    <table className="table" style={{ position: 'fixed', top: '205px', width: '30%', right:'300px', whiteSpace: 'nowrap'}}>
                         <thead>
+                            <tr>
+                                <th>항공사</th>
+                                <th></th>
+                                <th className="text-end">{flightInfo.airlineName}</th>
+                            </tr>
+                            <tr>
+                                <th> {flightInfo.departureAirport}</th>
+                                <th></th>
+                                <th className="text-end">출국시간 {flightInfo.departureTime}</th>
+                            </tr>
+                            <tr>
+                                <th> {flightInfo.arrivalAirport}</th>
+                                <th></th>
+                                <th className="text-end">입국시간 {flightInfo.arrivalTime}</th>
+                            </tr>
+                            <tr>
+                                <th>항공편 가격</th>
+                                <th></th>
+                                <th className="text-end">{(flightInfo.flightPrice+0).toLocaleString()}원</th>
+                            </tr>
+                            <tr>
+                               <th></th>
+                               <th></th>
+                               <th></th>
+                            </tr>
                             <tr>
                                 <th>등급</th>
                                 <th>좌석 번호</th>
@@ -156,7 +174,7 @@ import { useParams } from "react-router";
                                         <tr key={seats.seatsNo}>
                                             <td>{seats.seatsRank}</td>
                                             <td>{seats.seatsNumber}</td>
-                                            <td className="text-end">{seats.seatsPrice.toLocaleString()}원</td>
+                                            <td className="text-end">{(seats.seatsPrice+flightInfo.flightPrice).toLocaleString()}원</td>
                                         </tr>
                                     ))}
                             </>)}
@@ -165,7 +183,7 @@ import { useParams } from "react-router";
                                         <tr key={seats.seatsNo}>
                                             <td>{seats.seatsRank}</td>
                                             <td>{seats.seatsNumber}</td>
-                                            <td className="text-end">{seats.seatsPrice.toLocaleString()}원</td>
+                                            <td className="text-end">{(seats.seatsPrice+flightInfo.flightPrice).toLocaleString()}원</td>
                                         </tr>
                                     ))}
                             </>)}
@@ -175,8 +193,9 @@ import { useParams } from "react-router";
                                 </tr>
                             )}
                             <tr>
-
-                                <td colSpan="2"><strong>추가 금액</strong></td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2"><strong>총 결제금액</strong></td>
                                 <td className="text-end"><strong>{checkedSeatsTotal.toLocaleString()}원</strong></td>
                             </tr>
                         </tbody>
