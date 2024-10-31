@@ -10,15 +10,15 @@ const PaymentAllList=()=>{
 
      //effect
      useEffect(()=>{
-         loadPaymentList();
- 
+        loadPaymentList();
      }, []);
- 
+
      //callback
      const loadPaymentList = useCallback(async()=>{
          const resp = await axios.get("http://localhost:8080/seats/paymentTotalList");
          setPaymentList(resp.data);
      }, []);
+
      
      //추가정보 입력
     const updatePaymentDetail = useCallback(async (paymentDetailNo) => {
@@ -48,7 +48,7 @@ const PaymentAllList=()=>{
                     ...prev,
                     [paymentDetailNo]: { ...selectedDetail } // 등록된 정보를 저장
                 }));
-
+            
                 loadPaymentList(); // 결제 목록을 다시 불러옵니다
                 setSelectedDetail({}); // 입력 필드 초기화
             }
