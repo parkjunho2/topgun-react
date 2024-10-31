@@ -112,6 +112,7 @@ import { useParams } from "react-router";
                                 <th>좌석번호</th>
                                 <th>등급</th>
                                 <th>가격</th>
+                                <th>상태</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -120,7 +121,7 @@ import { useParams } from "react-router";
                                     <td>
                                         <input type="checkbox" className="form-check-input"
                                         checked={seats.select} onChange={e=>selectSeats(seats, e.target.checked)}
-                                        disabled={seats.status === "사용"} // 사용된 좌석은 선택 불가
+                                        disabled={seats.seatsStatus === "사용"} 
                                         />
                                     </td>
                                     {/* <td>{seats.seatsNo}</td> */}
@@ -128,6 +129,7 @@ import { useParams } from "react-router";
                                     <td>{seats.seatsNumber}</td>
                                     <td>{seats.seatsRank}</td>
                                     <td>+{seats.seatsPrice.toLocaleString()}원</td>
+                                    <td>{seats.seatsStatus}</td>
                             </tr>))}
                         </tbody>
                     </div>
