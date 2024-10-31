@@ -9,6 +9,8 @@ import moment from "moment";
 import { useNavigate } from 'react-router';
 import { IoClose } from "react-icons/io5";
 import * as hangul from 'hangul-js';
+import { FaStar } from "react-icons/fa";
+import Oval from 'react-loading-icons/dist/esm/components/oval';
 
 const MainPage = () => {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -462,13 +464,99 @@ const MainPage = () => {
         }
     }, [open, selectedIndex, searchResult, selectKeyword]);
 
+
+    // 환율 및 날씨에 대한 코드 정의
+    const [exchangeRates, setExchangeRates] = useState({ jpy: null, vnd: null });
+    const [currWeather, setCurrWeather] = useState(null);
+    const [newLoading, setNewLoading] = useState(false);
+    const [selectedCountry, setSelectedCountry] = useState(null);
+    const [amount, setAmount] = useState(1); // 기본값 1
+
+    // 환율 가져오기
+    const getExchangeRates = useCallback(async (currency) => {
+        // currency가 없을 경우 함수 종료
+        if (!currency) {
+            return;
+        }
+
+        const url = `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${currency}.json`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data;
+
+            if (data[currency]) {
+                // 선택한 통화의 환율을 기준으로 설정
+                setExchangeRates({
+                    jpy: data[currency]['krw'], // JPY 환율
+                    vnd: data[currency]['krw'], // VND 환율
+                });
+            } else {
+                console.error("환율 데이터가 없습니다.");
+            }
+        } catch (error) {
+            console.error("환율 조회 중 오류 발생:", error);
+        }
+    }, []);
+
+    const getWeatherData = useCallback(async (latitude, longitude) => {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m&daily=weathercode&timezone=Asia%2FSeoul`;
+        // const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m&daily=weathercode`;
+
+        try {
+            const response = await axios.get(url);
+            const data = response.data;
+            if (data.current_weather) {
+                setCurrWeather(data.current_weather);
+            } else {
+                console.error("현재 날씨 데이터가 없습니다.");
+            }
+        } catch (error) {
+            console.error("날씨 조회 중 오류 발생:", error);
+        }
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await Promise.all([getExchangeRates()]);
+        };
+
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        if (!selectedCountry) return;
+
+        setNewLoading(true);
+
+        const countryCoordinates = {
+            jpy: { latitude: 35.6895, longitude: 139.6917 }, // 일본 도쿄
+            vnd: { latitude: 21.0285, longitude: 105.8542 } // 베트남 하노이
+        };
+
+        const coordinates = countryCoordinates[selectedCountry];
+        if (coordinates) {
+            getWeatherData(coordinates.latitude, coordinates.longitude).finally(() => {
+                setNewLoading(false);
+            });
+        }
+
+        // 선택된 국가 통화로 환율 업데이트
+        getExchangeRates(selectedCountry); // selectedCountry를 인자로 전달
+    }, [selectedCountry, getWeatherData, getExchangeRates]);
+
+    const CountryChange = (e) => {
+        setSelectedCountry(e.target.value);
+        setCurrWeather(null);
+        setExchangeRates({}); // 환율 정보를 초기화
+    };
+
     return (
         <>
             <div className="container">
                 {/* 가는편 오는편 기능 구현 */}
-                <div className="flight-all-div mt-3" >   {/* 전체 기능에 대한 div */}
+                <div className="flight-all-div mt-3">   {/* 전체 기능에 대한 div */}
                     <div className="flight-search-check row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
-                        <h5>항공권 조회 구현중..</h5>
+                        {/* <h5>항공권 조회 구현중..</h5> */}
                         <div className="col-sm-3">
                             <input
                                 type="text"
@@ -513,7 +601,7 @@ const MainPage = () => {
                             />
                         </div>
 
-                        <div className="col-sm-2">
+                        <div className="col-sm-3">
                             <button className="btn btn-primary" onClick={handleSearch}><FaSearch /> 항공권 검색</button>
                         </div>
                     </div>
@@ -657,18 +745,19 @@ const MainPage = () => {
 
                 {/* Marketing messaging and featurettes
   ================================================== */}
-                {/* Wrap the rest of the page in another container to center all the content. */}
-
-                {/* 수정예정 */}
                 <div className="container marketing">
-                    {/* Three columns of text below the carousel */}
+                    <div className="row">
+                        <div className="col">
+                            <h3 className="mb-3"> <FaStar className="mb-2 me-2" />TopGun에서 추천하는 여행지<FaStar className="mb-2 ms-2" />
+                            </h3>
+                        </div>
+                    </div>
                     <div className="row">
                         <div className="col-lg-4">
                             <img
                                 className="bd-placeholder-img rounded-circle"
                                 width={200}
-                                height={200
-                                }
+                                height={200}
                                 src="https://i.ibb.co/09T9VTT/image.jpg"
                             />
                             <title>Placeholder</title>
@@ -687,8 +776,7 @@ const MainPage = () => {
                             <img
                                 className="bd-placeholder-img rounded-circle"
                                 width={200}
-                                height={200
-                                }
+                                height={200}
                                 src="https://i.ibb.co/qYVfVxq/image.jpg"
                             />
                             <title>Placeholder</title>
@@ -707,8 +795,7 @@ const MainPage = () => {
                             <img
                                 className="bd-placeholder-img rounded-circle"
                                 width={200}
-                                height={200
-                                }
+                                height={200}
                                 src="https://i.ibb.co/7NtShdX/image.webp"
                             />
                             <title>Placeholder</title>
@@ -729,19 +816,80 @@ const MainPage = () => {
 
                     {/* START THE FEATURETTES */}
                     <div className="row">
-                        <div className="col-md-7">
-                            <div className="card border-0 mb-4 mb-md-0 shadow-sm" style={{ backgroundColor: "#add8e6" }}>
+                        <div className="col-md-12">
+                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#add8e6" }}>
                                 <div className="card-body">
-                                    <h5 className="card-title">카드 제목</h5>
-                                    <p className="card-text">여긴 7</p>
+                                    <h5 className="card-title">나라 선택</h5>
+                                    <select
+                                        style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                                        value={selectedCountry || ""}
+                                        onChange={CountryChange}
+                                    >
+                                        <option value="" disabled>나라를 선택하세요</option>
+                                        <option value="jpy">JPY - 일본</option>
+                                        <option value="vnd">VND - 베트남</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-5">
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-6">
                             <div className="card border-0 mb-4 mb-md-0 shadow-sm" style={{ backgroundColor: "#add8e6" }}>
                                 <div className="card-body">
-                                    <h5 className="card-title">카드 제목</h5>
-                                    <p className="card-text">여긴 5</p>
+                                    <h5 className="card-title">환율 정보</h5>
+                                    <input
+                                        type="number"
+                                        value={amount === 0 ? '' : amount} // 0일 때 빈 문자열로 설정
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setAmount(value === '' ? '' : Number(value)); // 빈 문자열일 경우 빈 문자열로 설정
+                                        }}
+                                        style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                                    />
+                                    <small className="card-text">
+                                        {selectedCountry === 'jpy' && exchangeRates.jpy ? (
+                                            `1 JPY = ${exchangeRates.jpy.toFixed(3)} 원` // 엔화 기준 원화 환율
+                                        ) : selectedCountry === 'vnd' && exchangeRates.vnd ? (
+                                            `1 VND = ${exchangeRates.vnd.toFixed(3)} 원` // 베트남 동 기준 원화 환율
+                                        ) : (
+                                            "환율을 가져오는 중입니다..."
+                                        )}
+                                    </small>
+                                    {selectedCountry === 'jpy' && exchangeRates.jpy && (
+                                        <p>{`${amount} JPY는 ${(amount * exchangeRates.jpy).toFixed(3)} 원입니다.`}</p>
+                                    )}
+                                    {selectedCountry === 'vnd' && exchangeRates.vnd && (
+                                        <p>{`${amount} VND는 ${(amount * exchangeRates.vnd).toFixed(3)} 원입니다.`}</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="col-md-6">
+                            <div className="card border-0 mb-4 mb-md-0 shadow-sm" style={{ backgroundColor: "#add8e6" }}>
+                                <div className="card-body">
+                                    <h5 className="card-title">현재 날씨 정보</h5>
+
+                                    {newLoading ? (
+                                        <p className="card-text" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                            로딩 중...
+                                        </p>
+                                    ) : currWeather ? (
+                                        <>
+                                            <big>
+                                                {`현재 ${selectedCountry === 'jpy' ? '도쿄' : '하노이'}의 기온은 ${currWeather.temperature}°C입니다.`}
+                                            </big>
+                                            <br />
+                                            <small>{`${currWeather.weathercode} 이거 날씨코드`}</small>
+                                            <br />
+                                            <small>{`측정 시간: ${new Date(currWeather.time).toLocaleString()} (UTC)`}</small>
+                                        </>
+                                    ) : (
+                                        <p className="card-text">국가를 선택하면 날씨 정보가 표시됩니다.</p>
+                                    )}
+
                                 </div>
                             </div>
                         </div>

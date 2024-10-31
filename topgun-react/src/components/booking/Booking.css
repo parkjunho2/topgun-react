@@ -1,8 +1,8 @@
 .booking-time{
     border: 1px solid black;
-    border-top-left-radius: 1em !important;
-    border-bottom-left-radius: 1em !important;
-    border-right: none;
+    border-radius: 1em;
+    /* border-top-left-radius: 1em !important;
+    border-bottom-left-radius: 1em !important; */
 }
 
 /* 일반석 버튼 */
