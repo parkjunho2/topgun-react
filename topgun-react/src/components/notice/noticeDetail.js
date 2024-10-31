@@ -57,7 +57,7 @@ const NoticeDetail = () => {
             // 공지사항이 수정되었으므로 modifiedNotice를 1로 설정
             const updatedData = { ...updatedNotice, noticeContent: content, modifiedNotice: 1 };
     
-            await axios.put(`http://localhost:8080/notice/${id}`, updatedData);
+            await axios.put(`http://localhost:8080/notice/edit/${id}`, updatedData);
             alert('공지사항이 수정되었습니다!');
             setIsEditing(false);
             await loadNotice(); // 수정된 공지사항을 다시 불러오기

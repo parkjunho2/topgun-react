@@ -68,6 +68,9 @@ const PaymentAllList=()=>{
              <ul className="list-group">
                  {paymentList.map(payment=>(
                      <li key={payment.paymentNo} className="list-group-item">
+                         <div className="text-end mt-1">
+                             <NavLink className="btn btn-warning" to={`/payment/detail/${payment.paymentDto.paymentNo}`}>결제내역이동</NavLink>
+                           </div>
                          <h2 className="text-end my-4">결제일: {payment.paymentDto.paymentTime}</h2>
                          <h3>
                              {payment.paymentDto.paymentName}    
@@ -182,8 +185,7 @@ const PaymentAllList=()=>{
                                                 <div className="text-end">
                                                     <button
                                                         className="btn btn-primary"
-                                                        onClick={() => updatePaymentDetail(detail.paymentDetailNo)}
-                                                    >
+                                                        onClick={() => updatePaymentDetail(detail.paymentDetailNo)}>
                                                         등록
                                                     </button>
                                                 </div>
@@ -204,9 +206,6 @@ const PaymentAllList=()=>{
                                     )}
                                 </li>
                             ))}
-                             <div className="text-end mt-1">
-                             <NavLink className="btn btn-warning" to={`/payment/detail/${payment.paymentDto.paymentNo}`}>결제내역이동</NavLink>
-                           </div>
                          </ul>
                          )}
                      </li>

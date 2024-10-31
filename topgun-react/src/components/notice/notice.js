@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect, useMemo, useRef } from "react";
 import { FaStar, FaExclamationTriangle, FaTrash, FaMeteor, FaDizzy } from 'react-icons/fa';
+import { HiDocumentAdd } from "react-icons/hi";
 
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -64,7 +65,7 @@ const NoticeBoard = () => {
         const choice = window.confirm("정말 삭제하시겠습니까?");
         if (choice) {
             try {
-                await axios.delete(`http://localhost:8080/notice/${target.noticeId}`);
+                await axios.delete(`http://localhost:8080/notice/delete/${target.noticeId}`);
                 setNoticeList(prevNotices => prevNotices.filter(notice => notice.noticeId !== target.noticeId));
             } catch (error) {
                 console.error("Failed to delete notice:", error);
@@ -116,7 +117,7 @@ const NoticeBoard = () => {
 
 
         try {
-            await axios.post("http://localhost:8080/notice/", newNotice);
+            await axios.post("http://localhost:8080/notice/post", newNotice);
             clearInput();
             await loadList();
         } catch (error) {
@@ -217,14 +218,14 @@ const NoticeBoard = () => {
                                 }}
                             >
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
-                                <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                    {notice.noticeId}
-                                </Link>
+                                    <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                                        {notice.noticeId}
+                                    </Link>
                                     {notice.urgentNotice === 1 && (
                                         <span style={{ marginBottom: '15px', marginLeft: '5px', color: '#e63946' }}>
                                             <FaDizzy title="긴급 공지" style={{ fontSize: '1em' }} />
                                             <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                            Danger
+                                                Danger
                                             </Link>
                                         </span>
                                     )}
@@ -233,16 +234,20 @@ const NoticeBoard = () => {
                                         <span style={{ marginLeft: '10px', color: '#ec7393' }}>
                                             <FaMeteor style={{ fontSize: '1em' }} title="주요 공지" />
                                             <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                            main
+                                                main
                                             </Link>
                                         </span>
-                                        
+
                                     )}
                                 </td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>
                                     <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                                         {notice.noticeTitle}
                                     </Link>
+                                    {/* 어드민이면서 modifiedNotice가 1인 경우 아이콘 추가 */}
+                                    {user.userType === 'ADMIN' && notice.modifiedNotice === 1 && (
+                                        <HiDocumentAdd style={{ marginLeft: '5px', color: '#007bff', fontSize: '1em' }} title="수정됨" />
+                                    )}
                                 </td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeAuthor}</td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeCreatedAt}</td>
@@ -259,18 +264,18 @@ const NoticeBoard = () => {
                         ))}
                     </tbody>
 
-                   {/* 페이지네이션 추가 */}
-<div style={{ display: 'flex', justifyContent: 'center', width: '500%', marginTop: '5px' }}>
-    <Stack spacing={2}>
-        <Pagination
-            count={Math.ceil(noticeList.length / noticesPerPage)}
-            page={currentPage}
-            onChange={(event, page) => paginate(page)}
-            variant=""
-            color="primary"
-        />
-    </Stack>
-</div>
+                    {/* 페이지네이션 추가 */}
+                    <div style={{ display: 'flex', justifyContent: 'center', width: '500%', marginTop: '5px' }}>
+                        <Stack spacing={2}>
+                            <Pagination
+                                count={Math.ceil(noticeList.length / noticesPerPage)}
+                                page={currentPage}
+                                onChange={(event, page) => paginate(page)}
+                                variant=""
+                                color="primary"
+                            />
+                        </Stack>
+                    </div>
 
                     <tfoot>
                         {user.userType === 'ADMIN' && (
