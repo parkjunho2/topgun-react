@@ -106,28 +106,28 @@ const PaymentAllList=()=>{
                                             <>
                                             <div>
                                                 여권번호
-                                                <input className="w-25"
+                                                <input className="form-control"
                                                     type="text"
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassport: e.target.value }))}
                                                 />
                                             </div>
                                             <div>
                                             <span>한글이름</span>
-                                                <input className="w-25"
+                                                <input className="form-control"
                                                     type="text"
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassanger: e.target.value }))}
                                                 />
                                             </div>
                                             <div>
                                             <span>영문이름</span>
-                                                <input className="w-25"
+                                                <input className="form-control"
                                                     type="text"
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailEnglish: e.target.value }))}
                                                 />
                                             </div>
                                                 <div>
                                                 <span style={{ marginRight: '21px' }}> 성 별 </span>
-                                                    <select className="w-25"
+                                                    <select className="form-control"
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailSex: e.target.value }))}>
                                                         <option value="">선택하세요</option>
                                                         <option value="M">남성</option>
@@ -136,13 +136,13 @@ const PaymentAllList=()=>{
                                                 </div>
                                                 <div>
                                                     생년월일
-                                                    <input className="w-25"
+                                                    <input className="form-control"
                                                         type="date"
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
                                                     />
                                                     <div>
                                                     <span style={{ marginRight: '21px' }}> 국 적 </span>
-                                                        <select className="w-25"
+                                                        <select className="form-control"
                                                             id="country"
                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailCountry: e.target.value }))}>
                                                             <option value="">국적을 선택하세요</option>
@@ -160,7 +160,7 @@ const PaymentAllList=()=>{
                                                     </div>
                                                     <div>
                                                     <span> 발 행 국 </span>
-                                                        <select className="w-25"
+                                                        <select className="form-control"
                                                             id="visaType"
                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailVisa: e.target.value }))}>
                                                             <option value="">국적을 선택하세요</option>
@@ -177,7 +177,7 @@ const PaymentAllList=()=>{
                                                         </select>
                                                     </div>
                                                     <span> 만 료 일 </span>
-                                                    <input className="w-25"
+                                                    <input className="form-control"
                                                         type="date"
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailExpire: e.target.value }))}
                                                     />
