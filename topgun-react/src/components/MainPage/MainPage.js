@@ -474,21 +474,21 @@ const MainPage = () => {
 
     // 환율 가져오기
     const getExchangeRates = useCallback(async (currency) => {
-        // currency가 없을 경우 함수 종료
-        if (!currency) {
-            return;
-        }
+        if (!currency) return;
 
         const url = `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${currency}.json`;
         try {
-            const response = await axios.get(url);
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: undefined  // 이 요청에만 Authorization 헤더 제거
+                }
+            });
             const data = response.data;
 
             if (data[currency]) {
-                // 선택한 통화의 환율을 기준으로 설정
                 setExchangeRates({
-                    jpy: data[currency]['krw'], // JPY 환율
-                    vnd: data[currency]['krw'], // VND 환율
+                    jpy: data[currency]['krw'],
+                    vnd: data[currency]['krw'],
                 });
             } else {
                 console.error("환율 데이터가 없습니다.");
