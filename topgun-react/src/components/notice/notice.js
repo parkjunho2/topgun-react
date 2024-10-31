@@ -64,7 +64,7 @@ const NoticeBoard = () => {
         const choice = window.confirm("정말 삭제하시겠습니까?");
         if (choice) {
             try {
-                await axios.delete(`http://localhost:8080/notice/${target.noticeId}`);
+                await axios.delete(`http://localhost:8080/notice/delete/${target.noticeId}`);
                 setNoticeList(prevNotices => prevNotices.filter(notice => notice.noticeId !== target.noticeId));
             } catch (error) {
                 console.error("Failed to delete notice:", error);
@@ -116,7 +116,7 @@ const NoticeBoard = () => {
 
 
         try {
-            await axios.post("http://localhost:8080/notice/", newNotice);
+            await axios.post("http://localhost:8080/notice/post", newNotice);
             clearInput();
             await loadList();
         } catch (error) {
