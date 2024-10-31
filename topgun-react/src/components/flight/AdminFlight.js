@@ -109,8 +109,8 @@ const filteredFlights = resp.data.filter(flight => {
                                     <td><NavLink to={"/admin/detail/"+flight.flightId}>
                                     {flight.flightNumber}
                                     </NavLink></td>
-                                    <td>{new Date(flight.departureTime).toLocaleString()}</td>
-                                    <td>{new Date(flight.arrivalTime).toLocaleString()}</td>
+                                    <td>{new Date(flight.departureTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+                                    <td>{new Date(flight.arrivalTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
                                     <td>{flight.flightTime}</td>
                                     <td>{flight.departureAirport}</td>
                                     <td>{flight.arrivalAirport}</td>
