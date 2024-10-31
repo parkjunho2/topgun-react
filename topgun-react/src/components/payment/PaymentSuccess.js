@@ -87,7 +87,7 @@ const PaymentSuccess=()=>{
         <div className="container text-center">
         <div className="row mt-4">
             <div className="col">
-                <h1 className="text-center">{flightInfo.airlineName}항공</h1>
+                <h1 className="text-end">{flightInfo.airlineName}</h1>
             <div className="row">
                 <div className="col">
                     <div className="text-end"><strong>{flightInfo.departureAirport}</strong></div>
@@ -125,7 +125,7 @@ const PaymentSuccess=()=>{
                 </table>
                 <div className="text-end">
                 <button className="btn btn-primary" onClick={handleNavigate}>
-                            여권정보 등록
+                            예약내역
                 </button>
                 </div>
             </div>
