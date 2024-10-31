@@ -133,6 +133,11 @@ const Flight = () => {
             const arrival = new Date(input.arrivalTime);
     
             // 필드 검증
+            // if (!/^[A-Z0-9]+$/.test(input.flightNumber)) {
+            //     toast.error("항공편 번호는 알파벳과 숫자로 구성되어야 합니다.");
+            //     return;
+            // }
+
             if (!input.flightNumber) {
                 toast.error("항공편 번호를 입력하세요.");
                 return;
@@ -264,12 +269,12 @@ const Flight = () => {
                         </thead>
                         <tbody className="table-dark">
                         <tr>
-                            <th>항공편 번호</th>
-                            <th>출발 시간</th>
-                            <th>도착 시간</th>
-                            <th>운항 시간</th>
-                            <th>출발 공항</th>
-                            <th>도착 공항</th>
+                            <th>항공편번호</th>
+                            <th>출발시간</th>
+                            <th>도착시간</th>
+                            <th>운항시간</th>
+                            <th>출발공항</th>
+                            <th>도착공항</th>
                             <th>ID</th>
                             <th>가격</th>
                             <th>상태</th>
