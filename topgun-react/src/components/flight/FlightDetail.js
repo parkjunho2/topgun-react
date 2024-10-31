@@ -2,6 +2,7 @@ import { Navigate, useNavigate, useParams } from "react-router";
 import { useEffect, useCallback, useState, useRef } from 'react';
 import axios from "axios";
 import { Modal } from "bootstrap";
+import { toast } from "react-toastify";
 
 const FlightDetail = () => {
     const { flightId } = useParams();
@@ -61,8 +62,24 @@ const FlightDetail = () => {
             arrivalTime: new Date(input.arrivalTime).toISOString(),
             
         };
+            // 필드 검증
+            if (!input.flightNumber) {
+            toast.error("항공편 번호를 입력하세요.");
+            return;
+            }
+
+            if (!input.departureAirport) {
+                toast.error("출발 공항을 선택하세요.");
+                return;
+            }
+            if (!input.arrivalAirport) {
+                toast.error("도착 공항을 선택하세요.");
+                return;
+            }
+    
+
         if (input.flightPrice <= 0) {  // 가격이 0 이하일 때 경고
-            alert("가격은 0원 이상이어야 합니다.");
+            toast.error("가격은 0원 이상이어야 합니다.");
             return;
         }
 

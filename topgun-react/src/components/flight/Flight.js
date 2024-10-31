@@ -1,11 +1,12 @@
 import { useCallback, useState, useEffect, useRef, useMemo } from "react";
 import axios from "axios";
 import { FaTrash, FaEdit } from "react-icons/fa";
-import { Modal } from "bootstrap";
+import { Modal, Toast } from "bootstrap";
 import { FaMagnifyingGlass, FaPlus} from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { userState } from "../../util/recoil";
+import { toast } from "react-toastify";
 
 const Flight = () => {
     const [flightList, setFlightList] = useState([]);
@@ -133,33 +134,33 @@ const Flight = () => {
     
             // 필드 검증
             if (!input.flightNumber) {
-                alert("항공편 번호를 입력하세요.");
+                toast.error("항공편 번호를 입력하세요.");
                 return;
             }
             if (!input.departureTime) {
-                alert("출발 시간을 입력하세요.");
+                toast.error("출발 시간을 입력하세요.");
                 return;
             }
             if (!input.arrivalTime) {
-                alert("도착 시간을 입력하세요.");
+                toast.error("도착 시간을 입력하세요.");
                 return;
             }
             if (input.flightPrice <= 0) {  // 가격이 0 이하일 때 경고
-                alert("가격은 0원 이상이어야 합니다.");
+                toast.error("가격은 0원 이상이여야합니다.");
                 return;
             }
             if (!input.departureAirport) {
-                alert("출발 공항을 선택하세요.");
+                toast.error("출발 공항을 선택하세요.");
                 return;
             }
             if (!input.arrivalAirport) {
-                alert("도착 공항을 선택하세요.");
+                toast.error("도착 공항을 선택하세요.");
                 return;
             }
     
             // 도착 시간이 출발 시간보다 빠른지 확인
             if (arrival <= departure) {
-                alert("도착 시간은 출발 시간보다 늦어야 합니다.");
+                toast.error("도착 시간은 출발 시간보다 늦어야 합니다.");
                 return;
             }
     
