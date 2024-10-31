@@ -1,5 +1,5 @@
 .booking-time{
-    border: 1px solid black;
+    border: 1px solid #d9dbe1;
     border-radius: 1em;
     /* border-top-left-radius: 1em !important;
     border-bottom-left-radius: 1em !important; */
@@ -102,4 +102,41 @@
 }
 .modal-body-set{
     margin-bottom: 50px;
+}
+/* 편도 텍스트 */
+.badge-text{
+    color: rgb(54, 143, 255) !important;
+    font-weight: bolder !important;
+    font-size: 12px !important;
+    line-height: 14px !important;
+    width: 8% !important;
+}
+/* 편도 텍스트 박스*/
+.badge-text-box{
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    float: none;
+    white-space: pre-line;
+    margin-left: 2% !important;
+    display: inline !important;
+    padding: 4px 6px !important;
+    background-color: rgba(54, 143, 255, 0.1) !important;
+    border-radius: 4px !important;
+    text-align: center;
+}
+/* 하단 정보에 대한 전체 div box */
+.flight-bottom-price{
+    display: flex !important;
+    justify-content: center !important;
+    width: 60%;
+    border: 1px solid #d9dbe1;
+    margin-left: 20% !important;
+    padding: 1em !important;
+    border-radius: 0.5em;
+}
+/* 상세정보 텍스트에 대한 디자인 */
+.flight-detail-price{
+    text-decoration: underline;
+    font-size: 15px;
+    color: gray;
 }
