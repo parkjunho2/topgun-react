@@ -858,22 +858,20 @@ const MainPage = () => {
                                         )}
                                     </small>
                                     {selectedCountry === 'jpy' && exchangeRates.jpy && (
-                                        <input
-                                            type="text"
-                                            value={`${amount} JPY는 ${(amount * exchangeRates.jpy).toFixed(3)} 원 입니다.`}
-                                            readOnly
+                                        <div
                                             className="form-control mt-2"
                                             style={{ backgroundColor: "#e9ecef" }}
-                                        />
+                                        >
+                                            {`${amount.toLocaleString()} JPY는 ${(amount * exchangeRates.jpy.toFixed(3)).toLocaleString()} 원 입니다.`}
+                                        </div>
                                     )}
                                     {selectedCountry === 'vnd' && exchangeRates.vnd && (
-                                        <input
-                                            type="text"
-                                            value={`${amount} VND는 ${(amount * exchangeRates.vnd).toFixed(3)} 원 입니다.`}
-                                            readOnly
+                                        <div
                                             className="form-control mt-2"
                                             style={{ backgroundColor: "#e9ecef" }}
-                                        />
+                                        >
+                                            {`${amount.toLocaleString()} VND는 ${(amount * exchangeRates.vnd.toFixed(3)).toLocaleString()} 원 입니다.`}
+                                        </div>
                                     )}
                                 </div>
                             </div>
