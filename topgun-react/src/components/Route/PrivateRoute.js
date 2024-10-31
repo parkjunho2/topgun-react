@@ -2,24 +2,31 @@ import { useRecoilValue } from "recoil";
 import { Navigate, Outlet } from "react-router-dom";
 import { loginState, memberLoadingState } from "../../util/recoil";
 import Oval from "react-loading-icons/dist/esm/components/oval";
+import { ToastContainer, toast } from 'react-toastify'; // 추가
 import 'react-toastify/dist/ReactToastify.css';
-
 
 const PrivateRoute = () => {
     const login = useRecoilValue(loginState);
     const memberLoading = useRecoilValue(memberLoadingState);
 
-    // 로딩 진행중이라면 로딩 화면을 보여준다
     if (memberLoading === false) {
-        return (<>
-            <div className="d-flex justify-content-center align-items-center" style={{ height: '70vh' }}>
-                <Oval stroke="#007bff" /> {/* Oval 로딩 아이콘 */}
-            </div>
-        </>);
+        return (
+            <>
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '70vh' }}>
+                    <Oval stroke="#007bff" />
+                </div>
+            </>
+        );
     }
 
-    // 로그인 상태에 따라 Outlet을 렌더링
-    return login === true ? <Outlet /> : <Navigate to="/" />;
+    if (!login) {
+        toast.error('로그인 필요!', {
+            position: "top-center",
+        });
+        return <Navigate to="/" />;
+    }
+
+    return <Outlet />;
 };
 
 export default PrivateRoute;

@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router';
 import { IoClose } from "react-icons/io5";
 import * as hangul from 'hangul-js';
 import { FaStar } from "react-icons/fa";
-import Oval from 'react-loading-icons/dist/esm/components/oval';
+import { wmoCode } from '../../util/wmoCode/wmoCode';
 
 const MainPage = () => {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -817,11 +817,11 @@ const MainPage = () => {
                     {/* START THE FEATURETTES */}
                     <div className="row">
                         <div className="col-md-12">
-                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#add8e6" }}>
+                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#f8f9fa" }}>
                                 <div className="card-body">
                                     <h5 className="card-title">나라 선택</h5>
                                     <select
-                                        style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                                        className="form-select"
                                         value={selectedCountry || ""}
                                         onChange={CountryChange}
                                     >
@@ -836,7 +836,7 @@ const MainPage = () => {
 
                     <div className="row">
                         <div className="col-md-6">
-                            <div className="card border-0 mb-4 mb-md-0 shadow-sm" style={{ backgroundColor: "#add8e6" }}>
+                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#f0f8ff" }}>
                                 <div className="card-body">
                                     <h5 className="card-title">환율 정보</h5>
                                     <input
@@ -846,35 +846,47 @@ const MainPage = () => {
                                             const value = e.target.value;
                                             setAmount(value === '' ? '' : Number(value)); // 빈 문자열일 경우 빈 문자열로 설정
                                         }}
-                                        style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                                        className="form-control"
                                     />
-                                    <small className="card-text">
+                                    <small className="form-text text-muted">
                                         {selectedCountry === 'jpy' && exchangeRates.jpy ? (
-                                            `1 JPY = ${exchangeRates.jpy.toFixed(3)} 원` // 엔화 기준 원화 환율
+                                            `1 JPY = ${exchangeRates.jpy.toFixed(3)} 원`
                                         ) : selectedCountry === 'vnd' && exchangeRates.vnd ? (
-                                            `1 VND = ${exchangeRates.vnd.toFixed(3)} 원` // 베트남 동 기준 원화 환율
+                                            `1 VND = ${exchangeRates.vnd.toFixed(3)} 원`
                                         ) : (
                                             "환율을 가져오는 중입니다..."
                                         )}
                                     </small>
                                     {selectedCountry === 'jpy' && exchangeRates.jpy && (
-                                        <p>{`${amount} JPY는 ${(amount * exchangeRates.jpy).toFixed(3)} 원입니다.`}</p>
+                                        <input
+                                            type="text"
+                                            value={`${amount} JPY는 ${(amount * exchangeRates.jpy).toFixed(3)} 원 입니다.`}
+                                            readOnly
+                                            className="form-control mt-2"
+                                            style={{ backgroundColor: "#e9ecef" }}
+                                        />
                                     )}
                                     {selectedCountry === 'vnd' && exchangeRates.vnd && (
-                                        <p>{`${amount} VND는 ${(amount * exchangeRates.vnd).toFixed(3)} 원입니다.`}</p>
+                                        <input
+                                            type="text"
+                                            value={`${amount} VND는 ${(amount * exchangeRates.vnd).toFixed(3)} 원 입니다.`}
+                                            readOnly
+                                            className="form-control mt-2"
+                                            style={{ backgroundColor: "#e9ecef" }}
+                                        />
                                     )}
                                 </div>
                             </div>
                         </div>
 
                         <div className="col-md-6">
-                            <div className="card border-0 mb-4 mb-md-0 shadow-sm" style={{ backgroundColor: "#add8e6" }}>
+                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#f0f8ff" }}>
                                 <div className="card-body">
                                     <h5 className="card-title">현재 날씨 정보</h5>
-
                                     {newLoading ? (
                                         <p className="card-text" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                            로딩 중...
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            <span className="ms-2">로딩 중...</span>
                                         </p>
                                     ) : currWeather ? (
                                         <>
@@ -882,19 +894,23 @@ const MainPage = () => {
                                                 {`현재 ${selectedCountry === 'jpy' ? '도쿄' : '하노이'}의 기온은 ${currWeather.temperature}°C입니다.`}
                                             </big>
                                             <br />
-                                            <small>{`${currWeather.weathercode} 이거 날씨코드`}</small>
-                                            <br />
+                                            <img
+                                                src={wmoCode(currWeather.weathercode).icon}
+                                                alt={wmoCode(currWeather.weathercode).description}
+                                                style={{ width: '100px', height: '100px' }}
+                                            />
+                                            <p>{wmoCode(currWeather.weathercode).description}</p>
                                             <small>{`측정 시간: ${new Date(currWeather.time).toLocaleString()} (UTC)`}</small>
                                         </>
                                     ) : (
                                         <p className="card-text">국가를 선택하면 날씨 정보가 표시됩니다.</p>
                                     )}
-
                                 </div>
                             </div>
                         </div>
                     </div>
                     {/* /END THE FEATURETTES */}
+
 
 
                 </div>
