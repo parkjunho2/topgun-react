@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import axios from 'axios'; // Axios import
-import { FaFacebookF, FaTwitter, FaLinkedinIn } from 'react-icons/fa';
 import { MdAirlines, MdEmail, MdLock } from 'react-icons/md';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { IoCalendar, IoCall } from "react-icons/io5";
@@ -12,7 +11,6 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { debounce } from 'lodash';
 import { toast } from 'react-toastify';
-import { Modal } from 'bootstrap';
 
 const Login = () => {
 

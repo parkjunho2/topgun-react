@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router';
 import { IoClose } from "react-icons/io5";
 import * as hangul from 'hangul-js';
 import { FaStar } from "react-icons/fa";
+import { wmoCode } from '../../util/wmoCode/wmoCode';
 
 const MainPage = () => {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -18,38 +19,38 @@ const MainPage = () => {
     const [open, setOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1); // 선택된 항목의 인덱스
 
-        // state
-        const [input, setInput] = useState({
-            departureAirport: "",   // 출발 공항
-            arrivalAirport: "",     // 도착 공항
-            departureTime: "",         // 출발 날짜
-        });
+    // state
+    const [input, setInput] = useState({
+        departureAirport: "",   // 출발 공항
+        arrivalAirport: "",     // 도착 공항
+        departureTime: "",         // 출발 날짜
+    });
 
-        const handleSearch = () => {
-            const {departureAirport, arrivalAirport, departureTime} = input;
-            // navigate를 사용하여 쿼리 파라미터를 설정합니다.
-            navigate(`/flight/bookingList?departureAirport=${departureAirport}&arrivalAirport=${arrivalAirport}&departureTime=${departureTime}`);
-        };
+    const handleSearch = () => {
+        const { departureAirport, arrivalAirport, departureTime } = input;
+        // navigate를 사용하여 쿼리 파라미터를 설정합니다.
+        navigate(`/flight/bookingList?departureAirport=${departureAirport}&arrivalAirport=${arrivalAirport}&departureTime=${departureTime}`);
+    };
 
-      /*======================   복합검색을 위한 기능    =============================*/
-      const [result , setResult] = useState({
-        count : 0,
-        last : true,
-        flightList : []
+    /*======================   복합검색을 위한 기능    =============================*/
+    const [result, setResult] = useState({
+        count: 0,
+        last: true,
+        flightList: []
     });
 
     //페이징 관련 state
-    const [page , setPage] = useState(null);
-    const [size , setSize] = useState(10);
+    const [page, setPage] = useState(null);
+    const [size, setSize] = useState(10);
 
     // [2] effect로 계산 (권장하는 방법)
-    useEffect(()=> {
+    useEffect(() => {
         setInput({
             ...input,
-            beginRow : page * size - (size-1),
-            endRow : page * size
+            beginRow: page * size - (size - 1),
+            endRow: page * size
         })
-    } , [page,size]);
+    }, [page, size]);
 
     // useEffect(()=>{
     //     if(page === null) return;   //초기상태 page 값이 null이라면 아무것도 동작 X
@@ -63,77 +64,77 @@ const MainPage = () => {
     //    }
     // } , [input.beginRow , input.endRow]);
 
-        //callback
-        const changeInputString = useCallback(e=>{
+    //callback
+    const changeInputString = useCallback(e => {
+        setInput({
+            ...input,
+            [e.target.name]: e.target.value
+        });
+    }, [input]);
+
+    const ChangeInputNumber = useCallback((e) => {
+        setInput({
+            ...input,
+            [e.target.name]: parseInt(e.target.value) || ""
+        });
+    }, [input]);
+
+    const changeInputArray = useCallback(e => {
+        //console.log(e.target.name, e.target.value, e.target.checked);
+        const origin = input[e.target.name];//input의 항목을 하나 꺼낸다
+
+        if (e.target.checked === true) {//추가
             setInput({
-                ...input, 
-                [e.target.name] : e.target.value
+                ...input,
+                [e.target.name]: origin.concat(e.target.value)
             });
-        }, [input]);
-        
-        const ChangeInputNumber = useCallback((e)=>{
+        }
+        else {//삭제
             setInput({
-                ...input, 
-                [e.target.name] : parseInt(e.target.value) || ""
+                ...input,
+                [e.target.name]: origin.filter(level => level !== e.target.value)
             });
-        } , [input]);
+        }
+    }, [input]);
 
-        const changeInputArray = useCallback(e=>{
-            //console.log(e.target.name, e.target.value, e.target.checked);
-            const origin = input[e.target.name];//input의 항목을 하나 꺼낸다
-    
-            if(e.target.checked === true) {//추가
-                setInput({
-                    ...input,
-                    [e.target.name] : origin.concat(e.target.value)
-                });
-            }
-            else {//삭제
-                setInput({
-                    ...input,
-                    [e.target.name] : origin.filter(level=>level !== e.target.value)
-                });
-            }
-        }, [input]);
+    //첫 목록을 불러올 때 사용
+    const sendRequest = useCallback(async () => {
+        loading.current = true; //시작지점
+        const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
+        // console.log(resp.data);
 
-        //첫 목록을 불러올 때 사용
-        const sendRequest = useCallback(async ()=>{
-            loading.current = true; //시작지점
-            const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
-            // console.log(resp.data);
+        setResult(resp.data);
+        loading.current = false;    //종료지점
+    }, [input]);
 
-            setResult(resp.data);
-            loading.current = false;    //종료지점
-        }, [input]);
+    const setFirstPage = useCallback(() => {
+        setPage(prev => null);
+        setTimeout(() => {
+            setPage(prev => 1);
+        }, 1);  //이 코드는 1ms 뒤에 실행해라!
 
-        const setFirstPage = useCallback(()=>{
-            setPage(prev=>null);
-            setTimeout(()=>{
-                setPage(prev=>1);
-            }, 1);  //이 코드는 1ms 뒤에 실행해라!
-            
-        }, [page]);
-        // ※※  로딩중에 추가 로딩이 불가능하게 처리하기 위한 REF 사용 ※※
-        // 목록을 불러오기 시작하면 loading.current = true로 변경
-        // 목록을 불러오고 나면  loading.current = false로 변경
-        const loading = useRef(false);
+    }, [page]);
+    // ※※  로딩중에 추가 로딩이 불가능하게 처리하기 위한 REF 사용 ※※
+    // 목록을 불러오기 시작하면 loading.current = true로 변경
+    // 목록을 불러오고 나면  loading.current = false로 변경
+    const loading = useRef(false);
 
 
 
-  // 창 크기 변화 감지
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSmallScreen(window.innerWidth <= 768);  // 768px 이하일 때 true
-    };
+    // 창 크기 변화 감지
+    useEffect(() => {
+        const handleResize = () => {
+            setIsSmallScreen(window.innerWidth <= 768);  // 768px 이하일 때 true
+        };
 
-    // 처음 로드될 때와 창 크기 변화할 때 이벤트 핸들러 실행
-    window.addEventListener('resize', handleResize);
-    handleResize(); // 초기 실행
+        // 처음 로드될 때와 창 크기 변화할 때 이벤트 핸들러 실행
+        window.addEventListener('resize', handleResize);
+        handleResize(); // 초기 실행
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     //navigate
     const navigate = useNavigate();
@@ -201,8 +202,8 @@ const MainPage = () => {
 
     // 출발지 값이 선택된 도시로 설정되도록 useMemo로 메모이제이션
     const departureText = useMemo(() => {
-    // 우선적으로 keyword가 있으면 keyword를 반환, 그 다음 selectedDepCity를 반환
-    // if (keyword) return keyword;
+        // 우선적으로 keyword가 있으면 keyword를 반환, 그 다음 selectedDepCity를 반환
+        // if (keyword) return keyword;
         return selectedDepCity ? selectedDepCity : input.departureAirport;     // selectedDepCity가 있으면 해당 도시를 반환, 없으면 기존 input.departureAirport 값을 유지
     }, [keyword, selectedDepCity, input.departureAirport]);
 
@@ -225,33 +226,33 @@ const MainPage = () => {
             setCities(['서울/인천(ICN)', '서울/김포(GMP)', '제주(CJU)', '광주(KWJ)', '여수(RSU)', '청주(CJJ)', '대구(TAE)']); // 기본 도시 목록
         }
     };
-    
-// '다음' 버튼 클릭 시 도착지 입력창으로 포커스 이동 및 값 반영
-const handleNextClick = () => {
-    // 자동완성된 키워드 값을 input.departure에 설정
-    if (selectedDepCity) { // selectedDepCity가 존재하면
-        setInput(prev => ({
-            ...prev,
-            departureAirport: selectedDepCity // 선택된 도시로 설정
-        }));
-    } else if (keyword) {
-        setInput(prev => ({
-            ...prev,
-            departureAirport: keyword // 키워드로 설정
-        }));
-    }
-    
-    setOpen(false); // 자동완성 리스트 닫기
 
-    // 도착지 입력창으로 포커스 이동
-    setTimeout(() => {
-        const destinationInput = document.querySelector('input[name="arrivalAirport"]');
-        if (destinationInput) {
-            destinationInput.focus(); // 도착지 입력창에 포커스
+    // '다음' 버튼 클릭 시 도착지 입력창으로 포커스 이동 및 값 반영
+    const handleNextClick = () => {
+        // 자동완성된 키워드 값을 input.departure에 설정
+        if (selectedDepCity) { // selectedDepCity가 존재하면
+            setInput(prev => ({
+                ...prev,
+                departureAirport: selectedDepCity // 선택된 도시로 설정
+            }));
+        } else if (keyword) {
+            setInput(prev => ({
+                ...prev,
+                departureAirport: keyword // 키워드로 설정
+            }));
         }
-        setDestinationInputClick(true); // 도착지 선택 UI 열기
-    }, 100); // 약간의 딜레이 후 포커스 이동
-};
+
+        setOpen(false); // 자동완성 리스트 닫기
+
+        // 도착지 입력창으로 포커스 이동
+        setTimeout(() => {
+            const destinationInput = document.querySelector('input[name="arrivalAirport"]');
+            if (destinationInput) {
+                destinationInput.focus(); // 도착지 입력창에 포커스
+            }
+            setDestinationInputClick(true); // 도착지 선택 UI 열기
+        }, 100); // 약간의 딜레이 후 포커스 이동
+    };
 
 
     /*                         ☆☆☆☆ 도착지에 대한 기능 state ☆☆☆☆                             */
@@ -264,7 +265,7 @@ const handleNextClick = () => {
     const destinationClick = () => {
         if (input.departureAirport.length === 0) {
             window.alert("출발지를 입력해주세요.");
-            
+
             // 도착지 입력창의 포커스를 해제합니다.
             const destinationInput = document.querySelector('input[name="arrivalAirport"]');
             if (destinationInput) {
@@ -462,13 +463,100 @@ const handleNextClick = () => {
             selectKeyword(searchResult[selectedIndex].nationalName);
         }
     }, [open, selectedIndex, searchResult, selectKeyword]);
+
+
+    // 환율 및 날씨에 대한 코드 정의
+    const [exchangeRates, setExchangeRates] = useState({ jpy: null, vnd: null });
+    const [currWeather, setCurrWeather] = useState(null);
+    const [newLoading, setNewLoading] = useState(false);
+    const [selectedCountry, setSelectedCountry] = useState(null);
+    const [amount, setAmount] = useState(1); // 기본값 1
+
+    // 환율 가져오기
+    const getExchangeRates = useCallback(async (currency) => {
+        // currency가 없을 경우 함수 종료
+        if (!currency) {
+            return;
+        }
+
+        const url = `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${currency}.json`;
+        try {
+            const response = await axios.get(url);
+            const data = response.data;
+
+            if (data[currency]) {
+                // 선택한 통화의 환율을 기준으로 설정
+                setExchangeRates({
+                    jpy: data[currency]['krw'], // JPY 환율
+                    vnd: data[currency]['krw'], // VND 환율
+                });
+            } else {
+                console.error("환율 데이터가 없습니다.");
+            }
+        } catch (error) {
+            console.error("환율 조회 중 오류 발생:", error);
+        }
+    }, []);
+
+    const getWeatherData = useCallback(async (latitude, longitude) => {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m&daily=weathercode&timezone=Asia%2FSeoul`;
+        // const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m&daily=weathercode`;
+
+        try {
+            const response = await axios.get(url);
+            const data = response.data;
+            if (data.current_weather) {
+                setCurrWeather(data.current_weather);
+            } else {
+                console.error("현재 날씨 데이터가 없습니다.");
+            }
+        } catch (error) {
+            console.error("날씨 조회 중 오류 발생:", error);
+        }
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await Promise.all([getExchangeRates()]);
+        };
+
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        if (!selectedCountry) return;
+
+        setNewLoading(true);
+
+        const countryCoordinates = {
+            jpy: { latitude: 35.6895, longitude: 139.6917 }, // 일본 도쿄
+            vnd: { latitude: 21.0285, longitude: 105.8542 } // 베트남 하노이
+        };
+
+        const coordinates = countryCoordinates[selectedCountry];
+        if (coordinates) {
+            getWeatherData(coordinates.latitude, coordinates.longitude).finally(() => {
+                setNewLoading(false);
+            });
+        }
+
+        // 선택된 국가 통화로 환율 업데이트
+        getExchangeRates(selectedCountry); // selectedCountry를 인자로 전달
+    }, [selectedCountry, getWeatherData, getExchangeRates]);
+
+    const CountryChange = (e) => {
+        setSelectedCountry(e.target.value);
+        setCurrWeather(null);
+        setExchangeRates({}); // 환율 정보를 초기화
+    };
+
     return (
         <>
-        <div className="container">
-            {/* 가는편 오는편 기능 구현 */}
-            <div className="flight-all-div mt-3">   {/* 전체 기능에 대한 div */}
-                <div className="flight-search-check row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
-                    {/* <h5>항공권 조회 구현중..</h5> */}
+            <div className="container">
+                {/* 가는편 오는편 기능 구현 */}
+                <div className="flight-all-div mt-3">   {/* 전체 기능에 대한 div */}
+                    <div className="flight-search-check row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
+                        {/* <h5>항공권 조회 구현중..</h5> */}
                         <div className="col-sm-3">
                             <input
                                 type="text"
@@ -490,7 +578,7 @@ const handleNextClick = () => {
                                 name="arrivalAirport"
                                 className="form-control"
                                 placeholder="도착지"
-                                value={input.arrivalAirport} 
+                                value={input.arrivalAirport}
                                 onChange={changeInput}
                                 onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                                 onClick={destinationClick}
@@ -505,7 +593,7 @@ const handleNextClick = () => {
                                 name="departureTime"
                                 className="form-control"
                                 placeholder="출발일"
-                                alue={input.departureTime} 
+                                alue={input.departureTime}
                                 onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
                                 onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                                 ref={datePickerRef} // ref 추가
@@ -526,7 +614,7 @@ const handleNextClick = () => {
                                     <div className="form-group" style={{ position: "relative" }}>
                                         <input type="text" className="form-control" placeholder="출발지를 검색하세요." value={keyword}
                                             onChange={changeKeyword} onKeyUp={handleKeyDown} // 키보드 이벤트 핸들러 추가
-                                            style={{width:"100%"}}
+                                            style={{ width: "100%" }}
                                         />
                                         {/* {open === true && 화면} 왼쪽만 쓰겠다
                                             {open === true || 화면} 오르쪽만 쓰겠다 */}
@@ -548,8 +636,8 @@ const handleNextClick = () => {
                             </div>
 
                             {/* 검색창 */}
-                            <div className="flight-select-div mt-2 ms-3 me-3 mb-3">   
-                                <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between"}}>
+                            <div className="flight-select-div mt-2 ms-3 me-3 mb-3">
+                                <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
                                     <h4 className="mt-3 ms-2" style={{ fontWeight: "bold" }}>출발지 선택</h4>
                                     <button className="btn btn-danger mt-3 me-2" onClick={CloseSetting}><IoClose /></button>
                                 </div>
@@ -653,180 +741,179 @@ const handleNextClick = () => {
                         </div>
                     )}
                 </div>
-                
 
-            {/* Marketing messaging and featurettes
+
+                {/* Marketing messaging and featurettes
   ================================================== */}
-            <div className="container marketing">
-                <div className="row">
-                    <div className="col">
-                        <h3 className="mb-3"> <FaStar className="mb-2 me-2"/>TopGun에서 추천하는 여행지<FaStar className="mb-2 ms-2"/>
-                        </h3>
+                <div className="container marketing">
+                    <div className="row">
+                        <div className="col">
+                            <h3 className="mb-3"> <FaStar className="mb-2 me-2" />TopGun에서 추천하는 여행지<FaStar className="mb-2 ms-2" />
+                            </h3>
+                        </div>
                     </div>
-                </div>
-                <div className="row">
-                    <div className="col-lg-4">
-                        <img
-                            className="bd-placeholder-img rounded-circle"
-                            width={200}
-                            height={200}
-                            src="https://i.ibb.co/09T9VTT/image.jpg"                            
-                        />
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />                       
-                        <h2 className="fw-normal mt-3">도쿄</h2>
-                        <p className="mb-0">
-                            다채로운 모습을 가진 도쿄 <br/>                   
-                            넓은 면적만큼이나 매력적인 지역들이 <br/> 
-                            여행자를 기다린다. <br/>                   
-                            어느 곳을 가더라도 멋진 시간을 선물하는 <br/> 
-                            도쿄를 추천합니다.
-                        </p>
-                    </div>
-                    {/* /.col-lg-4 */}
-                    <div className="col-lg-4">
-                    <img
-                            className="bd-placeholder-img rounded-circle"
-                            width={200}
-                            height={200}
-                            src="https://i.ibb.co/qYVfVxq/image.jpg"                            
-                        />
+                    <div className="row">
+                        <div className="col-lg-4">
+                            <img
+                                className="bd-placeholder-img rounded-circle"
+                                width={200}
+                                height={200}
+                                src="https://i.ibb.co/09T9VTT/image.jpg"
+                            />
                             <title>Placeholder</title>
                             <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                        <h2 className="fw-normal mt-3">제주도</h2>
-                        <p>
-                            서울에서 비행기로 1시간 거리에 있는 <br/> 
-                            한국에서 가장 큰 섬인 제주도 <br/>
-                            4계절 각각의 모습이 너무나 아름다운 섬입니다.<br/>
-                            특산물과 특산물로 만든 먹거리도 다양한 <br/>
-                            제주도를 추천합니다.
-                        </p>
-                    </div>
-                    {/* /.col-lg-4 */}
-                    <div className="col-lg-4">
-                    <img
-                            className="bd-placeholder-img rounded-circle"
-                            width={200}
-                            height={200}
-                            src="https://i.ibb.co/7NtShdX/image.webp"                            
-                        />
+                            <h2 className="fw-normal mt-3">도쿄</h2>
+                            <p className="mb-0">
+                                다채로운 모습을 가진 도쿄 <br />
+                                넓은 면적만큼이나 매력적인 지역들이 <br />
+                                여행자를 기다린다. <br />
+                                어느 곳을 가더라도 멋진 시간을 선물하는 <br />
+                                도쿄를 추천합니다.
+                            </p>
+                        </div>
+                        {/* /.col-lg-4 */}
+                        <div className="col-lg-4">
+                            <img
+                                className="bd-placeholder-img rounded-circle"
+                                width={200}
+                                height={200}
+                                src="https://i.ibb.co/qYVfVxq/image.jpg"
+                            />
                             <title>Placeholder</title>
                             <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                        <h2 className="fw-normal mt-3">나트랑</h2>
-                        <p>
-                            맑고 푸른 바다와 <br/>
-                            황금빛 모래가 만나는 곳, 나트랑 <br/>
-                            이 해안 도시는 휴식과 모험을 모두 즐길 수 있는 <br/>
-                            이상적인 장소입니다.<br/>
-                            현지 음식을 맛보며, 다양한 수상 활동을 즐길 수 있는 나트랑을 추천합니다.
-                        </p>
+                            <h2 className="fw-normal mt-3">제주도</h2>
+                            <p>
+                                서울에서 비행기로 1시간 거리에 있는 <br />
+                                한국에서 가장 큰 섬인 제주도 <br />
+                                4계절 각각의 모습이 너무나 아름다운 섬입니다.<br />
+                                특산물과 특산물로 만든 먹거리도 다양한 <br />
+                                제주도를 추천합니다.
+                            </p>
+                        </div>
+                        {/* /.col-lg-4 */}
+                        <div className="col-lg-4">
+                            <img
+                                className="bd-placeholder-img rounded-circle"
+                                width={200}
+                                height={200}
+                                src="https://i.ibb.co/7NtShdX/image.webp"
+                            />
+                            <title>Placeholder</title>
+                            <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
+                            <h2 className="fw-normal mt-3">나트랑</h2>
+                            <p>
+                                맑고 푸른 바다와 <br />
+                                황금빛 모래가 만나는 곳, 나트랑 <br />
+                                이 해안 도시는 휴식과 모험을 모두 즐길 수 있는 <br />
+                                이상적인 장소입니다.<br />
+                                현지 음식을 맛보며, 다양한 수상 활동을 즐길 수 있는 나트랑을 추천합니다.
+                            </p>
+                        </div>
+                        {/* /.col-lg-4 */}
                     </div>
-                    {/* /.col-lg-4 */}
-                </div>
-                {/* /.row */}
+                    {/* /.row */}
 
 
-                {/* START THE FEATURETTES */}
-                <hr className="featurette-divider" />
-                <div className="row featurette">
-                    <div className="col-md-7">
-                        <h2 className="featurette-heading fw-normal lh-1">
-                            First featurette heading.{" "}
-                            <span className="text-body-secondary">It’ll blow your mind.</span>
-                        </h2>
-                        <p className="lead">
-                            Some great placeholder content for the first featurette here.
-                            Imagine some exciting prose here.
-                        </p>
+                    {/* START THE FEATURETTES */}
+                    <div className="row">
+                        <div className="col-md-12">
+                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#f8f9fa" }}>
+                                <div className="card-body">
+                                    <h5 className="card-title">나라 선택</h5>
+                                    <select
+                                        className="form-select"
+                                        value={selectedCountry || ""}
+                                        onChange={CountryChange}
+                                    >
+                                        <option value="" disabled>나라를 선택하세요</option>
+                                        <option value="jpy">JPY - 일본</option>
+                                        <option value="vnd">VND - 베트남</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="col-md-5">
-                        <svg
-                            className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"
-                            width={500}
-                            height={500}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder: 500x500"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-bg)" />
-                            <text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">
-                                500x500
-                            </text>
-                        </svg>
-                    </div>
-                </div>
-                <hr className="featurette-divider" />
-                <div className="row featurette">
-                    <div className="col-md-7 order-md-2">
-                        <h2 className="featurette-heading fw-normal lh-1">
-                            Oh yeah, it’s that good.{" "}
-                            <span className="text-body-secondary">See for yourself.</span>
-                        </h2>
-                        <p className="lead">
-                            Another featurette? Of course. More placeholder content here to give
-                            you an idea of how this layout would work with some actual
-                            real-world content in place.
-                        </p>
-                    </div>
-                    <div className="col-md-5 order-md-1">
-                        <svg
-                            className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"
-                            width={500}
-                            height={500}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder: 500x500"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-bg)" />
-                            <text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">
-                                500x500
-                            </text>
-                        </svg>
-                    </div>
-                </div>
-                <hr className="featurette-divider" />
-                <div className="row featurette">
-                    <div className="col-md-7">
-                        <h2 className="featurette-heading fw-normal lh-1">
-                            And lastly, this one.{" "}
-                            <span className="text-body-secondary">Checkmate.</span>
-                        </h2>
-                        <p className="lead">
-                            And yes, this is the last block of representative placeholder
-                            content. Again, not really intended to be actually read, simply here
-                            to give you a better view of what this would look like with some
-                            actual content. Your content.
-                        </p>
-                    </div>
-                    <div className="col-md-5">
-                        <svg
-                            className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"
-                            width={500}
-                            height={500}
-                            xmlns="http://www.w3.org/2000/svg"
-                            role="img"
-                            aria-label="Placeholder: 500x500"
-                            preserveAspectRatio="xMidYMid slice"
-                            focusable="false"
-                        >
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="var(--bs-secondary-bg)" />
-                            <text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">
-                                500x500
-                            </text>
-                        </svg>
-                    </div>
-                </div>
-                <hr className="featurette-divider" />
-                {/* /END THE FEATURETTES */}
 
-            </div>
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#f0f8ff" }}>
+                                <div className="card-body">
+                                    <h5 className="card-title">환율 정보</h5>
+                                    <input
+                                        type="number"
+                                        value={amount === 0 ? '' : amount} // 0일 때 빈 문자열로 설정
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setAmount(value === '' ? '' : Number(value)); // 빈 문자열일 경우 빈 문자열로 설정
+                                        }}
+                                        className="form-control"
+                                    />
+                                    <small className="form-text text-muted">
+                                        {selectedCountry === 'jpy' && exchangeRates.jpy ? (
+                                            `1 JPY = ${exchangeRates.jpy.toFixed(3)} 원`
+                                        ) : selectedCountry === 'vnd' && exchangeRates.vnd ? (
+                                            `1 VND = ${exchangeRates.vnd.toFixed(3)} 원`
+                                        ) : (
+                                            "환율을 가져오는 중입니다..."
+                                        )}
+                                    </small>
+                                    {selectedCountry === 'jpy' && exchangeRates.jpy && (
+                                        <input
+                                            type="text"
+                                            value={`${amount} JPY는 ${(amount * exchangeRates.jpy).toFixed(3)} 원 입니다.`}
+                                            readOnly
+                                            className="form-control mt-2"
+                                            style={{ backgroundColor: "#e9ecef" }}
+                                        />
+                                    )}
+                                    {selectedCountry === 'vnd' && exchangeRates.vnd && (
+                                        <input
+                                            type="text"
+                                            value={`${amount} VND는 ${(amount * exchangeRates.vnd).toFixed(3)} 원 입니다.`}
+                                            readOnly
+                                            className="form-control mt-2"
+                                            style={{ backgroundColor: "#e9ecef" }}
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="col-md-6">
+                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#f0f8ff" }}>
+                                <div className="card-body">
+                                    <h5 className="card-title">현재 날씨 정보</h5>
+                                    {newLoading ? (
+                                        <p className="card-text" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            <span className="ms-2">로딩 중...</span>
+                                        </p>
+                                    ) : currWeather ? (
+                                        <>
+                                            <big>
+                                                {`현재 ${selectedCountry === 'jpy' ? '도쿄' : '하노이'}의 기온은 ${currWeather.temperature}°C입니다.`}
+                                            </big>
+                                            <br />
+                                            <img
+                                                src={wmoCode(currWeather.weathercode).icon}
+                                                alt={wmoCode(currWeather.weathercode).description}
+                                                style={{ width: '100px', height: '100px' }}
+                                            />
+                                            <p>{wmoCode(currWeather.weathercode).description}</p>
+                                            <small>{`측정 시간: ${new Date(currWeather.time).toLocaleString()} (UTC)`}</small>
+                                        </>
+                                    ) : (
+                                        <p className="card-text">국가를 선택하면 날씨 정보가 표시됩니다.</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/* /END THE FEATURETTES */}
+
+
+
+                </div>
             </div>
             {/* /.container */}
         </>
