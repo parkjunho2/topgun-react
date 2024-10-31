@@ -621,8 +621,16 @@ const handleNextClick = () => {
 
                     <div className="row">
                         <div className="col">
-                            <button className="btn btn-primary" onClick={setFirstPage}
-                            onFocus={handleInputFocus}> <FaSearch />항공권 검색</button>
+                        <button className="btn btn-primary"  onClick={() => {
+                                setInput(prevInput => ({
+                                    ...prevInput,
+                                    order: "departure_time"  // 기본 정렬을 출발 시간순으로 설정
+                                }));
+                                setFirstPage(); // 페이지 초기화 및 데이터 요청
+                            }}
+                            onFocus={handleInputFocus}> 
+                            <FaSearch />항공권 검색
+                        </button>
                         </div>
                     </div>
                 </div>
@@ -769,16 +777,16 @@ const handleNextClick = () => {
                         <span className="me-2">출발시간순 |</span>
                         <span className="ms -2 me-2">도착시간순 |</span>
                         <button className="ms -2 me-2" 
-    onClick={() => {
-        setInput(prevInput => ({
-            ...prevInput,
-            order: "flight_price" // 'order' 값을 업데이트
-        }));
-        sendRequest(); // 요청 보내기
-    }}
->
-    최저가순
-</button>
+                            onClick={() => {
+                                setInput(prevInput => ({
+                                    ...prevInput,
+                                    order: "flight_price" // 'order' 값을 업데이트
+                                }));
+                                sendRequest(); // 요청 보내기
+                            }}
+                        >
+                            최저가순
+                        </button>
                         
                     </div>
                         <div className="row" style={{width:"60%" , marginLeft:"20%"}}>
@@ -846,7 +854,7 @@ const handleNextClick = () => {
                     </div>
                 </div>
             </div>
-
+                                        
 
             {/* 더보기 버튼 : result의 last가 false이면 ( 더 볼게 있다면) */}
             {/* A ? : B : C */}
