@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router";
+import { Seat , SeatGroup } from "hacademy-cinema-seat";
 
     const Payment=()=>{
     //params
@@ -10,6 +11,22 @@ import { useParams } from "react-router";
     const[seatsList, setSeatsList] =useState([]);
     const [flightInfo, setFlightInfo] = useState({});
     const [seatsInputValues, setSeatsInputValues] = useState({}); 
+    const [seatsDisplayList, setSeatsDisplayList] = useState([]);
+
+    //좌석UI
+    useEffect(()=>{
+        setSeatsDisplayList(seatsList.map(seat=>{
+            const row = seat.seatsNumber.substring(0, 1);
+            const col = seat.seatsNumber.substring(1);
+            const reserved = seat.seatsStatus === "사용";
+            return {
+                ...seat,
+                seatsRow : row,
+                seatsColumn : col,
+                seatsReserved : reserved
+            };
+        }));
+    }, [seatsList]);
 
     //effect
     //좌석 리스트 callback에 있는거 갖고옴
@@ -45,6 +62,7 @@ import { useParams } from "react-router";
             }
             return {...seats};
         })); 
+
          // 선택된 좌석의 입력 값 초기화
         if (checked) {
             setSeatsInputValues(prev => ({ ...prev, [target.seatsNo]: { passport: '', expire: '' } }));
@@ -105,12 +123,14 @@ import { useParams } from "react-router";
         return(<>
         <div className="container">
             <div className="row mt-3">
+                
+                
                 <div className="col mt-2">
                     <div className="table" style={{width: '100%', whiteSpace: 'nowrap'}}>
                         <thead>
                             <tr>
                                 <th>선택</th>
-                                {/* <th>번호</th> */}
+                                <th>번호</th>
                                 <th></th>
                                 <th>좌석번호</th>
                                 <th>등급</th>
@@ -127,7 +147,7 @@ import { useParams } from "react-router";
                                         disabled={seats.seatsStatus === "사용"} 
                                         />
                                     </td>
-                                    {/* <td>{seats.seatsNo}</td> */}
+                                    <td>{seats.seatsNo}</td> 
                                     <td></td>
                                     <td>{seats.seatsNumber}</td>
                                     <td>{seats.seatsRank}</td>
@@ -136,6 +156,24 @@ import { useParams } from "react-router";
                             </tr>))}
                         </tbody>
                     </div>
+                </div>
+               
+                <div className="col mt-2">
+                <SeatGroup map={seatsDisplayList} setMap={setSeatsDisplayList}
+                        fields={{
+                            no:'seatsNo', 
+                            row:'seatsColumn', 
+                            col:'seatsRow', 
+                            price:'seatsPrice', 
+                            grade:'seatsRank',
+                            reserved:'seatsReserved', 
+                            //disabled:'seatDisabled',
+                            checked:'select',
+                        }}
+                        cols={['A', 'B', ' ', 'C', 'D','E']}
+                        rows={['1', '2','3','4','5','6']}
+                        showNames={true}
+                />
                 </div>
                 
                                     
@@ -207,6 +245,8 @@ import { useParams } from "react-router";
                         </tbody>
                           
                          </table>
+
+
                           {/* 입력 필드 추가 */}
                           {checkedSeatsList.map(seats => (
                         <div key={seats.seatsNo} className="mb-3">
@@ -316,7 +356,7 @@ import { useParams } from "react-router";
                                 [seats.seatsNo]: { ...prev[seats.seatsNo], payment_detail_visa: e.target.value }
                             }))} 
                         >
-                            <option value="">비자 발행국을 선택하세요</option>
+                            <option value="">여권 발행국을 선택하세요</option>
                             <option value="KR">대한민국</option>
                                 <option value="US">미국</option>
                                 <option value="JP">일본</option>
@@ -331,7 +371,7 @@ import { useParams } from "react-router";
                     </div>
 
                             <div className="mb-2">
-                                <label>비자 만료일</label>
+                                <label>여권 만료일</label>
                                 <input 
                                     type="date" 
                                     className="form-control" 

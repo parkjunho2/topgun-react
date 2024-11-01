@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const PaymentAllList=()=>{
      //state
@@ -20,14 +21,14 @@ const PaymentAllList=()=>{
      }, []);
 
      
-     //추가정보 입력
+     //여권정보 입력
     const updatePaymentDetail = useCallback(async (paymentDetailNo) => {
         // 입력 값 체크
     const { paymentDetailPassport, paymentDetailPassanger, paymentDetailEnglish, paymentDetailSex, paymentDetailBirth, paymentDetailCountry, paymentDetailVisa, paymentDetailExpire } = selectedDetail;
 
     // 입력란 공란 체크
     if (!paymentDetailPassport || !paymentDetailPassanger || !paymentDetailEnglish || !paymentDetailSex || !paymentDetailBirth || !paymentDetailCountry || !paymentDetailVisa || !paymentDetailExpire) {
-        alert("모두 입력하세요."); // 경고 메시지
+        toast.error("모두 입력하세요."); // 경고 메시지
         return; // 등록을 중단
     }
         // 경고문구 표시
@@ -41,7 +42,7 @@ const PaymentAllList=()=>{
                 paymentDetailNo
             });
             if (response.status === 200) {
-                alert("여권정보가 저장되었습니다.");
+                toast.success("여권정보가 저장되었습니다.");
                 
                 // 제출된 정보를 업데이트
                 setSubmittedDetails(prev => ({
@@ -53,7 +54,7 @@ const PaymentAllList=()=>{
                 setSelectedDetail({}); // 입력 필드 초기화
             }
         } catch (error) {
-            alert("여권정보 저장을 실패했습니다.");
+            toast.error("여권정보 저장을 실패했습니다.");
         }
     }, [loadPaymentList, selectedDetail]);
     
@@ -71,6 +72,7 @@ const PaymentAllList=()=>{
                          <div className="text-end mt-1">
                              <NavLink className="btn btn-warning" to={`/payment/detail/${payment.paymentDto.paymentNo}`}>결제내역이동</NavLink>
                            </div>
+                        <h2 className="text-end">대표 주문번호:{payment.paymentDto.paymentNo}</h2>
                          <h2 className="text-end my-4">결제일: {payment.paymentDto.paymentTime}</h2>
                          <h3>
                              {payment.paymentDto.paymentName}    
@@ -78,12 +80,14 @@ const PaymentAllList=()=>{
                          <h3 className="text-end">
                              총 결제금액: {payment.paymentDto.paymentTotal.toLocaleString()}원
                          </h3>
+                         <hr/>
         {/* 상세 결제 내용 */}
         {payment.paymentDetailList?.length > 0 && (
                         <ul className="list-group list-group-flush mt-4">
                             {payment.paymentDetailList.map(detail => (
                                 <li className="list-group-item" key={detail.paymentDetailNo}>
                                     {detail.flightId.airlineName}
+                                    <h5 className="text-end"><small>주문번호:{detail.paymentDetailNo}</small></h5>
                                     <h4 className="d-flex justify-content-between">
                                         {detail.paymentDetailName}
                                         <span />
@@ -97,8 +101,8 @@ const PaymentAllList=()=>{
                                             <p>성별: {submittedDetails[detail.paymentDetailNo].paymentDetailSex}</p>
                                             <p>생년월일: {submittedDetails[detail.paymentDetailNo].paymentDetailBirth}</p>
                                             <p>국적: {submittedDetails[detail.paymentDetailNo].paymentDetailCountry}</p>
-                                            <p>비자 종류: {submittedDetails[detail.paymentDetailNo].paymentDetailVisa}</p>
-                                            <p>비자 만료일: {submittedDetails[detail.paymentDetailNo].paymentDetailExpire}</p>
+                                            <p>여권 발행국: {submittedDetails[detail.paymentDetailNo].paymentDetailVisa}</p>
+                                            <p>여권 만료일: {submittedDetails[detail.paymentDetailNo].paymentDetailExpire}</p>
                                         </div>
                                     ) : ( // 등록된 정보가 없으면 입력 필드 표시
                                         <div>
@@ -109,21 +113,21 @@ const PaymentAllList=()=>{
                                                 <input className="form-control"
                                                     type="text"
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassport: e.target.value }))}
-                                                />
+                                                    />
                                             </div>
                                             <div>
                                             <span>한글이름</span>
                                                 <input className="form-control"
                                                     type="text"
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassanger: e.target.value }))}
-                                                />
+                                                    />
                                             </div>
                                             <div>
                                             <span>영문이름</span>
                                                 <input className="form-control"
                                                     type="text"
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailEnglish: e.target.value }))}
-                                                />
+                                                    />
                                             </div>
                                                 <div>
                                                 <span style={{ marginRight: '21px' }}> 성 별 </span>
@@ -139,7 +143,7 @@ const PaymentAllList=()=>{
                                                     <input className="form-control"
                                                         type="date"
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
-                                                    />
+                                                        />
                                                     <div>
                                                     <span style={{ marginRight: '21px' }}> 국 적 </span>
                                                         <select className="form-control"
@@ -159,7 +163,7 @@ const PaymentAllList=()=>{
                                                         </select>
                                                     </div>
                                                     <div>
-                                                    <span> 발 행 국 </span>
+                                                    <span> 여권발행국 </span>
                                                         <select className="form-control"
                                                             id="visaType"
                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailVisa: e.target.value }))}>
@@ -176,13 +180,13 @@ const PaymentAllList=()=>{
                                                             <option value="AU">호주</option>
                                                         </select>
                                                     </div>
-                                                    <span> 만 료 일 </span>
+                                                    <span> 여권 만료일 </span>
                                                     <input className="form-control"
                                                         type="date"
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailExpire: e.target.value }))}
                                                     />
                                                 </div>
-                                                <div className="text-end">
+                                                <div className="text-end mt-2">
                                                     <button
                                                         className="btn btn-primary"
                                                         onClick={() => updatePaymentDetail(detail.paymentDetailNo)}>
@@ -198,8 +202,8 @@ const PaymentAllList=()=>{
                                             <p>성별: {detail.paymentDetailSex}</p>
                                             <p>생년월일: {detail.paymentDetailBirth}</p>
                                             <p>국적: {detail.paymentDetailCountry}</p>
-                                            <p>비자 종류: {detail.paymentDetailVisa}</p>
-                                            <p>비자 만료일: {detail.paymentDetailExpire}</p>
+                                            <p>여권 발행국: {detail.paymentDetailVisa}</p>
+                                            <p>여권 만료일: {detail.paymentDetailExpire}</p>
                                             </div>
                                         )}
                                     </div>

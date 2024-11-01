@@ -19,6 +19,7 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.5",
+    "hacademy-cinema-seat": "^0.0.14",
     "hangul-js": "^0.2.6",
     "lightpick": "^1.6.2",
     "lodash": "^4.17.21",
