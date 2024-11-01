@@ -184,6 +184,7 @@ const Chat = () => {
     console.log(more);
 
     return (<>
+        <section style={{ backgroundColor: "#eee" }}>
         <div className="container"  style={{width : "700px"}}>
             <div className="row mt-4">
                 <div className="col">
@@ -221,7 +222,7 @@ const Chat = () => {
                     {/* 입력창 */}
                     <div className="input-container mt-3">
                         <div className='col'>
-                            <div className="input-group">
+                            <div className="input-group my-3">
                                 <input type="text" className="form-control"
                                     value={input} onChange={e => setInput(e.target.value)}
                                     onKeyUp={e => {
@@ -234,6 +235,7 @@ const Chat = () => {
                 </div>
             </div>
         </div>
+        </section>
     </>);
 };
 
