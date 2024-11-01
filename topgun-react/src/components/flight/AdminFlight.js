@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect } from "react";
 import axios from "axios";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AdminFlight = () => {
     const [flightList, setFlightList] = useState([]);
@@ -10,17 +11,24 @@ const AdminFlight = () => {
         loadList();
     }, []);
 
+    const [isLoading, setIsLoading] = useState(true); // 로딩 상태 초기화
+
     const loadList = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/admin/");
-
-         // 현재 시간 (오늘 날짜)
-    const now = new Date();
-
-        const filteredFlights = resp.data.filter(flight => {
-        const arrivalTime = new Date(flight.arrivalTime);
-        return arrivalTime >= now;
-    });
-        setFlightList(filteredFlights);
+        setIsLoading(true);//로딩
+        try {
+            const resp = await axios.get("http://localhost:8080/admin/");
+            // 현재 시간 (오늘 날짜)
+       const now = new Date();
+       const filteredFlights = resp.data.filter(flight => {
+       const arrivalTime = new Date(flight.arrivalTime);
+       return arrivalTime >= now;
+   });
+   setFlightList(filteredFlights);
+} catch (error) {
+toast.error("데이터를 불러오는 중 오류가 발생했습니다.");
+} finally {
+setIsLoading(false);  // 로딩 종료
+}
     }, []);
 
     const updateFlight = useCallback(async (flightId, status) => {
@@ -62,6 +70,13 @@ const filteredFlights = resp.data.filter(flight => {
 
     return (
         <>
+          {/* 로딩 중 상태 메시지 */}
+          {isLoading ? (
+                <div className="text-center mt-5">
+                    <p>로딩 중입니다...</p>
+                </div>
+            ) : (
+                <>
   {/* 검색 화면 */}
   <div className="row mt-4">
             <div className="col-md-8 offset-md-2">
@@ -146,6 +161,8 @@ const filteredFlights = resp.data.filter(flight => {
                     </table>
                 </div>
             </div>
+            </>
+            )}
         </>
     );
 };
