@@ -12,9 +12,11 @@ const Footer = () => {
                             <svg className="bi me-2" width={40} height={32}><use xlinkHref="#bootstrap" /></svg>
                         </NavLink> */}
                         <div className="d-flex flex-column align-items-start ms-5">
-                            <p className="text-body-secondary  mb-0">TopGun Travel Agency</p>
-                            <img src="https://i.ibb.co/nCwjxGr/image.png"  
-                                    style={{ width: "200px", height: "auto" }} alt="TopGun Logo"/>
+                            <p className="text-body-secondary  mb-0 ms-4">TopGun Travel Agency</p>
+                            <NavLink to="/" className="nav-link px-2 text-white">
+                                <img src="https://i.ibb.co/HGd5JJ3/1-removebg-preview.png"  
+                                        style={{ width: "200px", height: "auto" }} alt="TopGun Logo"/>
+                            </NavLink>
                         </div>
                     </div>
                     <div className="col mb-2">
