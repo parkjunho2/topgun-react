@@ -29,42 +29,51 @@ const BookingList = () => {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
 
     const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const sendDepartureAirport = queryParams.get("departureAirport");
-    const sendArrivalAirport = queryParams.get("arrivalAirport");
-    const sendDepartureTime = queryParams.get("departureTime");
+    const { state } = location;
+    const sendDepartureAirport = state?.departureAirport || "";
+    const sendArrivalAirport = state?.arrivalAirport || "";
+    const sendDepartureTime = state?.departureTime || "";
 
-useEffect(() => {
-    // 쿼리 파라미터가 존재할 경우 input 상태를 업데이트
-    if (sendDepartureAirport) {
-        setInput((prev) => ({
-            ...prev,
-            departureAirport: sendDepartureAirport
-        }));
-    }
+    useEffect(() => {
+        // 상태가 존재할 경우 input 상태를 업데이트
+        if (sendDepartureAirport) {
+            setInput((prev) => ({
+                ...prev,
+                departureAirport: sendDepartureAirport
+            }));
+        }
+    
+        if (sendArrivalAirport) {
+            setInput((prev) => ({
+                ...prev,
+                arrivalAirport: sendArrivalAirport
+            }));
+        }
+    
+        if (sendDepartureTime) {
+            setInput((prev) => ({
+                ...prev,
+                departureTime: sendDepartureTime
+            }));
+        }
+        setFirstPage();
+    }, [sendDepartureAirport, sendArrivalAirport, sendDepartureTime]);
 
-    if (sendArrivalAirport) {
-        setInput((prev) => ({
-            ...prev,
-            arrivalAirport: sendArrivalAirport
-        }));
-    }
-
-    if (sendDepartureTime) {
-        setInput((prev) => ({
-            ...prev,
-            departureTime: sendDepartureTime
-        }));
-    }
-    setFirstPage();
-}, [sendDepartureAirport, sendArrivalAirport, sendDepartureTime]);
-
+    const handleSearch = () => {
+        navigate("/flight/bookingList", {
+            state: {
+                departureAirport: input.departureAirport,
+                arrivalAirport: input.arrivalAirport,
+                departureTime: input.departureTime
+            }
+        });
+        setFirstPage(); // 페이지 초기화 및 데이터 요청
+    };
     // state
     const [input, setInput] = useState({
-        departureAirport: `${sendDepartureAirport}`,   // 출발 공항
-        arrivalAirport: `${sendArrivalAirport}`,     // 도착 공항
-        departureTime: `${sendDepartureTime}`,         // 출발 날짜
-        order : "",
+        departureAirport: sendDepartureAirport,
+        arrivalAirport: sendArrivalAirport,
+        departureTime: sendDepartureTime,
     });
 
     const [keyword, setKeyword] = useState("");
@@ -174,6 +183,7 @@ useEffect(() => {
 
             setResult(resp.data);
             loading.current = false;    //종료지점
+            // console.log(resp.data);
         }, [input]);
 
         //더보기 버튼을 눌렀을 때 사용
@@ -274,22 +284,6 @@ useEffect(() => {
     //     }
     // }, [flightList]);
 
-    //조회 버튼에 대한 navigate 구현
-    const checkInputEmpty = useCallback(() => {
-        // e.preventDefault();
-        if (input.departureAirport.length === 0) {
-            return window.alert("출발지를 입력해주세요.");
-        }
-        else if (input.arrivalAirport.length === 0) {
-            return window.alert("도착지를 입력해주세요.");
-        }
-        else if (input.departureTime.length === 0) {
-            return window.alert("출발일자를 입력해주세요.");
-        }
-        else {
-            navigate("/flight/bookingList");   //위의 항목들이 모두 pass라면 이동
-        }
-    }, [input]);
     /*                         ☆☆☆☆ 출발지에 대한 기능 state ☆☆☆☆                              */
     //출발지에 대한 state
     const [departureInputClick, setDepartureInputClick] = useState(false); // 출발지 입력창 표시 여부
@@ -381,7 +375,6 @@ const handleNextClick = () => {
         setDestinationInputClick(true); // 도착지 선택 UI 열기
     }, 100); // 약간의 딜레이 후 포커스 이동
 };
-
 
     /*                         ☆☆☆☆ 도착지에 대한 기능 state ☆☆☆☆                             */
     const [destinationInputClick, setDestinationInputClick] = useState(false); // 도착지 입력창 표시 여부
@@ -621,15 +614,7 @@ const handleNextClick = () => {
 
                     <div className="row">
                         <div className="col">
-                        <button className="btn btn-primary"  onClick={() => {
-                                setInput(prevInput => ({
-                                    ...prevInput,
-                                    order: "departure_time"  // 기본 정렬을 출발 시간순으로 설정
-                                }));
-                                setFirstPage(); // 페이지 초기화 및 데이터 요청
-                            }}
-                            onFocus={handleInputFocus}> 
-                            <FaSearch />항공권 검색
+                        <button className="btn btn-primary"  onClick={handleSearch} onFocus={handleInputFocus}><FaSearch />항공권 검색
                         </button>
                         </div>
                     </div>
@@ -832,7 +817,12 @@ const handleNextClick = () => {
                                                             <div className="col" style={{display:"flex"}}>
                                                             <button className="btn btn-primary ms-5" style={{ width: "50%", height: "50%", marginTop:"1em"}}>선택하기</button>
                                                                 {user.userType === "MEMBER" && (
-                                                                    <button className="btn ms-1" style={{ width: "15%", height: "25%", fontSize:"1.5em"}} onClick={() => createRoom(flight)}><BsChatDotsFill /></button>
+                                                                    <button className="btn ms-1" style={{ width: "15%", height: "25%", fontSize:"1.5em"}} 
+                                                                    onClick={async (event) => {
+                                                                        event.preventDefault(); // NavLink 기본 동작 방지
+                                                                        event.stopPropagation(); // NavLink 클릭 전파 방지
+                                                                        await createRoom(flight);
+                                                                    }}><BsChatDotsFill /></button>
                                                                 )}
                                                             </div>
                                                         </div>

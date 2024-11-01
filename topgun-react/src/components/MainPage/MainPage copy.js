@@ -12,7 +12,6 @@ import * as hangul from 'hangul-js';
 import { FaStar } from "react-icons/fa";
 import { wmoCode } from '../../util/wmoCode/wmoCode';
 import { toast } from "react-toastify";
-import { IoMdClose } from "react-icons/io";
 
 const MainPage = () => {
     const [recentSearches, setRecentSearches] = useState([]); // recentSearches 상태 추가
@@ -58,13 +57,6 @@ const MainPage = () => {
         }
     };
 
-        // 검색 항목 삭제 함수
-        const recentSearchesDelete = (index) => {
-            const updatedSearches = recentSearches.filter((_, i) => i !== index);
-            setRecentSearches(updatedSearches);
-            localStorage.setItem("recentSearches", JSON.stringify(updatedSearches));
-        };
-
     // LocalStorage에서 최근 검색 항목을 불러와 화면에 표시
     useEffect(() => {
         const storedSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
@@ -109,6 +101,31 @@ const MainPage = () => {
             ...input,
             [e.target.name]: e.target.value
         });
+    }, [input]);
+
+    const ChangeInputNumber = useCallback((e) => {
+        setInput({
+            ...input,
+            [e.target.name]: parseInt(e.target.value) || ""
+        });
+    }, [input]);
+
+    const changeInputArray = useCallback(e => {
+        //console.log(e.target.name, e.target.value, e.target.checked);
+        const origin = input[e.target.name];//input의 항목을 하나 꺼낸다
+
+        if (e.target.checked === true) {//추가
+            setInput({
+                ...input,
+                [e.target.name]: origin.concat(e.target.value)
+            });
+        }
+        else {//삭제
+            setInput({
+                ...input,
+                [e.target.name]: origin.filter(level => level !== e.target.value)
+            });
+        }
     }, [input]);
 
     //첫 목록을 불러올 때 사용
@@ -180,7 +197,6 @@ const MainPage = () => {
     const [departureInputClick, setDepartureInputClick] = useState(false); // 출발지 입력창 표시 여부
     const [selectedDepNational, setSelectedDepNational] = useState("한국") //초기값은 한국으로 설정
     const [selectedDepCity, setSelectedDepCity] = useState(null);     //초기값은 null로 설정. 선택된 도시가 없음
-    const [selectedArrivalCity, setSelectedArrivalCity] = useState(null);     //초기값은 null로 설정. 선택된 도시가 없음
     const [cities, setCities] = useState([]); // 동적으로 표시할 도시 목록
 
     // 기본적으로 "한국"이 선택되었을 때 도시 목록 설정
@@ -212,6 +228,7 @@ const MainPage = () => {
     const CloseSetting = () => {
         setDepartureInputClick(false); // 출발지 입력창을 닫도록 상태 변경
         setDestinationInputClick(false);    //도착지 입력창을 닫도록 상태 변경
+        setShowPassengerSettings(false);    //인원수 입력창을 닫도록 상태 변경
     };
 
     // 출발지 값이 선택된 도시로 설정되도록 useMemo로 메모이제이션
@@ -266,29 +283,6 @@ const MainPage = () => {
             }
             setDestinationInputClick(true); // 도착지 선택 UI 열기
         }, 100); // 약간의 딜레이 후 포커스 이동
-    };
-
-    // '도착지' 다음 버튼 클릭 시 출발일 입력창으로 포커스 이동
-    const handleArrivalNextClick = () => {
-        if (selectedArrivalCity) {
-            setInput(prev => ({
-                ...prev,
-                arrivalAirport: selectedArrivalCity
-            }));
-        } else if (keyword) {
-            setInput(prev => ({
-                ...prev,
-                arrivalAirport: keyword
-            }));
-        }
-        setOpen(false);
-
-        // 출발일 입력창으로 포커스 이동
-        setTimeout(() => {
-            if (datePickerRef.current) {
-                datePickerRef.current.focus();
-            }
-        }, 100);
     };
 
 
@@ -349,7 +343,7 @@ const MainPage = () => {
     };
 
 
-    /*                         ☆☆☆☆가는편/오는편 기능 구현☆☆☆☆                               */
+    /*                         ☆☆☆☆가는편/오는편 , 좌석에 대한 기능 구현☆☆☆☆                               */
     // callback
     const changeInput = useCallback((e) => {
         setInput({
@@ -398,8 +392,17 @@ const MainPage = () => {
         }
     };
 
+    // 탑승객 및 좌석 등급 설정 UI 표시 여부
+    const [showPassengerSettings, setShowPassengerSettings] = useState(false);
+
+    // 탑승객 및 좌석 등급 클릭 시 UI 보여주기
+    const showPassengerClick = () => {
+        setShowPassengerSettings(!showPassengerSettings);
+    };
+
     // 다른 입력 필드 클릭 시 좌석 등급 설정 UI 숨기기
     const handleInputFocus = () => {
+        setShowPassengerSettings(false);
         setDepartureInputClick(false); // 출발지 입력창을 닫도록 상태 변경
         setDestinationInputClick(false);
     };
@@ -417,6 +420,20 @@ const MainPage = () => {
         { nationalNo: 8, nationalName: "오사카/간사이(KIX)" },
         { nationalNo: 9, nationalName: "나트랑(CXR)" }
     ]);
+
+
+    // //effect
+    // useEffect(()=>{
+    //     loadNationalList();
+    // } , [])
+
+    // //callback
+    // const loadNationalList = useCallback(async()=>{
+    //     const resp = await axios.get("/경로/");
+    //     setNationalList(resp.data);
+    // }, [setNationalList])
+
+
 
     //========================자동완성 기능 사용 시 백엔드와 연결하기 위한 코드================
     // //effect
@@ -528,6 +545,7 @@ const MainPage = () => {
             // 데이터 파싱 및 결합
             if (data.daily) {
 
+
                 // weekWeather 상태 업데이트
                 setWeekWeather(data.daily);
                 console.log(weekWeather);
@@ -577,11 +595,9 @@ const MainPage = () => {
 
     return (
         <>
-        <header className="bg-dark">
-            <div className="container">
                 {/* 가는편 오는편 기능 구현 */}
-                <div className="flight-all-div">   {/* 전체 기능에 대한 div */}
-                    <div className="flight-search-check row mt-4 mb-4"style={{marginLeft : "7rem"}}>    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
+                <div className="flight-all-div bg-dark">   {/* 전체 기능에 대한 div */}
+                    <div className="flight-search-check row mt-4 mb-4" style={{marginLeft : "16rem"}}>    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
                         <h3 className="text-white mb-4">항공권 조회를 한 번에!</h3>
                             <div className="col-sm-3">
                                 <input
@@ -634,27 +650,28 @@ const MainPage = () => {
                             </div>
                     </div>
 
-                <div className="row" style={{width:"85%", marginLeft:"13%"}}>
+                <div className="row" style={{width:"65%", marginLeft:"13%"}}>
                     {/*   ☆☆☆☆ 출발지 입력창 기능 구현 ☆☆☆☆ */}
                     {departureInputClick && ( // 출발지 입력창 클릭 시에만 보여주기
                         <>
-                            <div className="row mb-1 me-1" style={{marginLeft:"-6.2%"}}>
+                            <div className="row mb-1 me-1">
                                 <div className="col">
                                     <div className="form-group" style={{ position: "relative" }}>
                                         <input type="text" className="form-control" placeholder="출발지를 검색하세요." value={keyword}
                                             onChange={changeKeyword} onKeyUp={handleKeyDown} // 키보드 이벤트 핸들러 추가
-                                            style={{ width: "26%"}}
+                                            style={{ width: "33%", marginLeft:"0.5%" }}
                                         />
                                         {/* {open === true && 화면} 왼쪽만 쓰겠다
                                             {open === true || 화면} 오르쪽만 쓰겠다 */}
                                         {open === true && (
-                                            <ul className="auto-search list-group" style={{width:"26%"}}>
+                                            <ul className="auto-search list-group">
                                                 {/* 골라서 찍을 수 있도록 구현해야 함(자동완성이 동작할 수 있도록) */}
                                                 {searchResult.map((national, index) => (
                                                     <li key={national.nationalNo}
-                                                            className={`list-group-item ${selectedIndex === index ? 'active' : ''}`} // 선택된 항목에 'active' 클래스 적용
-                                                            onClick={e => selectKeyword(national.nationalName)}>
-                                                            {national.nationalName}
+                                                        className={`list-group-item ${selectedIndex === index ? 'active' : ''}`} // 선택된 항목에 'active' 클래스 적용
+                                                        onClick={e => selectKeyword(national.nationalName)}>
+                                                        {national.nationalName}
+                                                        {/* <span className="text-muted ms-1">({poketmon.poketmonType})</span> */}
                                                     </li>
                                                 ))}
                                             </ul>
@@ -664,7 +681,7 @@ const MainPage = () => {
                             </div>
 
                             {/* 검색창 */}
-                            <div className="flight-select-div mt-2 me-3 mb-3 bg-white" style={{marginLeft:"-4%"}}>
+                            <div className="flight-select-div mt-2 me-3 mb-3 bg-white" style={{marginLeft:"1.5%"}}>
                                 <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
                                     <h4 className="mt-3 ms-2" style={{ fontWeight: "bold" }}>출발지 선택</h4>
                                     <button className="btn btn-danger mt-3 me-2" onClick={CloseSetting}><IoClose /></button>
@@ -707,18 +724,14 @@ const MainPage = () => {
                                             </ul>
                                         </div>
                                     </div>
-                                    {/* 최근 검색 목록에 대한 코드 */}
                                     <div className="col-4 ms-5">
                                         <h5 style={{ fontWeight: "bold" }}>최근 검색 목록(최대5개)</h5>
                                         <div className="row flight-add-text">
                                             {recentSearches.length > 0 ? (
                                                 recentSearches.map((search, index) => (
                                                     <div key={index}>
-                                                        <div className="row mt-2" style={{border:"1px solid lightGray", width:"100%", borderRadius:"0.5em", fontSize:"15px"}}>
-                                                            <span style={{ display: "flex", alignItems: "center" }}>
-                                                                    {search.departureAirport} → {search.arrivalAirport} 
-                                                                        <IoMdClose style={{ marginLeft: "auto", cursor: "pointer" }} onClick={() => recentSearchesDelete(index)}/>
-                                                            </span>
+                                                        <div className="row mt-2" style={{border:"1px solid lightGray", width:"80%", borderRadius:"0.5em"}}>
+                                                            <span>{search.departureAirport} → {search.arrivalAirport}</span>
                                                         </div>
                                                     </div>
                                                 ))
@@ -726,9 +739,7 @@ const MainPage = () => {
                                                 <span>최근 검색 기록이 없습니다.</span>
                                             )}
                                         </div>
-                                            <div className="row" style={{width:"100%"}}>
-                                                <button className="btn btn-success mt-3" onClick={handleNextClick}>다음</button>
-                                            </div>
+                                        <button className="btn btn-success mt-3" onClick={handleNextClick}>다음</button>
                                     </div>
                                 </div>
                             </div>
@@ -737,295 +748,284 @@ const MainPage = () => {
 
                     {/*    ☆☆☆☆ 도착지 입력창 기능 구현 ☆☆☆☆   */}
                     {destinationInputClick && ( // 도착지 입력창 클릭 시에만 보여주기
-                        <>
-                            {/* 자동완성 기능에 대한 코드 */}
-                            <div className="row mb-1 me-1" style={{marginLeft:"-6.2%"}}>
-                                <div className="col">
-                                    <div className="form-group" style={{ position: "relative" }}>
-                                        <input type="text" className="form-control" placeholder="도착지를 검색하세요(구현중)" value={keyword}
-                                            onChange={changeKeyword} onKeyUp={handleKeyDown} // 키보드 이벤트 핸들러 추가
-                                            style={{ width: "26%"}}
-                                        />
-                                        {/* {open === true && 화면} 왼쪽만 쓰겠다
-                                            {open === true || 화면} 오르쪽만 쓰겠다 */}
-                                        {open === true && (
-                                            <ul className="auto-search list-group" style={{width:"26%"}}>
-                                                {/* 골라서 찍을 수 있도록 구현해야 함(자동완성이 동작할 수 있도록) */}
-                                                {searchResult.map((national, index) => (
-                                                    <li key={national.nationalNo}
-                                                            className={`list-group-item ${selectedIndex === index ? 'active' : ''}`} // 선택된 항목에 'active' 클래스 적용
-                                                            onClick={e => selectKeyword(national.nationalName)}>
-                                                            {national.nationalName}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
+                        // 검색창 기능
+                        <div className="flight-select-div mt-2 ms-3 me-3 mb-3 bg-white">
+                            <div className="d-flex ms-3 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
+                                <h4 className="mt-3" style={{ fontWeight: "bold" }}>도착지 선택</h4>
+                                <button className="btn btn-danger mt-3" onClick={CloseSetting}><IoClose /></button>
+                            </div>
+                            <div className="flights_list_national row mt-3 ms-1">
+                                <div className="nation col-2">
+                                    <ul className="list-group nation-group-box">
+                                        <li className="nation-list">
+                                            <button type="button" className={getButtonClass(selectedDesNational, '한국')}
+                                                onClick={sendNationalDes('한국', destinationNationalClick)}>
+                                                <span>한국</span>
+                                            </button>
+                                        </li>
+                                        <li className="nation-box-list">
+                                            <button type="button" className={getButtonClass(selectedDesNational, '동북아시아')}
+                                                onClick={sendNationalDes('동북아시아', destinationNationalClick)}>
+                                                <span>동북아시아</span>
+                                            </button>
+                                        </li>
+                                        <li className="nation-box-list">
+                                            <button type="button" className={getButtonClass(selectedDesNational, '동남아시아')}
+                                                onClick={sendNationalDes('동남아시아', destinationNationalClick)}>
+                                                <span>동남아시아</span>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="list_airport col-4" style={{ marginBottom: "1em" }}>
+                                    <h6 style={{ fontWeight: "bold" }}>취항지</h6>
+                                    <div className="national_list_box">
+                                        <ul className="list-group city_group-box">
+                                            {destinationCities.map((cityDes) => (
+                                                <li key={cityDes} className="city_name_list">
+                                                    <button type="button" className={getButtonClass(selectedDesCity, cityDes)}
+                                                        onClick={sendNationalDes(cityDes, destinationCity)}>
+                                                        <span>{cityDes}</span>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     </div>
                                 </div>
-                            </div>                        
-                                {/* 검색창 기능 */}
-                                <div className="flight-select-div mt-2 mb-3 bg-white" style={{marginLeft:"-3.9%"}}>
-                                    <div className="d-flex ms-3 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
-                                        <h4 className="mt-3 ms-2" style={{ fontWeight: "bold" }}>도착지 선택</h4>
-                                        <button className="btn btn-danger mt-3 me-2" onClick={CloseSetting}><IoClose /></button>
-                                    </div>
-                                    <div className="flights_list_national row mt-3 ms-1">
-                                        <div className="nation col-2">
-                                            <ul className="list-group nation-group-box">
-                                                <li className="nation-list">
-                                                    <button type="button" className={getButtonClass(selectedDesNational, '한국')}
-                                                        onClick={sendNationalDes('한국', destinationNationalClick)}>
-                                                        <span>한국</span>
-                                                    </button>
-                                                </li>
-                                                <li className="nation-box-list">
-                                                    <button type="button" className={getButtonClass(selectedDesNational, '동북아시아')}
-                                                        onClick={sendNationalDes('동북아시아', destinationNationalClick)}>
-                                                        <span>동북아시아</span>
-                                                    </button>
-                                                </li>
-                                                <li className="nation-box-list">
-                                                    <button type="button" className={getButtonClass(selectedDesNational, '동남아시아')}
-                                                        onClick={sendNationalDes('동남아시아', destinationNationalClick)}>
-                                                        <span>동남아시아</span>
-                                                    </button>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div className="list_airport col-4" style={{ marginBottom: "1em" }}>
-                                            <h6 style={{ fontWeight: "bold" }}>취항지</h6>
-                                            <div className="national_list_box">
-                                                <ul className="list-group city_group-box">
-                                                    {destinationCities.map((cityDes) => (
-                                                        <li key={cityDes} className="city_name_list">
-                                                            <button type="button" className={getButtonClass(selectedDesCity, cityDes)}
-                                                                onClick={sendNationalDes(cityDes, destinationCity)}>
-                                                                <span>{cityDes}</span>
-                                                            </button>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                            {/* 최근 검색 목록에 대한 코드 */}
-                                            <div className="col-4 ms-5">
-                                                    <h5 style={{ fontWeight: "bold" }}>최근 검색 목록(최대5개)</h5>
-                                                <div className="row flight-add-text">
-                                                    {recentSearches.length > 0 ? (
-                                                        recentSearches.map((search, index) => (
-                                                            <div key={index}>
-                                                                <div className="row mt-2" style={{border:"1px solid lightGray", width:"100%", borderRadius:"0.5em", fontSize:"15px"}}>
-                                                                    <span style={{ display: "flex", alignItems: "center" }}>
-                                                                            {search.departureAirport} → {search.arrivalAirport} 
-                                                                                <IoMdClose style={{ marginLeft: "auto", cursor: "pointer" }} onClick={() => recentSearchesDelete(index)}/>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        ))
-                                                    ) : (
-                                                        <span>최근 검색 기록이 없습니다.</span>
-                                                    )}
-                                                </div>
-                                                    <div className="row" style={{width:"100%"}}>
-                                                        <button className="btn btn-success mt-3" onClick={handleArrivalNextClick}>다음</button>
-                                                    </div>
-                                            </div>
-                                    </div>
+                                <div className="col-3">
+                                    <h5 style={{ fontWeight: "bold" }}>최근 검색 목록</h5>
                                 </div>
-                        </>
+                            </div>
+                        </div>
                         )}
+                    </div>
+                </div>
+
+                {/* ================= 날씨 및 환율 정보창 =============================== */}
+                <div className="row">
+                    <div className="col-md-4">
+                        <div className="card border-0 mb-4 shadow-sm">
+                            <div className="card-body bg-light rounded-3">
+                                <h5 className="card-title">나라 선택</h5>
+                                <select
+                                    className="form-select"
+                                    value={selectedCountry || "krw"}
+                                    onChange={CountryChange}
+                                >
+                                    <option value="" disabled>나라를 선택하세요</option> {/* 기본 안내 메시지 */}
+                                    <option value="krw">KRW - 한국</option>
+                                    <option value="jpy">JPY - 일본</option>
+                                    <option value="vnd">VND - 베트남</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="card border-0 mb-4 shadow-sm">
+                            <div className="card-body bg-light rounded-3">
+                                <h5 className="card-title">환율 정보</h5>
+                                {selectedCountry === 'krw' ? (
+                                    <input
+                                        type="number"
+                                        value={amount === 0 ? '' : amount} // 0일 때 빈 문자열로 설정
+                                        className="form-control"
+                                        disabled // disabled 속성 추가
+                                    />
+                                ) : (
+                                    <input
+                                        type="number"
+                                        value={amount === 0 ? '' : amount}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setAmount(value === '' ? '' : Number(value));
+                                        }}
+                                        className="form-control"
+                                    />
+                                )}
+                                <small className="form-text text-muted">
+                                    {selectedCountry === 'jpy' && exchangeRates.jpy ? (
+                                        `1 JPY = ${exchangeRates.jpy.toFixed(3)} 원`
+                                    ) : selectedCountry === 'vnd' && exchangeRates.vnd ? (
+                                        `1 VND = ${exchangeRates.vnd.toFixed(3)} 원`
+                                    ) : selectedCountry === 'krw' ? (
+                                        null // No output for KRW
+                                    ) : (
+                                        "환율을 가져오는 중입니다..."
+                                    )}
+                                </small>
+                                {selectedCountry === 'jpy' && exchangeRates.jpy && (
+                                    <div
+                                        className="form-control mt-2"
+                                        style={{ backgroundColor: "#e9ecef" }}
+                                    >
+                                        {`${amount.toLocaleString()} JPY는 ${(amount * exchangeRates.jpy.toFixed(3)).toLocaleString()} 원 입니다.`}
+                                    </div>
+                                )}
+                                {selectedCountry === 'vnd' && exchangeRates.vnd && (
+                                    <div
+                                        className="form-control mt-2"
+                                        style={{ backgroundColor: "#e9ecef" }}
+                                    >
+                                        {`${amount.toLocaleString()} VND는 ${(amount * exchangeRates.vnd.toFixed(3)).toLocaleString()} 원 입니다.`}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+
+                        {/* 현재 날씨 정보 칼럼 */}
+                        {/* <div className="card border-0 mb-4 shadow-sm">
+                            <div className="card-body bg-light">
+                                <h6 className="card-subtitle mb-2">현재 날씨</h6>
+                                {newLoading ? (
+                                    <p className="card-text" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        <span className="ms-2">로딩 중...</span>
+                                    </p>
+                                ) : currWeather ? (
+                                    <>
+                                        <big>
+                                            {`${selectedCountry === 'jpy' ? '도쿄' : selectedCountry === 'vnd' ? '하노이' : '서울'} ${currWeather.temperature}°C`}
+                                        </big>
+                                        <br />
+                                        <img
+                                            src={wmoCode(currWeather.weathercode).icon}
+                                            alt={wmoCode(currWeather.weathercode).description}
+                                            style={{ width: '100px', height: '100px' }}
+                                        />
+                                        <p>{wmoCode(currWeather.weathercode).description}</p>
+                                        <small>{`측정 시간: ${new Date(currWeather.time).toLocaleString()} (UTC)`}</small>
+                                    </>
+                                ) : (
+                                    <p className="card-text">국가를 선택하면 날씨 정보가 표시됩니다.</p>
+                                )}
+                            </div>
+                        </div> */}
+                    </div>
+
+                    <div className="col-md-8">
+                        <div className="card border-0 mb-4 shadow-sm">
+                            <div className="card-body bg-light rounded-3">
+                                <h5 className="card-title">날씨 정보</h5>
+
+                                {/* 주간 날씨 예보 칼럼 */}
+                                <h6 className="card-subtitle mb-2">주간 날씨 예보</h6>
+                                {weekWeather && weekWeather.time && weekWeather.time.length > 0 ? (
+                                    <div className="row">
+                                        {weekWeather.time.map((date, index) => {
+                                            return (
+                                                <div key={index} className="col-3 mb-3"> {/* 모바일에서 1열, 중간 크기에서 2열 */}
+                                                    <div className="card border-light shadow-sm">
+                                                        <div className="card-body rounded-3">
+                                                            <h6 className="card-title">{moment(date).format('D일 (dd)')}</h6>
+                                                            <p className="card-text">
+                                                                <span className="text-danger">{weekWeather.temperature_2m_max[index]}°C</span> /
+                                                                <span className="text-primary"> {weekWeather.temperature_2m_min[index]}°C </span>
+                                                                <img
+                                                                    src={wmoCode(weekWeather.weathercode[index]).icon}
+                                                                    alt={wmoCode(weekWeather.weathercode[index]).description}
+                                                                    style={{ width: '30px', height: '30px' }}
+                                                                />
+                                                            </p>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <p>주간 날씨 데이터가 없습니다.</p>
+                                )}
+                            </div>
+
                         </div>
                     </div>
-                </div>
-            </header>
 
-            {/* Marketing messaging and featurettes
-            ================================================== */}
+                    </div>
+
+                {/* 날씨 및 환율 정보창 끝라인 */}
+
+
+                {/* Marketing messaging and featurettes
+  ================================================== */}
             <div className="container">
                 <div className="container marketing">
-                    {/* 날씨 및 환율 정보창 */}
                     <div className="row">
-                                    <div className="col-md-4">
-                                        <div className="card border-0 mb-4 shadow-sm">
-                                            <div className="card-body bg-light rounded-3">
-                                                <h5 className="card-title">나라 선택</h5>
-                                                <select
-                                                    className="form-select"
-                                                    value={selectedCountry || "krw"}
-                                                    onChange={CountryChange}
-                                                >
-                                                    <option value="" disabled>나라를 선택하세요</option> {/* 기본 안내 메시지 */}
-                                                    <option value="krw">KRW - 한국</option>
-                                                    <option value="jpy">JPY - 일본</option>
-                                                    <option value="vnd">VND - 베트남</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="card border-0 mb-4 shadow-sm">
-                                            <div className="card-body bg-light rounded-3">
-                                                <h5 className="card-title">환율 정보</h5>
-                                                {selectedCountry === 'krw' ? (
-                                                    <input
-                                                        type="number"
-                                                        value={amount === 0 ? '' : amount} // 0일 때 빈 문자열로 설정
-                                                        className="form-control"
-                                                        disabled // disabled 속성 추가
-                                                    />
-                                                ) : (
-                                                    <input
-                                                        type="number"
-                                                        value={amount === 0 ? '' : amount}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            setAmount(value === '' ? '' : Number(value));
-                                                        }}
-                                                        className="form-control"
-                                                    />
-                                                )}
-                                                <small className="form-text text-muted">
-                                                    {selectedCountry === 'jpy' && exchangeRates.jpy ? (
-                                                        `1 JPY = ${exchangeRates.jpy.toFixed(3)} 원`
-                                                    ) : selectedCountry === 'vnd' && exchangeRates.vnd ? (
-                                                        `1 VND = ${exchangeRates.vnd.toFixed(3)} 원`
-                                                    ) : selectedCountry === 'krw' ? (
-                                                        null // No output for KRW
-                                                    ) : (
-                                                        "환율을 가져오는 중입니다..."
-                                                    )}
-                                                </small>
-                                                {selectedCountry === 'jpy' && exchangeRates.jpy && (
-                                                    <div
-                                                        className="form-control mt-2"
-                                                        style={{ backgroundColor: "#e9ecef" }}
-                                                    >
-                                                        {`${amount.toLocaleString()} JPY는 ${(amount * exchangeRates.jpy.toFixed(3)).toLocaleString()} 원 입니다.`}
-                                                    </div>
-                                                )}
-                                                {selectedCountry === 'vnd' && exchangeRates.vnd && (
-                                                    <div
-                                                        className="form-control mt-2"
-                                                        style={{ backgroundColor: "#e9ecef" }}
-                                                    >
-                                                        {`${amount.toLocaleString()} VND는 ${(amount * exchangeRates.vnd.toFixed(3)).toLocaleString()} 원 입니다.`}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div className="col-md-8">
-                                        <div className="card border-0 mb-4 shadow-sm">
-                                            <div className="card-body bg-light rounded-3">
-                                                <h5 className="card-title">날씨 정보</h5>
-
-                                                {/* 주간 날씨 예보 칼럼 */}
-                                                <h6 className="card-subtitle mb-2">주간 날씨 예보</h6>
-                                                {weekWeather && weekWeather.time && weekWeather.time.length > 0 ? (
-                                                    <div className="row">
-                                                        {weekWeather.time.map((date, index) => {
-                                                            return (
-                                                                <div key={index} className="col-3 mb-3"> {/* 모바일에서 1열, 중간 크기에서 2열 */}
-                                                                    <div className="card border-light shadow-sm">
-                                                                        <div className="card-body rounded-3">
-                                                                            <h6 className="card-title">{moment(date).format('D일 (dd)')}</h6>
-                                                                            <p className="card-text">
-                                                                                <span className="text-danger">{weekWeather.temperature_2m_max[index]}°C</span> /
-                                                                                <span className="text-primary"> {weekWeather.temperature_2m_min[index]}°C </span>
-                                                                                <img
-                                                                                    src={wmoCode(weekWeather.weathercode[index]).icon}
-                                                                                    alt={wmoCode(weekWeather.weathercode[index]).description}
-                                                                                    style={{ width: '30px', height: '30px' }}
-                                                                                />
-                                                                            </p>
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                ) : (
-                                                    <p>주간 날씨 데이터가 없습니다.</p>
-                                                )}
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                            {/* 날씨 및 환율 정보창 끝라인 */}
-                                <div className="row">
-                                    <div className="col">
-                                        <h3 className="mb-3"> <FaStar className="mb-2 me-2" />TopGun에서 추천하는 여행지<FaStar className="mb-2 ms-2" />
-                                        </h3>
-                                    </div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-lg-4">
-                                        <img
-                                            className="bd-placeholder-img rounded-circle"
-                                            width={200}
-                                            height={200}
-                                            src="https://i.ibb.co/09T9VTT/image.jpg"
-                                        />
-                                        <title>Placeholder</title>
-                                        <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                                        <h2 className="fw-normal mt-3">도쿄</h2>
-                                        <p className="mb-0">
-                                            다채로운 모습을 가진 도쿄 <br />
-                                            넓은 면적만큼이나 매력적인 지역들이 <br />
-                                            여행자를 기다린다. <br />
-                                            어느 곳을 가더라도 멋진 시간을 선물하는 <br />
-                                            도쿄를 추천합니다.
-                                        </p>
-                                    </div>
-                                    {/* /.col-lg-4 */}
-                                    <div className="col-lg-4">
-                                        <img
-                                            className="bd-placeholder-img rounded-circle"
-                                            width={200}
-                                            height={200}
-                                            src="https://i.ibb.co/qYVfVxq/image.jpg"
-                                        />
-                                        <title>Placeholder</title>
-                                        <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                                        <h2 className="fw-normal mt-3">제주도</h2>
-                                        <p>
-                                            서울에서 비행기로 1시간 거리에 있는 <br />
-                                            한국에서 가장 큰 섬인 제주도 <br />
-                                            4계절 각각의 모습이 너무나 아름다운 섬입니다.<br />
-                                            특산물과 특산물로 만든 먹거리도 다양한 <br />
-                                            제주도를 추천합니다.
-                                        </p>
-                                    </div>
-                                    {/* /.col-lg-4 */}
-                                    <div className="col-lg-4">
-                                        <img
-                                            className="bd-placeholder-img rounded-circle"
-                                            width={200}
-                                            height={200}
-                                            src="https://i.ibb.co/7NtShdX/image.webp"
-                                        />
-                                        <title>Placeholder</title>
-                                        <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-                                        <h2 className="fw-normal mt-3">나트랑</h2>
-                                        <p>
-                                            맑고 푸른 바다와 <br />
-                                            황금빛 모래가 만나는 곳, 나트랑 <br />
-                                            이 해안 도시는 휴식과 모험을 모두 즐길 수 있는 <br />
-                                            이상적인 장소입니다.<br />
-                                            현지 음식을 맛보며, 다양한 수상 활동을 즐길 수 있는 나트랑을 추천합니다.
-                                        </p>
-                                    </div>
-                                    {/* /.col-lg-4 */}
-                                </div>
-                                {/* /.row */}
+                        <div className="col">
+                            <h3 className="mb-3"> <FaStar className="mb-2 me-2" />TopGun에서 추천하는 여행지<FaStar className="mb-2 ms-2" />
+                            </h3>
+                        </div>
                     </div>
+                    <div className="row">
+                        <div className="col-lg-4">
+                            <img
+                                className="bd-placeholder-img rounded-circle"
+                                width={200}
+                                height={200}
+                                src="https://i.ibb.co/09T9VTT/image.jpg"
+                            />
+                            <title>Placeholder</title>
+                            <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
+                            <h2 className="fw-normal mt-3">도쿄</h2>
+                            <p className="mb-0">
+                                다채로운 모습을 가진 도쿄 <br />
+                                넓은 면적만큼이나 매력적인 지역들이 <br />
+                                여행자를 기다린다. <br />
+                                어느 곳을 가더라도 멋진 시간을 선물하는 <br />
+                                도쿄를 추천합니다.
+                            </p>
+                        </div>
+                        {/* /.col-lg-4 */}
+                        <div className="col-lg-4">
+                            <img
+                                className="bd-placeholder-img rounded-circle"
+                                width={200}
+                                height={200}
+                                src="https://i.ibb.co/qYVfVxq/image.jpg"
+                            />
+                            <title>Placeholder</title>
+                            <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
+                            <h2 className="fw-normal mt-3">제주도</h2>
+                            <p>
+                                서울에서 비행기로 1시간 거리에 있는 <br />
+                                한국에서 가장 큰 섬인 제주도 <br />
+                                4계절 각각의 모습이 너무나 아름다운 섬입니다.<br />
+                                특산물과 특산물로 만든 먹거리도 다양한 <br />
+                                제주도를 추천합니다.
+                            </p>
+                        </div>
+                        {/* /.col-lg-4 */}
+                        <div className="col-lg-4">
+                            <img
+                                className="bd-placeholder-img rounded-circle"
+                                width={200}
+                                height={200}
+                                src="https://i.ibb.co/7NtShdX/image.webp"
+                            />
+                            <title>Placeholder</title>
+                            <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
+                            <h2 className="fw-normal mt-3">나트랑</h2>
+                            <p>
+                                맑고 푸른 바다와 <br />
+                                황금빛 모래가 만나는 곳, 나트랑 <br />
+                                이 해안 도시는 휴식과 모험을 모두 즐길 수 있는 <br />
+                                이상적인 장소입니다.<br />
+                                현지 음식을 맛보며, 다양한 수상 활동을 즐길 수 있는 나트랑을 추천합니다.
+                            </p>
+                        </div>
+                        {/* /.col-lg-4 */}
+                    </div>
+                    {/* /.row */}
+
+
+
+
+
                 </div>
-                {/* /.container */}
-            </>
+            </div>
+            {/* /.container */}
+        </>
+
     );
 };
 
