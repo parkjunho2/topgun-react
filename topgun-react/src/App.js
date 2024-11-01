@@ -140,6 +140,7 @@ const App = () => {
           <Route path="/chat/:roomNo" element={<Chat />} />
           <Route path="/room" element={<Room />} />
           <Route path='/payment/detail/:paymentNo' element={<PaymentDetail />} />
+          <Route path="/graph" element={<Graph />} />
         </Route>
 
 
@@ -154,7 +155,6 @@ const App = () => {
         {/* 멤버만 못보는 페이지 -> ADMIN, AIRLINE만 가능 */}
         <Route element={<NotMemberRoute />}>
           <Route path="/airline" element={<AirLine />} />
-
           <Route path="/graph" element={<Graph />} />
         </Route>
 
