@@ -28,10 +28,10 @@ const MainPage = () => {
         arrivalAirport: "",     // 도착 공항
         departureTime: "",         // 출발 날짜
     });
-    
+
     const handleSearch = () => {
         const { departureAirport, arrivalAirport, departureTime } = input;
-        
+
         if (departureAirport.length === 0) {
             return toast.error("출발지를 입력해주세요.");
         } else if (arrivalAirport.length === 0) {
@@ -45,7 +45,7 @@ const MainPage = () => {
             recentSearches.unshift(recentSearch); // 최근 검색을 맨 앞에 추가
             recentSearches = recentSearches.slice(0, 5); // 최대 5개만 유지
             localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
-    
+
             // 이동
             navigate(`/flight/bookingList?departureAirport=${departureAirport}&arrivalAirport=${arrivalAirport}&departureTime=${departureTime}`);
         }
@@ -589,59 +589,59 @@ const MainPage = () => {
 
     return (
         <>
-                {/* 가는편 오는편 기능 구현 */}
-                <div className="flight-all-div bg-dark">   {/* 전체 기능에 대한 div */}
-                    <div className="flight-search-check row mt-4 mb-4" style={{marginLeft : "16rem"}}>    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
-                        <h3 className="text-white mb-4">항공권 조회를 한 번에!</h3>
-                            <div className="col-sm-3">
-                                <input
-                                    type="text"
-                                    name="departureAirport"
-                                    className="form-control" style={{ height: "5em"}}
-                                    placeholder="출발지"
-                                    value={input.departureAirport}
-                                    onChange={changeInput}
-                                    onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                                    onClick={DepartureClick}
-                                    autoComplete="off"
-                                    readOnly
-                                />
-                            </div>
-
-                            <div className="col-sm-3">                                
-                                <input
-                                    type="text"
-                                    name="arrivalAirport"
-                                    className="form-control"  style={{ height: "5em"}}
-                                    placeholder="도착지"
-                                    value={input.arrivalAirport}
-                                    onChange={changeInput}
-                                    onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                                    onClick={destinationClick}
-                                    autoComplete="off"
-                                    readOnly></input>
-                            </div>
-
-                            <div className="col-sm-3">
-                                <input
-                                    type="text"
-                                    name="departureTime"
-                                    className="form-control"  style={{ height: "5em"}}
-                                    placeholder="출발일"
-                                    alue={input.departureTime}
-                                    onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
-                                    onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                                    ref={datePickerRef} // ref 추가
-                                    readOnly
-                                />
-                            </div>
-
-                            <div className="col-sm-3">
-                                <button className="btn btn-primary"  style={{ height: "5em"}} onClick={handleSearch}><FaSearch /> 검색하기</button>
-                            </div>
+            {/* 가는편 오는편 기능 구현 */}
+            <div className="flight-all-div bg-dark">   {/* 전체 기능에 대한 div */}
+                <div className="flight-search-check row mt-4 mb-4" style={{ marginLeft: "16rem" }}>    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
+                    <h3 className="text-white mb-4">항공권 조회를 한 번에!</h3>
+                    <div className="col-sm-3">
+                        <input
+                            type="text"
+                            name="departureAirport"
+                            className="form-control" style={{ height: "5em" }}
+                            placeholder="출발지"
+                            value={input.departureAirport}
+                            onChange={changeInput}
+                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                            onClick={DepartureClick}
+                            autoComplete="off"
+                            readOnly
+                        />
                     </div>
 
-                    <div className="container">
+                    <div className="col-sm-3">
+                        <input
+                            type="text"
+                            name="arrivalAirport"
+                            className="form-control" style={{ height: "5em" }}
+                            placeholder="도착지"
+                            value={input.arrivalAirport}
+                            onChange={changeInput}
+                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                            onClick={destinationClick}
+                            autoComplete="off"
+                            readOnly></input>
+                    </div>
+
+                    <div className="col-sm-3">
+                        <input
+                            type="text"
+                            name="departureTime"
+                            className="form-control" style={{ height: "5em" }}
+                            placeholder="출발일"
+                            alue={input.departureTime}
+                            onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
+                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                            ref={datePickerRef} // ref 추가
+                            readOnly
+                        />
+                    </div>
+
+                    <div className="col-sm-3">
+                        <button className="btn btn-primary" style={{ height: "5em" }} onClick={handleSearch}><FaSearch /> 검색하기</button>
+                    </div>
+                </div>
+
+                <div className="container">
                     {/*   ☆☆☆☆ 출발지 입력창 기능 구현 ☆☆☆☆ */}
                     {departureInputClick && ( // 출발지 입력창 클릭 시에만 보여주기
                         <>
@@ -721,7 +721,7 @@ const MainPage = () => {
                                             {recentSearches.length > 0 ? (
                                                 recentSearches.map((search, index) => (
                                                     <div key={index}>
-                                                        <div className="row mt-2" style={{border:"1px solid lightGray", width:"80%", borderRadius:"0.5em"}}>
+                                                        <div className="row mt-2" style={{ border: "1px solid lightGray", width: "80%", borderRadius: "0.5em" }}>
                                                             <span>{search.departureAirport} → {search.arrivalAirport}</span>
                                                         </div>
                                                     </div>
@@ -790,81 +790,90 @@ const MainPage = () => {
                         </div>
                     )}
                 </div>
-                </div>
+            </div>
 
-                {/* 날씨 및 환율 정보창 */}
-                <div className="row">
-                    <div className="col-md-4">
-                        <div className="card border-0 mb-4 shadow-sm">
-                            <div className="card-body bg-light rounded-3">
-                                <h5 className="card-title">나라 선택</h5>
-                                <select
-                                    className="form-select"
-                                    value={selectedCountry || "krw"}
-                                    onChange={CountryChange}
-                                >
-                                    <option value="" disabled>나라를 선택하세요</option> {/* 기본 안내 메시지 */}
-                                    <option value="krw">KRW - 한국</option>
-                                    <option value="jpy">JPY - 일본</option>
-                                    <option value="vnd">VND - 베트남</option>
-                                </select>
-                            </div>
+            
+
+
+            {/* Marketing messaging and featurettes
+  ================================================== */}
+            <div className="container">
+                <div className="container marketing">
+
+
+{/* 날씨 및 환율 정보창 */}
+<div className="row">
+                <div className="col-md-4">
+                    <div className="card border-0 mb-4 shadow-sm">
+                        <div className="card-body bg-light rounded-3">
+                            <h5 className="card-title">나라 선택</h5>
+                            <select
+                                className="form-select"
+                                value={selectedCountry || "krw"}
+                                onChange={CountryChange}
+                            >
+                                <option value="" disabled>나라를 선택하세요</option> {/* 기본 안내 메시지 */}
+                                <option value="krw">KRW - 한국</option>
+                                <option value="jpy">JPY - 일본</option>
+                                <option value="vnd">VND - 베트남</option>
+                            </select>
                         </div>
+                    </div>
 
-                        <div className="card border-0 mb-4 shadow-sm">
-                            <div className="card-body bg-light rounded-3">
-                                <h5 className="card-title">환율 정보</h5>
-                                {selectedCountry === 'krw' ? (
-                                    <input
-                                        type="number"
-                                        value={amount === 0 ? '' : amount} // 0일 때 빈 문자열로 설정
-                                        className="form-control"
-                                        disabled // disabled 속성 추가
-                                    />
+                    <div className="card border-0 mb-4 shadow-sm">
+                        <div className="card-body bg-light rounded-3">
+                            <h5 className="card-title">환율 정보</h5>
+                            {selectedCountry === 'krw' ? (
+                                <input
+                                    type="number"
+                                    value={amount === 0 ? '' : amount} // 0일 때 빈 문자열로 설정
+                                    className="form-control"
+                                    disabled // disabled 속성 추가
+                                />
+                            ) : (
+                                <input
+                                    type="number"
+                                    value={amount === 0 ? '' : amount}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        setAmount(value === '' ? '' : Number(value));
+                                    }}
+                                    className="form-control"
+                                />
+                            )}
+                            <small className="form-text text-muted">
+                                {selectedCountry === 'jpy' && exchangeRates.jpy ? (
+                                    `1 JPY = ${exchangeRates.jpy.toFixed(3)} 원`
+                                ) : selectedCountry === 'vnd' && exchangeRates.vnd ? (
+                                    `1 VND = ${exchangeRates.vnd.toFixed(3)} 원`
+                                ) : selectedCountry === 'krw' ? (
+                                    null // No output for KRW
                                 ) : (
-                                    <input
-                                        type="number"
-                                        value={amount === 0 ? '' : amount}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            setAmount(value === '' ? '' : Number(value));
-                                        }}
-                                        className="form-control"
-                                    />
+                                    "환율을 가져오는 중입니다..."
                                 )}
-                                <small className="form-text text-muted">
-                                    {selectedCountry === 'jpy' && exchangeRates.jpy ? (
-                                        `1 JPY = ${exchangeRates.jpy.toFixed(3)} 원`
-                                    ) : selectedCountry === 'vnd' && exchangeRates.vnd ? (
-                                        `1 VND = ${exchangeRates.vnd.toFixed(3)} 원`
-                                    ) : selectedCountry === 'krw' ? (
-                                        null // No output for KRW
-                                    ) : (
-                                        "환율을 가져오는 중입니다..."
-                                    )}
-                                </small>
-                                {selectedCountry === 'jpy' && exchangeRates.jpy && (
-                                    <div
-                                        className="form-control mt-2"
-                                        style={{ backgroundColor: "#e9ecef" }}
-                                    >
-                                        {`${amount.toLocaleString()} JPY는 ${(amount * exchangeRates.jpy.toFixed(3)).toLocaleString()} 원 입니다.`}
-                                    </div>
-                                )}
-                                {selectedCountry === 'vnd' && exchangeRates.vnd && (
-                                    <div
-                                        className="form-control mt-2"
-                                        style={{ backgroundColor: "#e9ecef" }}
-                                    >
-                                        {`${amount.toLocaleString()} VND는 ${(amount * exchangeRates.vnd.toFixed(3)).toLocaleString()} 원 입니다.`}
-                                    </div>
-                                )}
-                            </div>
+                            </small>
+                            {selectedCountry === 'jpy' && exchangeRates.jpy && (
+                                <div
+                                    className="form-control mt-2"
+                                    style={{ backgroundColor: "#e9ecef" }}
+                                >
+                                    {`${amount.toLocaleString()} JPY는 ${(amount * exchangeRates.jpy.toFixed(3)).toLocaleString()} 원 입니다.`}
+                                </div>
+                            )}
+                            {selectedCountry === 'vnd' && exchangeRates.vnd && (
+                                <div
+                                    className="form-control mt-2"
+                                    style={{ backgroundColor: "#e9ecef" }}
+                                >
+                                    {`${amount.toLocaleString()} VND는 ${(amount * exchangeRates.vnd.toFixed(3)).toLocaleString()} 원 입니다.`}
+                                </div>
+                            )}
                         </div>
+                    </div>
 
 
-                        {/* 현재 날씨 정보 칼럼 */}
-                        {/* <div className="card border-0 mb-4 shadow-sm">
+                    {/* 현재 날씨 정보 칼럼 */}
+                    {/* <div className="card border-0 mb-4 shadow-sm">
                             <div className="card-body bg-light">
                                 <h6 className="card-subtitle mb-2">현재 날씨</h6>
                                 {newLoading ? (
@@ -891,57 +900,50 @@ const MainPage = () => {
                                 )}
                             </div>
                         </div> */}
-                    </div>
+                </div>
 
-                    <div className="col-md-8">
-                        <div className="card border-0 mb-4 shadow-sm">
-                            <div className="card-body bg-light rounded-3">
-                                <h5 className="card-title">날씨 정보</h5>
+                <div className="col-md-8">
+                    <div className="card border-0 mb-4 shadow-sm">
+                        <div className="card-body bg-light rounded-3">
+                            <h5 className="card-title">날씨 정보</h5>
 
-                                {/* 주간 날씨 예보 칼럼 */}
-                                <h6 className="card-subtitle mb-2">주간 날씨 예보</h6>
-                                {weekWeather && weekWeather.time && weekWeather.time.length > 0 ? (
-                                    <div className="row">
-                                        {weekWeather.time.map((date, index) => {
-                                            return (
-                                                <div key={index} className="col-3 mb-3"> {/* 모바일에서 1열, 중간 크기에서 2열 */}
-                                                    <div className="card border-light shadow-sm">
-                                                        <div className="card-body rounded-3">
-                                                            <h6 className="card-title">{moment(date).format('D일 (dd)')}</h6>
-                                                            <p className="card-text">
-                                                                <span className="text-danger">{weekWeather.temperature_2m_max[index]}°C</span> /
-                                                                <span className="text-primary"> {weekWeather.temperature_2m_min[index]}°C </span>
-                                                                <img
-                                                                    src={wmoCode(weekWeather.weathercode[index]).icon}
-                                                                    alt={wmoCode(weekWeather.weathercode[index]).description}
-                                                                    style={{ width: '30px', height: '30px' }}
-                                                                />
-                                                            </p>
+                            {/* 주간 날씨 예보 칼럼 */}
+                            <h6 className="card-subtitle mb-2">주간 날씨 예보</h6>
+                            {weekWeather && weekWeather.time && weekWeather.time.length > 0 ? (
+                                <div className="row">
+                                    {weekWeather.time.map((date, index) => {
+                                        return (
+                                            <div key={index} className="col-3 mb-3"> {/* 모바일에서 1열, 중간 크기에서 2열 */}
+                                                <div className="card border-light shadow-sm">
+                                                    <div className="card-body rounded-3">
+                                                        <h6 className="card-title">{moment(date).format('D일 (dd)')}</h6>
+                                                        <p className="card-text">
+                                                            <span className="text-danger">{weekWeather.temperature_2m_max[index]}°C</span> /
+                                                            <span className="text-primary"> {weekWeather.temperature_2m_min[index]}°C </span>
+                                                            <img
+                                                                src={wmoCode(weekWeather.weathercode[index]).icon}
+                                                                alt={wmoCode(weekWeather.weathercode[index]).description}
+                                                                style={{ width: '30px', height: '30px' }}
+                                                            />
+                                                        </p>
 
-                                                        </div>
                                                     </div>
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
-                                ) : (
-                                    <p>주간 날씨 데이터가 없습니다.</p>
-                                )}
-                            </div>
-
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <p>주간 날씨 데이터가 없습니다.</p>
+                            )}
                         </div>
+
                     </div>
-
-
-
                 </div>
-                {/* 날씨 및 환율 정보창 끝라인 */}
 
+            </div>
+            {/* 날씨 및 환율 정보창 끝라인 */}
 
-                {/* Marketing messaging and featurettes
-  ================================================== */}
-            <div className="container">
-                <div className="container marketing">
                     <div className="row">
                         <div className="col">
                             <h3 className="mb-3"> <FaStar className="mb-2 me-2" />TopGun에서 추천하는 여행지<FaStar className="mb-2 ms-2" />
