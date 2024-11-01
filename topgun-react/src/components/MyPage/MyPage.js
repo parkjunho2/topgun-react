@@ -240,7 +240,7 @@ const MyPage = () => {
 
     // View
     return (
-        <section style={{ backgroundColor: "#eee" }}>
+        <section>
             <div className="container py-5">
                 {/* 상태창 바 */}
                 <div className="row">
@@ -258,7 +258,7 @@ const MyPage = () => {
                 <div className="row">
                     <div className="col-lg-4">
                         <div className="card border-0 mb-4 shadow-sm">
-                            <div className="card-body text-center">
+                            <div className="card-body text-center rounded-3 bg-light">
                                 <div className="position-relative" id="ImageWrapper"
                                     onMouseEnter={MouseEnter} // 호버 시 상태 업데이트
                                     onMouseLeave={MouseLeave} // 호버 해제 시 상태 업데이트
@@ -390,7 +390,7 @@ const MyPage = () => {
                     {/* 상세 프로필 우 상단 */}
                     <div className="col-lg-8">
                         <div className="card border-0 mb-4 shadow-sm">
-                            <div className="card-body">
+                            <div className="card-body rounded-3 bg-light">
                                 {userInfo ? (
                                     <>
                                         <div className="row">

@@ -45,6 +45,18 @@ const AdminState = selector({
 });
 export { AdminState };
 
+const AirlineState = selector({
+    key: "AirlineState",
+    get: (state) => {
+
+        const user = state.get(userState);
+
+        return user && user.userId && user.userType === 'AIRLINE' &&
+            user.userId.length > 0 && user.userType.length > 0;
+    }
+});
+export { AirlineState };
+
 const NotMemberState = selector({
     key: "NotMemberState",
     get: (state) => {
