@@ -37,9 +37,9 @@ import { ToastContainer } from 'react-toastify';
 import PaymentDetail from "./components/payment/PaymentDetail.js";
 import FindPw from './components/ForgotPw/FindPw/FindPw';
 import ResetPw from './components/ForgotPw/ResetPw/ResetPw.js';
-import Seats from './components/flight/Seats/Seasts.js';
 import ComplexTest from './components/booking/complexTest.js';
 import UserList from './components/UserList/UserList.js';
+import AirLineRoute from './components/Route/AirLineRoute.js';
 
 
 
@@ -154,6 +154,12 @@ const App = () => {
         {/* 멤버만 못보는 페이지 -> ADMIN, AIRLINE만 가능 */}
         <Route element={<NotMemberRoute />}>
           <Route path="/airline" element={<AirLine />} />
+
+          <Route path="/graph" element={<Graph />} />
+        </Route>
+
+        {/* 항공사만 봐야하는 페이지 */}
+        <Route element={<AirLineRoute />}>
           <Route path="/flight" element={<Flight />} />
           <Route path="/flight/detail/:flightId" element={<FlightDetail />} />
         </Route>
@@ -162,7 +168,7 @@ const App = () => {
         {/* 공지사항 페이지 추가 */}
         <Route path="/notice" element={<Notice />} />  {/* Notice 페이지 경로 설정 */}
         <Route path="/notice/:id" element={<NoticeDetail />} />  {/* 공지사항 상세 페이지 경로 설정 */}
-        <Route path="/graph" element={<Graph />} /> 
+
 
 
         <Route path="*" element={<NotFound />} /> {/* 모든 잘못된 경로 처리 */}

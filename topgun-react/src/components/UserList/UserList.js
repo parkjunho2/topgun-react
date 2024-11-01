@@ -90,14 +90,14 @@ const UserList = () => {
 
     return (
         <>
-            <section style={{ backgroundColor: "#eee" }}>
+            <section>
                 <div className="container py-5">
                     <div className="row justify-content-center">
 
                         {/* 복합 검색 창 (작은 화면에서는 12칸, 큰 화면에서는 4칸) */}
                         <div className="col-12 col-lg-4 mb-4">
-                            <div className="card border-0 shadow-sm">
-                                <div className="card-body">
+                            <div className="card border-0 shadow-sm rounded-3">
+                                <div className="card-body bg-light">
                                     <h5 className="card-title">검색</h5>
                                     <div className="mb-3">
                                         <label htmlFor="searchId" className="form-label">아이디</label>
@@ -162,7 +162,7 @@ const UserList = () => {
                         </div>
 
                         {/* 사용자 목록 (항상 보이도록 설정) */}
-                        <div className="col-12 col-lg-7 offset-lg-1 mb-4 bg-white shadow-sm border-0 rounded">
+                        <div className="col-12 col-lg-7 offset-lg-1 mb-4 bg-light shadow-sm border-0 rounded-3">
                             <div className="main-box no-header clearfix"> {/* 배경색을 하얀색으로 설정 */}
                                 <div className="main-box-body clearfix">
                                     <div className="user-list">
@@ -175,7 +175,7 @@ const UserList = () => {
                                         </div>
                                         {/* 사용자 목록 */}
                                         {result.userList.map((user) => (
-                                            <div className="row user align-items-center mb-3 border-bottom" key={user.usersId}>
+                                            <div className="row user align-items-center mb-3 border-bottom " key={user.usersId}>
                                                 <div className="col py-2 px-3">
                                                     <div className="col py-2 px-3">
                                                         <div className="d-block">

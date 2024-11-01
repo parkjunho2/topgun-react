@@ -464,12 +464,13 @@ const MainPage = () => {
         }
     }, [open, selectedIndex, searchResult, selectKeyword]);
 
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 환율 및 날씨에 대한 코드 정의
     const [exchangeRates, setExchangeRates] = useState({ jpy: null, vnd: null });
     const [currWeather, setCurrWeather] = useState(null);
+    const [weekWeather, setWeekWeather] = useState({}); // 초기값을 빈 배열로 설정
     const [newLoading, setNewLoading] = useState(false);
-    const [selectedCountry, setSelectedCountry] = useState(null);
+    const [selectedCountry, setSelectedCountry] = useState("krw");
     const [amount, setAmount] = useState(1); // 기본값 1
 
     // 환율 가져오기
@@ -499,16 +500,26 @@ const MainPage = () => {
     }, []);
 
     const getWeatherData = useCallback(async (latitude, longitude) => {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m&daily=weathercode&timezone=Asia%2FSeoul`;
-        // const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m&daily=weathercode`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia%2FSeoul&start_date=${moment().utcOffset(9).format('YYYY-MM-DD')}&end_date=${moment().utcOffset(9).add(7, 'days').format('YYYY-MM-DD')}`;
 
         try {
             const response = await axios.get(url);
             const data = response.data;
+            console.log(data);
             if (data.current_weather) {
                 setCurrWeather(data.current_weather);
             } else {
                 console.error("현재 날씨 데이터가 없습니다.");
+            }
+            // 데이터 파싱 및 결합
+            if (data.daily) {
+
+
+                // weekWeather 상태 업데이트
+                setWeekWeather(data.daily);
+                console.log(weekWeather);
+            } else {
+                console.error("주간 날씨 데이터가 없습니다.");
             }
         } catch (error) {
             console.error("날씨 조회 중 오류 발생:", error);
@@ -530,7 +541,8 @@ const MainPage = () => {
 
         const countryCoordinates = {
             jpy: { latitude: 35.6895, longitude: 139.6917 }, // 일본 도쿄
-            vnd: { latitude: 21.0285, longitude: 105.8542 } // 베트남 하노이
+            vnd: { latitude: 21.0285, longitude: 105.8542 }, // 베트남 하노이
+            krw: { latitude: 37.5665, longitude: 126.9780 }  // 한국 서울
         };
 
         const coordinates = countryCoordinates[selectedCountry];
@@ -743,6 +755,152 @@ const MainPage = () => {
                 </div>
 
 
+                {/* 날씨 및 환율 정보창 */}
+                <div className="row">
+                    <div className="col-md-4">
+                        <div className="card border-0 mb-4 shadow-sm">
+                            <div className="card-body bg-light rounded-3">
+                                <h5 className="card-title">나라 선택</h5>
+                                <select
+                                    className="form-select"
+                                    value={selectedCountry || "krw"}
+                                    onChange={CountryChange}
+                                >
+                                    <option value="" disabled>나라를 선택하세요</option> {/* 기본 안내 메시지 */}
+                                    <option value="krw">KRW - 한국</option>
+                                    <option value="jpy">JPY - 일본</option>
+                                    <option value="vnd">VND - 베트남</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="card border-0 mb-4 shadow-sm">
+                            <div className="card-body bg-light rounded-3">
+                                <h5 className="card-title">환율 정보</h5>
+                                {selectedCountry === 'krw' ? (
+                                    <input
+                                        type="number"
+                                        value={amount === 0 ? '' : amount} // 0일 때 빈 문자열로 설정
+                                        className="form-control"
+                                        disabled // disabled 속성 추가
+                                    />
+                                ) : (
+                                    <input
+                                        type="number"
+                                        value={amount === 0 ? '' : amount}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setAmount(value === '' ? '' : Number(value));
+                                        }}
+                                        className="form-control"
+                                    />
+                                )}
+                                <small className="form-text text-muted">
+                                    {selectedCountry === 'jpy' && exchangeRates.jpy ? (
+                                        `1 JPY = ${exchangeRates.jpy.toFixed(3)} 원`
+                                    ) : selectedCountry === 'vnd' && exchangeRates.vnd ? (
+                                        `1 VND = ${exchangeRates.vnd.toFixed(3)} 원`
+                                    ) : selectedCountry === 'krw' ? (
+                                        null // No output for KRW
+                                    ) : (
+                                        "환율을 가져오는 중입니다..."
+                                    )}
+                                </small>
+                                {selectedCountry === 'jpy' && exchangeRates.jpy && (
+                                    <div
+                                        className="form-control mt-2"
+                                        style={{ backgroundColor: "#e9ecef" }}
+                                    >
+                                        {`${amount.toLocaleString()} JPY는 ${(amount * exchangeRates.jpy.toFixed(3)).toLocaleString()} 원 입니다.`}
+                                    </div>
+                                )}
+                                {selectedCountry === 'vnd' && exchangeRates.vnd && (
+                                    <div
+                                        className="form-control mt-2"
+                                        style={{ backgroundColor: "#e9ecef" }}
+                                    >
+                                        {`${amount.toLocaleString()} VND는 ${(amount * exchangeRates.vnd.toFixed(3)).toLocaleString()} 원 입니다.`}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+
+                        {/* 현재 날씨 정보 칼럼 */}
+                        {/* <div className="card border-0 mb-4 shadow-sm">
+                            <div className="card-body bg-light">
+                                <h6 className="card-subtitle mb-2">현재 날씨</h6>
+                                {newLoading ? (
+                                    <p className="card-text" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        <span className="ms-2">로딩 중...</span>
+                                    </p>
+                                ) : currWeather ? (
+                                    <>
+                                        <big>
+                                            {`${selectedCountry === 'jpy' ? '도쿄' : selectedCountry === 'vnd' ? '하노이' : '서울'} ${currWeather.temperature}°C`}
+                                        </big>
+                                        <br />
+                                        <img
+                                            src={wmoCode(currWeather.weathercode).icon}
+                                            alt={wmoCode(currWeather.weathercode).description}
+                                            style={{ width: '100px', height: '100px' }}
+                                        />
+                                        <p>{wmoCode(currWeather.weathercode).description}</p>
+                                        <small>{`측정 시간: ${new Date(currWeather.time).toLocaleString()} (UTC)`}</small>
+                                    </>
+                                ) : (
+                                    <p className="card-text">국가를 선택하면 날씨 정보가 표시됩니다.</p>
+                                )}
+                            </div>
+                        </div> */}
+                    </div>
+
+                    <div className="col-md-8">
+                        <div className="card border-0 mb-4 shadow-sm">
+                            <div className="card-body bg-light rounded-3">
+                                <h5 className="card-title">날씨 정보</h5>
+
+                                {/* 주간 날씨 예보 칼럼 */}
+                                <h6 className="card-subtitle mb-2">주간 날씨 예보</h6>
+                                {weekWeather && weekWeather.time && weekWeather.time.length > 0 ? (
+                                    <div className="row">
+                                        {weekWeather.time.map((date, index) => {
+                                            return (
+                                                <div key={index} className="col-3 mb-3"> {/* 모바일에서 1열, 중간 크기에서 2열 */}
+                                                    <div className="card border-light shadow-sm">
+                                                        <div className="card-body rounded-3">
+                                                            <h6 className="card-title">{moment(date).format('D일 (dd)')}</h6>
+                                                            <p className="card-text">
+                                                                <span className="text-danger">{weekWeather.temperature_2m_max[index]}°C</span> /
+                                                                <span className="text-primary"> {weekWeather.temperature_2m_min[index]}°C </span>
+                                                                <img
+                                                                    src={wmoCode(weekWeather.weathercode[index]).icon}
+                                                                    alt={wmoCode(weekWeather.weathercode[index]).description}
+                                                                    style={{ width: '30px', height: '30px' }}
+                                                                />
+                                                            </p>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <p>주간 날씨 데이터가 없습니다.</p>
+                                )}
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+                {/* 날씨 및 환율 정보창 끝라인 */}
+
+
                 {/* Marketing messaging and featurettes
   ================================================== */}
                 <div className="container marketing">
@@ -814,100 +972,6 @@ const MainPage = () => {
                     {/* /.row */}
 
 
-                    {/* START THE FEATURETTES */}
-                    <div className="row">
-                        <div className="col-md-12">
-                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#f8f9fa" }}>
-                                <div className="card-body">
-                                    <h5 className="card-title">나라 선택</h5>
-                                    <select
-                                        className="form-select"
-                                        value={selectedCountry || ""}
-                                        onChange={CountryChange}
-                                    >
-                                        <option value="" disabled>나라를 선택하세요</option>
-                                        <option value="jpy">JPY - 일본</option>
-                                        <option value="vnd">VND - 베트남</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#f0f8ff" }}>
-                                <div className="card-body">
-                                    <h5 className="card-title">환율 정보</h5>
-                                    <input
-                                        type="number"
-                                        value={amount === 0 ? '' : amount} // 0일 때 빈 문자열로 설정
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            setAmount(value === '' ? '' : Number(value)); // 빈 문자열일 경우 빈 문자열로 설정
-                                        }}
-                                        className="form-control"
-                                    />
-                                    <small className="form-text text-muted">
-                                        {selectedCountry === 'jpy' && exchangeRates.jpy ? (
-                                            `1 JPY = ${exchangeRates.jpy.toFixed(3)} 원`
-                                        ) : selectedCountry === 'vnd' && exchangeRates.vnd ? (
-                                            `1 VND = ${exchangeRates.vnd.toFixed(3)} 원`
-                                        ) : (
-                                            "환율을 가져오는 중입니다..."
-                                        )}
-                                    </small>
-                                    {selectedCountry === 'jpy' && exchangeRates.jpy && (
-                                        <div
-                                            className="form-control mt-2"
-                                            style={{ backgroundColor: "#e9ecef" }}
-                                        >
-                                            {`${amount.toLocaleString()} JPY는 ${(amount * exchangeRates.jpy.toFixed(3)).toLocaleString()} 원 입니다.`}
-                                        </div>
-                                    )}
-                                    {selectedCountry === 'vnd' && exchangeRates.vnd && (
-                                        <div
-                                            className="form-control mt-2"
-                                            style={{ backgroundColor: "#e9ecef" }}
-                                        >
-                                            {`${amount.toLocaleString()} VND는 ${(amount * exchangeRates.vnd.toFixed(3)).toLocaleString()} 원 입니다.`}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-md-6">
-                            <div className="card border-0 mb-4 shadow-sm" style={{ backgroundColor: "#f0f8ff" }}>
-                                <div className="card-body">
-                                    <h5 className="card-title">현재 날씨 정보</h5>
-                                    {newLoading ? (
-                                        <p className="card-text" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                            <span className="ms-2">로딩 중...</span>
-                                        </p>
-                                    ) : currWeather ? (
-                                        <>
-                                            <big>
-                                                {`현재 ${selectedCountry === 'jpy' ? '도쿄' : '하노이'}의 기온은 ${currWeather.temperature}°C입니다.`}
-                                            </big>
-                                            <br />
-                                            <img
-                                                src={wmoCode(currWeather.weathercode).icon}
-                                                alt={wmoCode(currWeather.weathercode).description}
-                                                style={{ width: '100px', height: '100px' }}
-                                            />
-                                            <p>{wmoCode(currWeather.weathercode).description}</p>
-                                            <small>{`측정 시간: ${new Date(currWeather.time).toLocaleString()} (UTC)`}</small>
-                                        </>
-                                    ) : (
-                                        <p className="card-text">국가를 선택하면 날씨 정보가 표시됩니다.</p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {/* /END THE FEATURETTES */}
 
 
 
