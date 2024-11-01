@@ -65,8 +65,13 @@ const Flight = () => {
     const deleteFlight = useCallback(async (flightId) => {
         const choice = window.confirm("정말 삭제하시겠습니까?");
         if (!choice) return;
-        await axios.delete(`http://localhost:8080/flight/${flightId}`);
-        loadList();
+        try {
+            await axios.delete(`http://localhost:8080/flight/${flightId}`);
+            toast.success("삭제 완료되었습니다."); // 삭제 성공 시 토스트 알림 표시
+            loadList(); // 목록 새로고침
+        } catch (error) {
+            toast.error("삭제에 실패했습니다. 다시 시도해주세요."); // 에러 발생 시 토스트 알림 표시
+        }
     }, [loadList]);
 
     const updateFlight = useCallback(async () => {
