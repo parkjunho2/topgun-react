@@ -136,7 +136,7 @@ const PaymentSuccess=()=>{
         else{
             return(<>
             <div className="container">
-            <h1 className="text-center mt-5">결제 승인 실패</h1>
+            <h1 className="text-center mt-5">결제 승인 실패... </h1>
             </div>
             </>);
         }
