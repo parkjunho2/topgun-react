@@ -74,6 +74,17 @@ const PaymentAllList=()=>{
                            </div>
                         <h2 className="text-end">대표 주문번호:{payment.paymentDto.paymentNo}</h2>
                          <h2 className="text-end my-4">결제일: {payment.paymentDto.paymentTime}</h2>
+                         <h2 className="text-end my-4">
+                        결제일: {new Date(payment.paymentDto.paymentTime).toLocaleString('ko-KR', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: false, // 24시간 형식
+                        })}
+                        </h2>
                          <h3>
                              {payment.paymentDto.paymentName}    
                          </h3>
@@ -112,6 +123,7 @@ const PaymentAllList=()=>{
                                                 여권번호
                                                 <input className="form-control"
                                                     type="text"
+                                                    style={{ width: '25%' }}
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassport: e.target.value }))}
                                                     />
                                             </div>
@@ -119,6 +131,7 @@ const PaymentAllList=()=>{
                                             <span>한글이름</span>
                                                 <input className="form-control"
                                                     type="text"
+                                                    style={{ width: '25%' }}
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassanger: e.target.value }))}
                                                     />
                                             </div>
@@ -126,12 +139,14 @@ const PaymentAllList=()=>{
                                             <span>영문이름</span>
                                                 <input className="form-control"
                                                     type="text"
+                                                    style={{ width: '25%' }}
                                                     onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailEnglish: e.target.value }))}
                                                     />
                                             </div>
                                                 <div>
                                                 <span style={{ marginRight: '21px' }}> 성 별 </span>
                                                     <select className="form-control"
+                                                    style={{ width: '25%' }}
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailSex: e.target.value }))}>
                                                         <option value="">선택하세요</option>
                                                         <option value="M">남성</option>
@@ -141,12 +156,14 @@ const PaymentAllList=()=>{
                                                 <div>
                                                     생년월일
                                                     <input className="form-control"
+                                                    style={{ width: '25%' }}
                                                         type="date"
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
                                                         />
                                                     <div>
                                                     <span style={{ marginRight: '21px' }}> 국 적 </span>
                                                         <select className="form-control"
+                                                        style={{ width: '25%' }}
                                                             id="country"
                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailCountry: e.target.value }))}>
                                                             <option value="">국적을 선택하세요</option>
@@ -163,8 +180,9 @@ const PaymentAllList=()=>{
                                                         </select>
                                                     </div>
                                                     <div>
-                                                    <span> 여권발행국 </span>
+                                                    <span> 여권 발행국 </span>
                                                         <select className="form-control"
+                                                        style={{ width: '25%' }}
                                                             id="visaType"
                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailVisa: e.target.value }))}>
                                                             <option value="">국적을 선택하세요</option>
@@ -182,6 +200,7 @@ const PaymentAllList=()=>{
                                                     </div>
                                                     <span> 여권 만료일 </span>
                                                     <input className="form-control"
+                                                    style={{ width: '25%' }}
                                                         type="date"
                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailExpire: e.target.value }))}
                                                     />
