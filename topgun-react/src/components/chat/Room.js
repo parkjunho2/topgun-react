@@ -105,7 +105,6 @@ const Room = () => {
     };
 
     return (
-        <section style={{ backgroundColor: "#eee" }}>
         <div className="container">
             <div className="room-container">
                 {/* 방 생성 화면 */}
@@ -154,7 +153,6 @@ const Room = () => {
                 </div>
             </div>
         </div>
-        </section>
     );
 };
 

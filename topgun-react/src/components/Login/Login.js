@@ -287,7 +287,7 @@ const Login = () => {
     // JSX
     return (
         <>
-            <div className="container-fluid h-custom mt-5">
+            <div className="container h-custom mt-5">
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-md-9 col-lg-6 col-xl-5">
                         {/* 샘플 이미지 나중에 이미지 수정 필요 */}
@@ -359,9 +359,9 @@ const Login = () => {
                                     checked={loginData.rememberMe}
                                     onChange={InputChange}
                                 />
-                                <label className="form-check-label" htmlFor="formRemember">Remember me</label>
+                                <label className="form-check-label" htmlFor="formRemember">로그인 유지</label>
                             </div>
-                            <NavLink to="/findPw" className="text-body">Forgot password?</NavLink>
+                            <NavLink to="/findPw" className="text-body">비밀번호 찾기</NavLink>
                         </div>
 
                         <div className="text-center text-lg-start mt-4 pt-2 mb-0">
@@ -380,9 +380,9 @@ const Login = () => {
                                 로그인
                             </button>
                             <p className="small fw-bold mt-2 pt-1 mb-0">
-                                Don't have an account? <NavLink className="link-danger" data-bs-toggle="modal" data-bs-target="#JoinForm" onClick={(e) => {
+                                회원이 아니신가요? <NavLink className="link-danger" data-bs-toggle="modal" data-bs-target="#JoinForm" onClick={(e) => {
                                     e.preventDefault(); // 기본 동작 방지
-                                }}>Register</NavLink>
+                                }}>회원가입</NavLink>
                             </p>
                         </div>
                     </div>
