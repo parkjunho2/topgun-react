@@ -16,16 +16,27 @@ const FlightDetail = () => {
         loadFlight();
     }, []);
 
-    const loadFlight = useCallback(async () => {
-        try {
-            const resp = await axios.get(`http://localhost:8080/flight/${flightId}`);
-            setFlight(resp.data);
-            setInput(resp.data);
-        } catch (e) {
-            setFlight(null);
-        }
-        setLoad(true);
-    }, [flightId]);
+ // `datetime-local` 형식으로 변환하는 함수
+ const formatDateForInput = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().slice(0, 16); // "yyyy-MM-ddTHH:mm" 형식으로 자르기
+};
+
+const loadFlight = useCallback(async () => {
+    try {
+        const resp = await axios.get(`http://localhost:8080/flight/${flightId}`);
+
+        setFlight(resp.data);
+        setInput({
+            ...resp.data,
+            departureTime: formatDateForInput(resp.data.departureTime),
+            arrivalTime: formatDateForInput(resp.data.arrivalTime)
+        });
+    } catch (e) {
+        setFlight(null);
+    }
+    setLoad(true);
+}, [flightId]);
 
     const deleteFlight = useCallback(async () => {
         await axios.delete(`http://localhost:8080/flight/${flightId}`);
@@ -124,10 +135,10 @@ const FlightDetail = () => {
                     <div className="col-sm-4"><strong>항공편 번호:</strong> {flight.flightNumber}</div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>출발 시간:</strong> {new Date(flight.departureTime).toLocaleString()}</div>
+                    <div className="col-sm-4"><strong>출발 시간:</strong> {new Date(flight.departureTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-sm-4"><strong>도착 시간:</strong> {new Date(flight.arrivalTime).toLocaleString()}</div>
+                    <div className="col-sm-4"><strong>도착 시간:</strong> {new Date(flight.arrivalTime).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>
                 </div>
                 <div className="row mb-3">
                     <div className="col-sm-4"><strong>운항 시간:</strong> {flight.flightTime}</div>

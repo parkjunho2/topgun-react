@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 
 const Flight = () => {
     const [flightList, setFlightList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true); // 로딩 상태 초기화
     const [input, setInput] = useState({
         flightId: "",
         flightNumber: "",
@@ -48,18 +49,22 @@ const Flight = () => {
     }, [input.departureTime, input.arrivalTime]);
 
     const loadList = useCallback(async () => {
+        setIsLoading(true);//로딩
+        try {
         const resp = await axios.get("http://localhost:8080/flight/");
-
         // 현재 시간 (오늘 날짜)
-    const now = new Date();
-
+        const now = new Date();
         // 항공편 리스트에서 현재 로그인된 사용자 ID와 도착 시간이 현재 시간보다 이후인 항공편만 필터링
     const filteredFlights = resp.data.filter(flight => {
         const arrivalTime = new Date(flight.arrivalTime);
         return flight.userId === user.userId && arrivalTime >= now;
     });
-    
     setFlightList(filteredFlights);
+        } catch (error) {
+    toast.error("데이터를 불러오는 중 오류가 발생했습니다.");
+        } finally {
+    setIsLoading(false);  // 로딩 종료
+        }
 }, [user.userId]);
 
     const deleteFlight = useCallback(async (flightId) => {
@@ -118,6 +123,10 @@ const Flight = () => {
     
 
     const openModal = useCallback(() => {
+        if (user.userType !== "AIRLINE") {
+            toast.error("항공편 등록 권한이 없습니다.");
+            return;
+        }
         setInput((prevInput) => ({
             ...prevInput,
             userId: user.userId, // 현재 로그인된 사용자 ID를 설정
@@ -227,6 +236,13 @@ const Flight = () => {
     // 뷰
     return (
         <>
+        {/* 로딩 중 상태 메시지 */}
+        {isLoading ? (
+                <div className="text-center mt-5">
+                    <p>로딩 중입니다...</p>
+                </div>
+            ) : (
+                <>
          {/* 검색 화면 */}
          <div className="row mt-4">
             <div className="col-md-8 offset-md-2">
@@ -425,6 +441,8 @@ const Flight = () => {
                     </div>
                 </div>
             </div>
+            </>
+            )}
         </>
     );
 };
