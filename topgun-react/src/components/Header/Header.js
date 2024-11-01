@@ -6,6 +6,7 @@ import axios from "axios";
 import { useCallback } from "react";
 import Oval from 'react-loading-icons/dist/esm/components/oval';
 import { AiFillHome } from "react-icons/ai";
+import { FaUserCircle } from "react-icons/fa";
 
 const Header = () => {
     const navigate = useNavigate();
@@ -102,16 +103,16 @@ const Header = () => {
                             ) : (
                                 login ? (
                                     <>
-                                        <button type="button" onClick={() => navigate("/mypage")} className="btn text-light text-decoration-none me-2">
-                                            {user.userId} ({user.userType})
+                                        <button type="button" onClick={() => navigate("/mypage")} className="btn text-light text-decoration-none">
+                                            <FaUserCircle className="mb-1"/> 마이페이지
                                         </button>
-                                        <button type="button" onClick={logout} className="btn btn-danger me-2">
+                                        <button type="button" onClick={logout} className="btn text-white me-2">
                                             로그아웃
                                         </button>
                                     </>
                                 ) : (
-                                    <button type="button" onClick={() => navigate("/login")} className="btn btn-success me-2">
-                                        로그인
+                                    <button type="button" onClick={() => navigate("/login")} className="btn me-2 text-white">
+                                        <FaUserCircle className="mb-1"/> 로그인
                                     </button>
                                 )
                             )}

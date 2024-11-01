@@ -11,6 +11,7 @@ import { IoClose } from "react-icons/io5";
 import * as hangul from 'hangul-js';
 import { FaStar } from "react-icons/fa";
 import { wmoCode } from '../../util/wmoCode/wmoCode';
+import { toast } from "react-toastify";
 
 const MainPage = () => {
     const [recentSearches, setRecentSearches] = useState([]); // recentSearches 상태 추가
@@ -32,11 +33,11 @@ const MainPage = () => {
         const { departureAirport, arrivalAirport, departureTime } = input;
         
         if (departureAirport.length === 0) {
-            return window.alert("출발지를 입력해주세요.");
+            return toast.error("출발지를 입력해주세요.");
         } else if (arrivalAirport.length === 0) {
-            return window.alert("도착지를 입력해주세요.");
+            return toast.error("도착지를 입력해주세요.");
         } else if (departureTime.length === 0) {
-            return window.alert("출발일자를 입력해주세요.");
+            return toast.error("출발일자를 입력해주세요.");
         } else {
             const recentSearch = { departureAirport, arrivalAirport };
             // 최근 검색 항목을 LocalStorage에 저장
@@ -169,13 +170,13 @@ const MainPage = () => {
     const checkInputEmpty = useCallback(() => {
         // e.preventDefault();
         if (input.departureAirport.length === 0) {
-            return window.alert("출발지를 입력해주세요.");
+            return toast.error("출발지를 입력해주세요.");
         }
         else if (input.arrivalAirport.length === 0) {
-            return window.alert("도착지를 입력해주세요.");
+            return toast.error("도착지를 입력해주세요.");
         }
         else if (input.departureTime.length === 0) {
-            return window.alert("출발일자를 입력해주세요.");
+            return toast.error("출발일자를 입력해주세요.");
         }
         // else if (input.departureDate.length === 0) {
         //     return window.alert("도착일자를 입력해주세요.");
@@ -288,7 +289,7 @@ const MainPage = () => {
     // 도착지 input 클릭 시 출발지 기능을 표시하는 함수
     const destinationClick = () => {
         if (input.departureAirport.length === 0) {
-            window.alert("출발지를 입력해주세요.");
+            toast.error("출발지를 입력해주세요.");
 
             // 도착지 입력창의 포커스를 해제합니다.
             const destinationInput = document.querySelector('input[name="arrivalAirport"]');
@@ -576,60 +577,59 @@ const MainPage = () => {
 
     return (
         <>
-            <div className="container">
                 {/* 가는편 오는편 기능 구현 */}
-                <div className="flight-all-div mt-3">   {/* 전체 기능에 대한 div */}
-                    <div className="flight-search-check row mt-4 mb-4 ms-3">    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
-                        {/* <h5>항공권 조회 구현중..</h5> */}
-                        <div className="col-sm-3">
-                            <input
-                                type="text"
-                                name="departureAirport"
-                                className="form-control"
-                                placeholder="출발지"
-                                value={input.departureAirport}
-                                onChange={changeInput}
-                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                                onClick={DepartureClick}
-                                autoComplete="off"
-                                readOnly
-                            />
-                        </div>
+                <div className="flight-all-div bg-dark">   {/* 전체 기능에 대한 div */}
+                    <div className="flight-search-check row mt-4 mb-4" style={{marginLeft : "16rem"}}>    {/* 안쪽 여백을 위한 div(전체 기능을 감싸는) */}
+                        <h3 className="text-white mb-4">항공권 조회를 한 번에!</h3>
+                            <div className="col-sm-3">
+                                <input
+                                    type="text"
+                                    name="departureAirport"
+                                    className="form-control" style={{ height: "5em"}}
+                                    placeholder="출발지"
+                                    value={input.departureAirport}
+                                    onChange={changeInput}
+                                    onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                                    onClick={DepartureClick}
+                                    autoComplete="off"
+                                    readOnly
+                                />
+                            </div>
 
-                        <div className="col-sm-3">
-                            <input
-                                type="text"
-                                name="arrivalAirport"
-                                className="form-control"
-                                placeholder="도착지"
-                                value={input.arrivalAirport}
-                                onChange={changeInput}
-                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                                onClick={destinationClick}
-                                autoComplete="off"
-                                readOnly
-                            />
-                        </div>
+                            <div className="col-sm-3">                                
+                                <input
+                                    type="text"
+                                    name="arrivalAirport"
+                                    className="form-control"  style={{ height: "5em"}}
+                                    placeholder="도착지"
+                                    value={input.arrivalAirport}
+                                    onChange={changeInput}
+                                    onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                                    onClick={destinationClick}
+                                    autoComplete="off"
+                                    readOnly></input>
+                            </div>
 
-                        <div className="col-sm-3">
-                            <input
-                                type="text"
-                                name="departureTime"
-                                className="form-control"
-                                placeholder="출발일"
-                                alue={input.departureTime}
-                                onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
-                                onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                                ref={datePickerRef} // ref 추가
-                                readOnly
-                            />
-                        </div>
+                            <div className="col-sm-3">
+                                <input
+                                    type="text"
+                                    name="departureTime"
+                                    className="form-control"  style={{ height: "5em"}}
+                                    placeholder="출발일"
+                                    alue={input.departureTime}
+                                    onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
+                                    onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                                    ref={datePickerRef} // ref 추가
+                                    readOnly
+                                />
+                            </div>
 
-                        <div className="col-sm-3">
-                            <button className="btn btn-primary" onClick={handleSearch}><FaSearch /> 항공권 검색</button>
-                        </div>
+                            <div className="col-sm-3">
+                                <button className="btn btn-primary"  style={{ height: "5em"}} onClick={handleSearch}><FaSearch /> 검색하기</button>
+                            </div>
                     </div>
 
+                    <div className="container">
                     {/*   ☆☆☆☆ 출발지 입력창 기능 구현 ☆☆☆☆ */}
                     {departureInputClick && ( // 출발지 입력창 클릭 시에만 보여주기
                         <>
@@ -660,7 +660,7 @@ const MainPage = () => {
                             </div>
 
                             {/* 검색창 */}
-                            <div className="flight-select-div mt-2 ms-3 me-3 mb-3">
+                            <div className="flight-select-div mt-2 ms-3 me-3 mb-3 bg-white">
                                 <div className="d-flex ms-2 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
                                     <h4 className="mt-3 ms-2" style={{ fontWeight: "bold" }}>출발지 선택</h4>
                                     <button className="btn btn-danger mt-3 me-2" onClick={CloseSetting}><IoClose /></button>
@@ -728,7 +728,7 @@ const MainPage = () => {
                     {/*    ☆☆☆☆ 도착지 입력창 기능 구현 ☆☆☆☆   */}
                     {destinationInputClick && ( // 도착지 입력창 클릭 시에만 보여주기
                         // 검색창 기능
-                        <div className="flight-select-div mt-2 ms-3 me-3">
+                        <div className="flight-select-div mt-2 ms-3 me-3 mb-3 bg-white">
                             <div className="d-flex ms-3 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
                                 <h4 className="mt-3" style={{ fontWeight: "bold" }}>도착지 선택</h4>
                                 <button className="btn btn-danger mt-3" onClick={CloseSetting}><IoClose /></button>
@@ -778,10 +778,11 @@ const MainPage = () => {
                         </div>
                     )}
                 </div>
-
+                </div>
 
                 {/* Marketing messaging and featurettes
   ================================================== */}
+            <div className="container">
                 <div className="container marketing">
                     <div className="row">
                         <div className="col">

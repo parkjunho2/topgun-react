@@ -184,7 +184,6 @@ const Chat = () => {
     console.log(more);
 
     return (<>
-        <section style={{ backgroundColor: "#eee" }}>
         <div className="container"  style={{width : "700px"}}>
             <div className="row mt-4">
                 <div className="col">
@@ -204,7 +203,7 @@ const Chat = () => {
                                                 {login && user.userId !== message.senderUsersId && (
                                                     <div className="message-header">
                                                         <h5>
-                                                            {maskUserId(message.senderUsersId)}
+                                                            {user.userType === 'ADMIN' ? message.senderUsersId : maskUserId(message.senderUsersId)}
                                                             <small className="text-muted"> ({message.senderUsersType})</small>
                                                         </h5>
                                                     </div>
@@ -235,7 +234,6 @@ const Chat = () => {
                 </div>
             </div>
         </div>
-        </section>
     </>);
 };
 

@@ -100,7 +100,7 @@ const App = () => {
   const location = useLocation();
 
   // 헤더를 숨길 경로 배열
-  const noHeaderRoutes = ['/login', '/join'];
+  const noHeaderRoutes = ['/join'];
 
   return (
     <>{/* ToastContainer 추가 */}
