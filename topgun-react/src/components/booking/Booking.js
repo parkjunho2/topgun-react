@@ -35,8 +35,6 @@ const Booking = () => {
     };
   }, []);
 
-
-
       //페이지 갱신 후 한번만 실행
       useEffect(()=>{
         loadFlightList();

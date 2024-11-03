@@ -20,6 +20,7 @@ import { Modal } from 'bootstrap';
 import { FaArrowDown } from "react-icons/fa";
 import { PiLineVerticalBold } from "react-icons/pi";
 import { AiOutlineSwapRight } from "react-icons/ai";
+import { IoMdClose } from "react-icons/io";
 
 const BookingList = () => {
     //const [flightList , setflightList] = useState([]);
@@ -27,6 +28,23 @@ const BookingList = () => {
     const [flightComplexList , setFlightComplexList] = useState([]);
 
     const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+
+    // LocalStorage에서 불러온 최근 검색 목록을 저장할 상태
+    const [recentSearches, setRecentSearches] = useState([]);
+
+    // 컴포넌트가 마운트될 때 localStorage에서 recentSearches를 가져와 상태에 설정
+    useEffect(() => {
+        const storedSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
+        setRecentSearches(storedSearches);
+    }, []);
+
+    // 검색 항목 삭제 함수
+    const recentSearchesDelete = (index) => {
+        const updatedSearches = recentSearches.filter((_, i) => i !== index);
+        setRecentSearches(updatedSearches);
+        localStorage.setItem("recentSearches", JSON.stringify(updatedSearches));
+    };
 
     const location = useLocation();
     const { state } = location;
@@ -259,30 +277,6 @@ const BookingList = () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
-
-    // useEffect(()=>{
-    //     complexSearch();
-    // } , []);
-
-    //하히
-    // const complexSearch = useCallback(async () => {
-    //     const requestData = {
-    //         departureAirport: "서울/인천(ICN)",
-    //         arrivalAirport: "광주(KWJ)",
-    //         departureTime: "2024-10-25", // 유효한 날짜 형식으로 입력
-    //         passengers: 1,
-    //         orderList: []
-    //     };
-    
-    //     try {
-    //         const resp = await axios.post("http://localhost:8080/flight/complexSearch", requestData);
-    //         setFlightList(resp.data.flightList);
-    //         // console.log(resp.data);
-    //     } catch (error) {
-    //         console.error("Error fetching flight data:", error);
-    //     }
-    // }, [flightList]);
 
     /*                         ☆☆☆☆ 출발지에 대한 기능 state ☆☆☆☆                              */
     //출발지에 대한 state
@@ -562,6 +556,56 @@ const handleNextClick = () => {
         }
     }, [open, selectedIndex, searchResult, selectKeyword]);
 
+    // 날짜 배열을 저장할 상태
+    const [dateList, setDateList] = useState([]);
+    const [pricesList, setPricesList] = useState([]); // 각 날짜별 가격 목록
+
+    // 날짜 목록 생성 및 가격 데이터 불러오기
+    useEffect(() => {
+        const initialDate = new Date(input.departureTime);
+        const dates = [];
+        for (let i = 0; i < 7; i++) {
+            const newDate = new Date(initialDate);
+            newDate.setDate(initialDate.getDate() + i);
+            dates.push(newDate.toISOString().split('T')[0]);
+        }
+        setDateList(dates);
+
+        const fetchPrices = async () => {
+            try {
+                const pricesData = await Promise.all(
+                    dates.map(async (date) => {
+                        const response = await axios.post("http://localhost:8080/flight/complexSearch", {
+                            ...input,
+                            departureTime: date
+                        });
+                        const flightPrices = response.data.flightList.map(flight => flight.price);
+                        return flightPrices.length ? Math.min(...flightPrices) : "가격 없음";
+                    })
+                );
+                setPricesList(pricesData);
+            } catch (error) {
+                console.error("가격 데이터를 불러오는 중 오류가 발생했습니다:", error);
+            }
+        };
+
+        fetchPrices();
+    }, [input.departureTime]);
+
+    const [activeIndex, setActiveIndex] = useState(null); // 활성화된 버튼의 인덱스
+
+    // 버튼 클릭 시 활성화 인덱스를 업데이트하고 검색 실행
+    const dateButtonClick = (index, date) => {
+        setActiveIndex(index); // 클릭된 버튼의 인덱스를 설정하여 활성화
+        setInput((prev) => ({ ...prev, departureTime: date })); // departureTime 업데이트
+        handleSearch(); // 검색 실행
+    };
+
+    // 각 날짜별 최저 가격을 반환하는 함수
+    const getLowestPrice = (priceArray) => {
+        return priceArray.length > 0 ? Math.min(...priceArray) : "가격 없음";
+    };
+
     return (
         <>
         <div className="container">
@@ -693,9 +737,28 @@ const handleNextClick = () => {
                                             </ul>
                                         </div>
                                     </div>
-                                    <div className="col-3">
-                                        <h5 style={{ fontWeight: "bold" }}>최근 검색 목록</h5>
-                                        <button className="btn btn-success" onClick={handleNextClick}>다음</button>
+                                    {/* 최근 검색 목록에 대한 코드 */}
+                                    <div className="col-4 ms-5">
+                                        <h5 style={{ fontWeight: "bold" }}>최근 검색 목록(최대5개)</h5>
+                                        <div className="row flight-add-text">
+                                            {recentSearches.length > 0 ? (
+                                                recentSearches.map((search, index) => (
+                                                    <div key={index}>
+                                                        <div className="row mt-2" style={{border:"1px solid lightGray", width:"100%", borderRadius:"0.5em", fontSize:"15px"}}>
+                                                            <span style={{ display: "flex", alignItems: "center" }}>
+                                                                    {search.departureAirport} → {search.arrivalAirport} 
+                                                                        <IoMdClose style={{ marginLeft: "auto", cursor: "pointer" }} onClick={() => recentSearchesDelete(index)}/>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <span>최근 검색 기록이 없습니다.</span>
+                                            )}
+                                        </div>
+                                            <div className="row" style={{width:"100%"}}>
+                                                <button className="btn btn-success mt-3" onClick={handleNextClick}>다음</button>
+                                            </div>
                                     </div>
                                 </div>
                             </div>
@@ -748,9 +811,29 @@ const handleNextClick = () => {
                                         </ul>
                                     </div>
                                 </div>
-                                <div className="col-3">
-                                    <h5 style={{ fontWeight: "bold" }}>최근 검색 목록</h5>
-                                </div>
+                                    {/* 최근 검색 목록에 대한 코드 */}
+                                    <div className="col-4 ms-5">
+                                        <h5 style={{ fontWeight: "bold" }}>최근 검색 목록(최대5개)</h5>
+                                        <div className="row flight-add-text">
+                                            {recentSearches.length > 0 ? (
+                                                recentSearches.map((search, index) => (
+                                                    <div key={index}>
+                                                        <div className="row mt-2" style={{border:"1px solid lightGray", width:"100%", borderRadius:"0.5em", fontSize:"15px"}}>
+                                                            <span style={{ display: "flex", alignItems: "center" }}>
+                                                                    {search.departureAirport} → {search.arrivalAirport} 
+                                                                        <IoMdClose style={{ marginLeft: "auto", cursor: "pointer" }} onClick={() => recentSearchesDelete(index)}/>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <span>최근 검색 기록이 없습니다.</span>
+                                            )}
+                                        </div>
+                                            <div className="row" style={{width:"100%"}}>
+                                                <button className="btn btn-success mt-3" onClick={handleNextClick}>다음</button>
+                                            </div>
+                                    </div>
                             </div>
                         </div>
                     )}
@@ -758,22 +841,30 @@ const handleNextClick = () => {
 
                 {/* 항공편 리스트에 대한 기능 */}
                 <div className="col mt-3">
-                    <div className="d-flex mb-3">
-                        <span className="me-2">출발시간순 |</span>
-                        <span className="ms -2 me-2">도착시간순 |</span>
-                        <button className="ms -2 me-2" 
-                            onClick={() => {
-                                setInput(prevInput => ({
-                                    ...prevInput,
-                                    order: "flight_price" // 'order' 값을 업데이트
-                                }));
-                                sendRequest(); // 요청 보내기
-                            }}
-                        >
-                            최저가순
-                        </button>
-                        
+                    <div>
+                        <div className="row mt-4">
+                                <div className="d-flex" style={{color:"#00256c"}}>
+                                    <h3 style={{fontWeight:"bold"}}>가는편</h3>
+                                    <span className='ms-4 me-2' style={{fontSize:"24px"}}>{input.departureAirport}</span>
+                                    <span style={{fontSize:"24px", width:"30%"}}>
+                                        <AiOutlineSwapRight style={{fontSize:"24px", marginRight:"3%"}}/>
+                                        {input.arrivalAirport}
+                                    </span>
+                                </div>
+                        </div>
+                        {/* 날짜와 가격을 표시 */}
+                        <div className="d-flex mt-4 mb-4">
+                            {dateList.map((date, index) => (
+                                    <button key={index} className="btn btn-outline-primary flight-date-box" onClick={() => dateButtonClick(index, date)}>
+                                        <span style={{fontSize:"20px", fontWeight:"bolder", color:"black", display:"block"}}>{moment(date).format("MM.DD(dd)")}</span>
+                                        <span style={{ color: "#767676", fontWeight: "bold" }}>
+                        {pricesList[index] ? `${pricesList[index]}원` : `${pricesList[index]}원`}
+                    </span>
+                                    </button>
+                                ))}
+                        </div>
                     </div>
+
                         <div className="row" style={{width:"60%" , marginLeft:"20%"}}>
                             {/* 항공권 리스트를 출력 */}
                                 {result.flightList.length > 0 ? (
@@ -783,7 +874,7 @@ const handleNextClick = () => {
                                                 <div className="col">
                                                     <div className="d-flex mt-3" style={{ border: "1px solid lightgray", borderRadius: "1.5em", width: "100%" }}>
                                                         <div className="row mt-3 mb-3 ms-1" style={{ width: "70%" }}>
-                                                            <h3 style={{ color: "black" }}>{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}<GiCommercialAirplane /></h3>
+                                                            <h3 style={{ color: "black" }}>{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}<GiCommercialAirplane/></h3>
                                                             <div className="d-flex mb-2" style={{ justifyContent: "space-between" }}>
                                                                 <div className="d-flex mt-3" style={{ width: "200px", justifyContent: "space-between" }}>
                                                                     <span style={{ width: "100%", textAlign: "center" , color:"#626971", fontWeight:"bolder" }}>
