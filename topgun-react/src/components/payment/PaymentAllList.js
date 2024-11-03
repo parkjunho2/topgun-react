@@ -8,7 +8,6 @@ const PaymentAllList=()=>{
      const [paymentList, setPaymentList] = useState([]); 
      const [selectedDetail, setSelectedDetail] = useState({});
      const [submittedDetails, setSubmittedDetails] = useState({}); // 등록된 정보를 저장
-
      //effect
      useEffect(()=>{
         loadPaymentList();
@@ -69,27 +68,37 @@ const PaymentAllList=()=>{
              <ul className="list-group">
                  {paymentList.map(payment=>(
                      <li key={payment.paymentNo} className="list-group-item">
-                         <div className="text-end mt-1">
-                             <NavLink className="btn btn-warning" to={`/payment/detail/${payment.paymentDto.paymentNo}`}>결제내역이동</NavLink>
-                           </div>
-                        <h2 className="text-end">대표 주문번호:{payment.paymentDto.paymentNo}</h2>
-                         <h2 className="text-end my-4">결제일: {payment.paymentDto.paymentTime}</h2>
-                         <h2 className="text-end my-4">
+
+                         <h2 className="text-end">대표 주문번호:{payment.paymentDto.paymentNo}</h2>
+                         <h3 className="text-end mt-4">
                         결제일: {new Date(payment.paymentDto.paymentTime).toLocaleString('ko-KR', {
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
+                        })}
+                        </h3>
+                        <h3 className="text-end">
+                        {new Date(payment.paymentDto.paymentTime).toLocaleString('ko-KR', {
                             hour: '2-digit',
                             minute: '2-digit',
                             second: '2-digit',
-                            hour12: false, // 24시간 형식
+                            hour12: false
                         })}
-                        </h2>
+                        <h3>출발공항:{payment.flightVO.departureAirport}</h3>
+                        <h3>출발시간:{payment.flightVO.departureTime}</h3>
+                        <h3>도착공항:{payment.flightVO.arrivalAirport}</h3>
+                        <h3>도착시간:{payment.flightVO.arrivalTime}</h3>
+                        <h3>운행시간:{payment.flightVO.flightTime}</h3>
+                        </h3>
+                        {/* <h1>항공기번호:{payment.paymentDto.flightId}</h1> */}
                          <h3>
                              {payment.paymentDto.paymentName}    
                          </h3>
                          <h3 className="text-end">
                              총 결제금액: {payment.paymentDto.paymentTotal.toLocaleString()}원
+                            <div className="text-end mt-1">
+                                <NavLink className="btn btn-warning" to={`/payment/detail/${payment.paymentDto.paymentNo}`}>결제내역이동</NavLink>
+                              </div>
                          </h3>
                          <hr/>
         {/* 상세 결제 내용 */}
@@ -117,7 +126,7 @@ const PaymentAllList=()=>{
                                         </div>
                                     ) : ( // 등록된 정보가 없으면 입력 필드 표시
                                         <div>
-                                        {detail.paymentDetailPassport === null ? ( // passport가 null인 경우 입력 필드 표시
+                                        {detail.paymentDetailPassanger === null ? ( // passport가 null인 경우 입력 필드 표시
                                             <>
                                             <div>
                                                 여권번호

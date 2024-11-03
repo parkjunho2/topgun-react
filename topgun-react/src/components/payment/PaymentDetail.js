@@ -215,17 +215,6 @@ const PaymentDetail=()=>{
                                 <div className="col-9">{action.payload}</div>
                             </div>
                             )}
-                            {action.amount === 0 && selectedDetailName.length !==0 &&(
-                            <div className="row">
-                                <div className="col-3">취소된 좌석</div>
-                                <div className="col-9"><ul>
-                                {selectedDetailName.map((name, index) => (
-                                    <li key={index}>{name}</li>
-                                ))}
-                            </ul></div>
-                            <div style={{ display: 'none' }}>{action.amount.toLocaleString()}</div>
-                            </div>
-                            )}
                         </li>
                     ))}
                     </ul>

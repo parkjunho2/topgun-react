@@ -125,7 +125,7 @@ const PaymentSuccess=()=>{
                 </table>
                 <div className="text-end">
                 <button className="btn btn-primary" onClick={handleNavigate}>
-                            여권정보 입력하기
+                            예약내역
                 </button>
                 </div>
             </div>
