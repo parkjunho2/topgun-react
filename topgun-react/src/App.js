@@ -150,6 +150,7 @@ const App = () => {
           <Route path="/admin/list" element={<AdminFlight />} />
           <Route path="/admin/detail/:flightId" element={<AdminFlightDetail />} />
           <Route path="/userlist" element={<UserList />} />
+       
         </Route>
 
         {/* 멤버만 못보는 페이지 -> ADMIN, AIRLINE만 가능 */}
