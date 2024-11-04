@@ -184,7 +184,7 @@ const Chat = () => {
     console.log(more);
 
     return (<>
-        <div className="container"  style={{width : "700px"}}>
+        <div className="container" style={{ width: "700px" }}>
             <div className="row mt-4">
                 <div className="col">
                     {/* {more === true && (
@@ -200,16 +200,24 @@ const Chat = () => {
                                         <div className={`chat-message ${login && user.userId === message.senderUsersId ? "my-message" : "other-message"}`}>
                                             <div className="chat-bubble">
                                                 {/* 발신자 정보 */}
-                                                {login && user.userId !== message.senderUsersId && (
+                                                {login && message.senderUsersId !== null ? (
+                                                    <>
+                                                        {user.userId !== message.senderUsersId && (
+                                                            <div className="message-header">
+                                                                <h5>
+                                                                    {user.userType === 'ADMIN' ? message.senderUsersId : maskUserId(message.senderUsersId)}
+                                                                    <small className="text-muted"> ({message.senderUsersType})</small>
+                                                                </h5>
+                                                            </div>
+                                                        )}
+                                                        <p className="message-content">{message.content}</p>
+                                                        <p className="text-muted message-time">{formatMessageTime(message.time)}</p>
+                                                    </>
+                                                ) : (
                                                     <div className="message-header">
-                                                        <h5>
-                                                            {user.userType === 'ADMIN' ? message.senderUsersId : maskUserId(message.senderUsersId)}
-                                                            <small className="text-muted"> ({message.senderUsersType})</small>
-                                                        </h5>
+                                                        <h5>탈퇴한 사용자</h5>
                                                     </div>
                                                 )}
-                                                <p className="message-content">{message.content}</p>
-                                                <p className="text-muted message-time">{formatMessageTime(message.time)}</p>
                                             </div>
                                         </div>
                                     )}
@@ -226,7 +234,7 @@ const Chat = () => {
                                     value={input} onChange={e => setInput(e.target.value)}
                                     onKeyUp={e => {
                                         if (e.key === 'Enter' && login) { sendMessage(); }
-                                    }} disabled={login === false} placeholder="메세지를 입력하세요"/>
+                                    }} disabled={login === false} placeholder="메세지를 입력하세요" />
                                 <button className="btn btn-success" disabled={login === false} onClick={sendMessage}>보내기</button>
                             </div>
                         </div>
