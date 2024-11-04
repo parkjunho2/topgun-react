@@ -30,7 +30,7 @@ const Header = () => {
                     <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                         <span className="d-flex align-items-center mb-lg-0 text-white text-decoration-none fs-4">
                             <NavLink to="/" className="nav-link px-2 text-white">
-                                <img src="https://i.ibb.co/82NtGDh/Black-and-Yellow-Illustrative-Travel-Agency-Logo-removebg-preview.png"
+                                <img src="/image/logo.png" alt="TopGun Logo"
                                     width={120}
                                     height={35}
                                 />
