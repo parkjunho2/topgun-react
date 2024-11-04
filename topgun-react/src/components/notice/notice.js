@@ -232,7 +232,7 @@ const NoticeBoard = () => {
                                         <span style={{ marginBottom: '15px', marginLeft: '5px', color: '#e63946' }}>
                                             <FaDizzy title="긴급 공지" style={{ fontSize: '1em' }} />
                                             <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                                Danger
+                                                [긴급공지]
                                             </Link>
                                         </span>
                                     )}
@@ -241,7 +241,7 @@ const NoticeBoard = () => {
                                         <span style={{ marginLeft: '10px', color: '#ec7393' }}>
                                             <FaMeteor style={{ fontSize: '1em' }} title="주요 공지" />
                                             <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                                main
+                                                [main]
                                             </Link>
                                         </span>
 
@@ -262,7 +262,7 @@ const NoticeBoard = () => {
                                     {user.userType === 'ADMIN' && (
                                         <FaTrash
                                             className="text-danger trash-icon"
-                                            style={{ color: '#ec7393', fill: '#ff0000', fontSize: '1em' }}
+                                            style={{ color: '#ec7393', fill: '#dc3545', fontSize: '1em' }}
                                             onClick={() => deleteNotice(notice)}
                                         />
                                     )}
