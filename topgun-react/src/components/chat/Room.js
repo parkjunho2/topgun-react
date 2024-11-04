@@ -47,7 +47,7 @@ const Room = () => {
             filteredRooms = resp.data.filter(room => room.roomName === '관리자에게 문의'); // '관리자에게 문의'인 방만 표시
         }
         else if (user.userType === "AIRLINE") {
-            filteredRooms = resp.data.filter(room => room.roomCreatedBy === user.userId || room.join === 'Y');
+            filteredRooms = resp.data.filter(room => room.roomCreatedBy === user.userId || room.join === user.userId);
         }
 
         setRoomList(filteredRooms);
@@ -141,9 +141,6 @@ const Room = () => {
                                         <span className="last-message-time ms-5">{formatMessageTime(room.lastMessageTime)}</span>
                                     )}
                                 </div>
-                                {/* <button className="btn btn-primary ms-2" onClick={e => enterRoom(room)}>
-                                    <IoEnterOutline style={{ fontSize: '1.5rem' }} />
-                                </button> */}
                                 <button className="btn btn-danger ms-2" onClick={e => deleteRoom(room)}>
                                     <FaXmark style={{ fontSize: '1.5rem' }} />
                                 </button>
