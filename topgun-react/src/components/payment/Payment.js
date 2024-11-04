@@ -2,6 +2,7 @@ import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router";
 import { Seat , SeatGroup } from "hacademy-cinema-seat";
+import { toast } from "react-toastify";
 
     const Payment=()=>{
     //params
@@ -41,8 +42,16 @@ import { Seat , SeatGroup } from "hacademy-cinema-seat";
             setSeatsList(resp.data.map(seats=>{
                 return{
                     ...seats,
-                      select:false,
-                    qty:1//고정
+                    select:false,
+                    qty:1,
+                    paymentDetailPassport:"",
+                    paymentDetailPassanger:"",
+                    paymentDetailEnglish:"",
+                    paymentDetailSex:"",
+                    paymentDetailBirth:"",
+                    paymentDetailCountry:"",
+                    paymentDetailVisa:"",
+                    paymentDetailExpire:""
                 }
             }));
     }, [flightId]);
@@ -52,17 +61,6 @@ import { Seat , SeatGroup } from "hacademy-cinema-seat";
         const resp = await axios.get(`http://localhost:8080/seats/info/${flightId}`);
         setFlightInfo(resp.data[0]); // 첫 번째 항공편 정보만 가져오기
     }, [flightId]);
-    
-    //좌석선택
-    const selectSeats = useCallback((target, checked)=>{ 
-        setSeatsList(seatsList.map(seats=>{
-            if(seats.seatsNo === target.seatsNo){
-                return {...seats, select:checked};
-            }
-            return {...seats};
-        })); 
-
-    }, [seatsList]);
 
     //memo 
     //체크된 좌석 목록
@@ -94,11 +92,40 @@ import { Seat , SeatGroup } from "hacademy-cinema-seat";
     }, []);
     //체크된 좌석 금액 결제
     const sendPurchaseRequest = useCallback(async()=>{
+        // 모든 입력 필드가 채워져 있는지 확인
+    // 모든 입력 필드가 채워져 있거나 모두 비어있는지 확인
+    const allFilled = checkedSeatsList.every(seat => 
+        seat.paymentDetailPassport &&
+        seat.paymentDetailPassanger &&
+        seat.paymentDetailEnglish &&
+        seat.paymentDetailSex &&
+        seat.paymentDetailBirth &&
+        seat.paymentDetailCountry &&
+        seat.paymentDetailVisa &&
+        seat.paymentDetailExpire
+    );
+
+    const allEmpty = checkedSeatsList.every(seat => 
+        !seat.paymentDetailPassport &&
+        !seat.paymentDetailPassanger &&
+        !seat.paymentDetailEnglish &&
+        !seat.paymentDetailSex &&
+        !seat.paymentDetailBirth &&
+        !seat.paymentDetailCountry &&
+        !seat.paymentDetailVisa &&
+        !seat.paymentDetailExpire
+    );
+
+    if (!allFilled && !allEmpty) {
+        toast("모든 정보를 입력하거나 아무것도 입력하지 않아야 합니다.");
+        return; // 조건이 충족되지 않으면 함수 종료
+    }
+
         if(checkedSeatsList.length===0) return;
         const resp = await axios.post(
             "http://localhost:8080/seats/purchase", 
             {//백엔드 puchaseReqeustVO 로 전송
-                seatsList: checkedSeatsList, //seatNo,qty
+                seatsList: checkedSeatsList, //seatNo,qty,여권정보
                 approvalUrl: getCurrentUrl() + "/success",
                 cancelUrl: getCurrentUrl() + "/cancel",
                 failUrl: getCurrentUrl() + "/fail",
@@ -109,53 +136,32 @@ import { Seat , SeatGroup } from "hacademy-cinema-seat";
             window.location.href= resp.data.next_redirect_pc_url;//결제 페이지로 이동
     }, [checkedSeatsList]);
 
+
+    const changeSeats= useCallback((target, input, field)=>{
+        setSeatsList(seatsList.map(seats=>{
+            if(seats.seatsNo===target.seatsNo){
+                return{...seats, 
+                    [field]:input
+                };
+            }
+            return{...seats};
+        }));
+    }, [seatsList]);
+
         //view
         return(<>
         <div className="container">
             <div className="row mt-3">
-                
-                
                 <div className="col mt-2">
-                    <div className="table" style={{width: '100%', whiteSpace: 'nowrap'}}>
-                        <thead>
-                            <tr>
-                                <th>선택</th>
-                                <th>번호</th>
-                                <th>좌석번호</th>
-                                <th>등급</th>
-                                <th>가격</th>
-                                <th>상태</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {seatsList.map(seats=>(
-                                <tr key={seats.seatsNo}>
-                                    <td>
-                                        <input type="checkbox" className="form-check-input"
-                                        checked={seats.select} onChange={e=>selectSeats(seats, e.target.checked)}
-                                        disabled={seats.seatsStatus === "사용"} 
-                                        />
-                                    </td>
-                                    <td>{seats.seatsNo}</td> 
-                                    <td>{seats.seatsNumber}</td>
-                                    <td>{seats.seatsRank}</td>
-                                    <td>+{seats.seatsPrice.toLocaleString()}원</td>
-                                    <td>{seats.seatsStatus}</td>
-                            </tr>))}
-                        </tbody>
-                    </div>
-                </div>
-               
-                <div className="col mt-2">
-                <SeatGroup map={seatsDisplayList} setMap={setSeatsDisplayList}
+                <SeatGroup map={seatsDisplayList} setMap={setSeatsList}
                         fields={{
                             no:'seatsNo', 
-                            row:'seatsColumn', 
                             col:'seatsRow', 
+                            row:'seatsColumn', 
                             price:'seatsPrice', 
                             grade:'seatsRank',
                             reserved:'seatsReserved', 
-                            //disabled:'seatDisabled',
+                            disabled:'seatsStatus',
                             checked:'select',
                         }}
                         cols={['A', 'B', ' ', 'C', 'D','E']}
@@ -163,7 +169,6 @@ import { Seat , SeatGroup } from "hacademy-cinema-seat";
                         showNames={true}
                 />
                 </div>
-                
                                     
                 <div className="col mt-2">
                     <table className="table">
@@ -231,7 +236,114 @@ import { Seat , SeatGroup } from "hacademy-cinema-seat";
                             </tr>
                         </tbody>
                          </table>
+
+                         {seatsList.map(seats => (
+                        checkedSeatsList.some(checkedSeat => checkedSeat.seatsNo === seats.seatsNo) && ( // Check if the seat is selected
+                            <div key={seats.seatsNo} className="mb-3">
+                                <h5>{seats.seatsRank} {seats.seatsNumber} 좌석 여권정보 입력</h5>
+                                <div className="mb-2">
+                                    <label>여권 번호</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={seats.paymentDetailPassport}
+                                        onChange={e => changeSeats(seats, e.target.value, 'paymentDetailPassport')}
+                                    />
+                                </div>
+                                <div className="mb-2">
+                                    <label>한글이름</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={seats.paymentDetailPassanger}
+                                        onChange={e => changeSeats(seats, e.target.value, 'paymentDetailPassanger')}
+                                    />
+                                </div>
+                                <div className="mb-2">
+                                    <label>영문이름</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={seats.paymentDetailEnglish}
+                                        onChange={e => changeSeats(seats, e.target.value, 'paymentDetailEnglish')}
+                                    />
+                                </div>
+                                <div className="mb-2">
+                                    <label>성별</label>
+                                    <select 
+                                        className="form-control" 
+                                        value={seats.paymentDetailSex} 
+                                        onChange={e => changeSeats(seats, e.target.value, 'paymentDetailSex')} 
+                                    >
+                                        <option value="">선택하세요</option>
+                                        <option value="M">남성</option>
+                                        <option value="W">여성</option>
+                                    </select>
+                                </div>
+                                <div className="mb-2">
+                                    <label>생년월일</label>
+                                    <input
+                                        type="date"
+                                        className="form-control"
+                                        value={seats.paymentDetailBirth}
+                                        onChange={e => changeSeats(seats, e.target.value, 'paymentDetailBirth')}
+                                    />
+                                </div>
+                                <div className="mb-2">
+                                    <label>국적</label>
+                                    <select 
+                                        className="form-control" 
+                                        value={seats.paymentDetailCountry} 
+                                        onChange={e => changeSeats(seats, e.target.value, 'paymentDetailCountry')} 
+                                    >
+                                        <option value="">선택하세요</option>
+                                        <option value="대한민국">대한민국</option>
+                                        <option value="미국">미국</option>
+                                        <option value="일본">일본</option>
+                                        <option value="중국">중국</option>
+                                        <option value="영국">영국</option>
+                                        <option value="독일">독일</option>
+                                        <option value="프랑스">프랑스</option>
+                                        <option value="캐나다">캐나다</option>
+                                        <option value="호주">호주</option>
+                                        <option value="인도">인도</option>
+                                    </select>
+                                </div>
+                                <div className="mb-2">
+                                    <label>여권 발행국</label>
+                                    <select 
+                                        className="form-control" 
+                                        value={seats.paymentDetailVisa} 
+                                        onChange={e => changeSeats(seats, e.target.value, 'paymentDetailVisa')} 
+                                    >
+                                        <option value="">선택하세요</option>
+                                        <option value="대한민국">대한민국</option>
+                                        <option value="미국">미국</option>
+                                        <option value="일본">일본</option>
+                                        <option value="중국">중국</option>
+                                        <option value="영국">영국</option>
+                                        <option value="독일">독일</option>
+                                        <option value="프랑스">프랑스</option>
+                                        <option value="캐나다">캐나다</option>
+                                        <option value="호주">호주</option>
+                                        <option value="인도">인도</option>
+                                    </select>
+                                </div>
+                                <div className="mb-2">
+                                    <label>여권 만료일</label>
+                                    <input
+                                        type="date"
+                                        className="form-control"
+                                        value={seats.paymentDetailExpire}
+                                        onChange={e => changeSeats(seats, e.target.value, 'paymentDetailExpire')}
+                                    />
+                                </div>
+                                <hr />
+                            </div>
+                        )
+                    ))}
                             <hr/>
+                            <div className="text-center"><strong>여권 정보는 결제 완료 후에도 입력하실 수 있습니다</strong></div>
                         <button className="btn btn-success w-100 my-3" onClick={sendPurchaseRequest}>
                             구매하기
                         </button>
