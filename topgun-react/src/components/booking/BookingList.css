@@ -230,11 +230,6 @@ button:disabled {
   justify-content: center;
 }
 
-/* 비지니스석(할인운임) */
-
-/* 비지니스석(정상운임) */
-
-
 /* 여행정보 상세 내역(모달) */
 .travel-info-title{
   background-color: #e6f9ff;
@@ -267,6 +262,25 @@ button:disabled {
 }
 .modal-body-set{
   margin-bottom: 50px;
+}
+/* 항공편 날짜 선택 버튼에 대한 디자인 */
+.flight-date-box{
+  display: block;
+  width: 25%;
+  padding: 1.5em !important;
+  border: 1px solid #d9dbe1 !important;
+  border-right: none !important;
+  border-left: none !important;
+  border-radius: 0% !important;
+  /* border-top-right-radius: 0% !important;
+  border-top-left-radius: 0% !important; */
+}
+.flight-date-box:hover{
+  background-color: #eee !important;
+}
+
+.btn-select-box{
+  background-color: #00256c !important;
 }
 
   
