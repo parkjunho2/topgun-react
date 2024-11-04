@@ -161,7 +161,7 @@ function WorldMapWithGraphs() {
   };
 
   console.log("로그인한 사용자 항공사:", userInfo?.airlineName);
-  console.log("사용자 타입:", userInfo?.userType);
+  console.log("사용자 타입:", user.userType);
   console.log("aircraftRevenueData 객체:", aircraftRevenueData);
 
   const aircraftTitles = {
@@ -183,8 +183,8 @@ function WorldMapWithGraphs() {
         </div>
       )}
       <div style={styles.graphContainer}>
-        {/* 사용자 타입이 null일 때만 총 매출 그래프를 조건부 렌더링 */}
-        {userInfo?.airlineName === undefined && (
+        {/* 사용자 타입이 ADMIN 일 때만 총 매출 그래프를 조건부 렌더링 */}
+        {user.userType == 'ADMIN' && (
           <div style={styles.graph}>
             <h3 style={styles.graphTitle}>항공사별 총 매출</h3>
             <Bar data={airlineRevenueData} options={graphOptions} />
