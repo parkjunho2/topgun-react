@@ -931,8 +931,8 @@ const MainPage = () => {
                                                                         <div className="card-body rounded-3">
                                                                             <h6 className="card-title">{moment(date).format('D일 (dd)')}</h6>
                                                                             <p className="card-text">
-                                                                                <span className="text-danger">{weekWeather.temperature_2m_max[index]}°C</span> /
-                                                                                <span className="text-primary"> {weekWeather.temperature_2m_min[index]}°C </span>
+                                                                            <span className="text-primary"> {weekWeather.temperature_2m_min[index]}°C </span>/
+                                                                            <span className="text-danger"> {weekWeather.temperature_2m_max[index]}°C</span>
                                                                                 <img
                                                                                     src={wmoCode(weekWeather.weathercode[index]).icon}
                                                                                     alt={wmoCode(weekWeather.weathercode[index]).description}
@@ -968,7 +968,7 @@ const MainPage = () => {
                                             className="bd-placeholder-img rounded-circle"
                                             width={200}
                                             height={200}
-                                            src="https://i.ibb.co/09T9VTT/image.jpg"
+                                            src="/image/도쿄.jfif"
                                         />
                                         <title>Placeholder</title>
                                         <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
@@ -987,7 +987,7 @@ const MainPage = () => {
                                             className="bd-placeholder-img rounded-circle"
                                             width={200}
                                             height={200}
-                                            src="https://i.ibb.co/qYVfVxq/image.jpg"
+                                            src="/image/제주도.jpg"
                                         />
                                         <title>Placeholder</title>
                                         <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
@@ -1006,7 +1006,7 @@ const MainPage = () => {
                                             className="bd-placeholder-img rounded-circle"
                                             width={200}
                                             height={200}
-                                            src="https://i.ibb.co/7NtShdX/image.webp"
+                                            src="/image/나트랑.webp"
                                         />
                                         <title>Placeholder</title>
                                         <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />

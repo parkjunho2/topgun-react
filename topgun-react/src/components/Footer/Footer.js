@@ -14,7 +14,7 @@ const Footer = () => {
                         <div className="d-flex flex-column align-items-start ms-5">
                             <p className="text-body-secondary  mb-0 ms-4">TopGun Travel Agency</p>
                             <NavLink to="/" className="nav-link px-2 text-white">
-                                <img src="https://i.ibb.co/HGd5JJ3/1-removebg-preview.png"  
+                                <img src="/image/1-removebg-preview.png"  
                                         style={{ width: "200px", height: "auto" }} alt="TopGun Logo"/>
                             </NavLink>
                         </div>
