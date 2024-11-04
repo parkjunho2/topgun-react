@@ -215,7 +215,9 @@ const Chat = () => {
                                                     </>
                                                 ) : (
                                                     <div className="message-header">
-                                                        <h5>탈퇴한 사용자</h5>
+                                                        <h5 className="text-danger">탈퇴한 사용자</h5>
+                                                        <p className="message-content">{message.content}</p>
+                                                        <p className="text-muted message-time">{formatMessageTime(message.time)}</p>
                                                     </div>
                                                 )}
                                             </div>
