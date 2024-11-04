@@ -283,6 +283,7 @@ const BookingList = () => {
     const [departureInputClick, setDepartureInputClick] = useState(false); // 출발지 입력창 표시 여부
     const [selectedDepNational, setSelectedDepNational] = useState("한국") //초기값은 한국으로 설정
     const [selectedDepCity, setSelectedDepCity] = useState(null);     //초기값은 null로 설정. 선택된 도시가 없음
+    const [selectedArrivalCity, setSelectedArrivalCity] = useState(null);    //초기값은 null로 설정. 선택된 도시가 없음
     const [cities, setCities] = useState([]); // 동적으로 표시할 도시 목록
 
     // 기본적으로 "한국"이 선택되었을 때 도시 목록 설정
@@ -343,32 +344,55 @@ const BookingList = () => {
         }
     };
     
-// '다음' 버튼 클릭 시 도착지 입력창으로 포커스 이동 및 값 반영
-const handleNextClick = () => {
-    // 자동완성된 키워드 값을 input.departure에 설정
-    if (selectedDepCity) { // selectedDepCity가 존재하면
-        setInput(prev => ({
-            ...prev,
-            departureAirport: selectedDepCity // 선택된 도시로 설정
-        }));
-    } else if (keyword) {
-        setInput(prev => ({
-            ...prev,
-            departureAirport: keyword // 키워드로 설정
-        }));
-    }
-    
-    setOpen(false); // 자동완성 리스트 닫기
-
-    // 도착지 입력창으로 포커스 이동
-    setTimeout(() => {
-        const destinationInput = document.querySelector('input[name="arrivalAirport"]');
-        if (destinationInput) {
-            destinationInput.focus(); // 도착지 입력창에 포커스
+    // '다음' 버튼 클릭 시 도착지 입력창으로 포커스 이동 및 값 반영
+    const handleNextClick = () => {
+        // 자동완성된 키워드 값을 input.departure에 설정
+        if (selectedDepCity) { // selectedDepCity가 존재하면
+            setInput(prev => ({
+                ...prev,
+                departureAirport: selectedDepCity // 선택된 도시로 설정
+            }));
+        } else if (keyword) {
+            setInput(prev => ({
+                ...prev,
+                departureAirport: keyword // 키워드로 설정
+            }));
         }
-        setDestinationInputClick(true); // 도착지 선택 UI 열기
-    }, 100); // 약간의 딜레이 후 포커스 이동
-};
+
+        setOpen(false); // 자동완성 리스트 닫기
+
+        // 도착지 입력창으로 포커스 이동
+        setTimeout(() => {
+            const destinationInput = document.querySelector('input[name="arrivalAirport"]');
+            if (destinationInput) {
+                destinationInput.focus(); // 도착지 입력창에 포커스
+            }
+            setDestinationInputClick(true); // 도착지 선택 UI 열기
+        }, 100); // 약간의 딜레이 후 포커스 이동
+    };
+
+    // '도착지' 다음 버튼 클릭 시 출발일 입력창으로 포커스 이동
+    const handleArrivalNextClick = () => {
+        if (selectedArrivalCity) {
+            setInput(prev => ({
+                ...prev,
+                arrivalAirport: selectedArrivalCity
+            }));
+        } else if (keyword) {
+            setInput(prev => ({
+                ...prev,
+                arrivalAirport: keyword
+            }));
+        }
+        setOpen(false);
+
+        // 출발일 입력창으로 포커스 이동
+        setTimeout(() => {
+            if (datePickerRef.current) {
+                datePickerRef.current.focus();
+            }
+        }, 100);
+    };
 
     /*                         ☆☆☆☆ 도착지에 대한 기능 state ☆☆☆☆                             */
     const [destinationInputClick, setDestinationInputClick] = useState(false); // 도착지 입력창 표시 여부
@@ -471,6 +495,7 @@ const handleNextClick = () => {
 
     // 탑승일 클릭 시 날짜 선택기 표시
     const handleDateClick = () => {
+        handleScrollToTop(); // 최상단 이동을 보장
         if (lightpickRef.current) {
             lightpickRef.current.show();
         }
@@ -564,33 +589,61 @@ const handleNextClick = () => {
     useEffect(() => {
         const initialDate = new Date(input.departureTime);
         const dates = [];
+
         for (let i = 0; i < 7; i++) {
             const newDate = new Date(initialDate);
             newDate.setDate(initialDate.getDate() + i);
             dates.push(newDate.toISOString().split('T')[0]);
         }
-        setDateList(dates);
 
-        const fetchPrices = async () => {
-            try {
-                const pricesData = await Promise.all(
-                    dates.map(async (date) => {
-                        const response = await axios.post("http://localhost:8080/flight/complexSearch", {
-                            ...input,
-                            departureTime: date
-                        });
-                        const flightPrices = response.data.flightList.map(flight => flight.price);
-                        return flightPrices.length ? Math.min(...flightPrices) : "가격 없음";
-                    })
-                );
-                setPricesList(pricesData);
-            } catch (error) {
-                console.error("가격 데이터를 불러오는 중 오류가 발생했습니다:", error);
-            }
-        };
+    setDateList(dates);
+    const fetchPrices = async () => {
+        try {
+            const pricesData = await Promise.all(
+                dates.map(async (date) => {
+                    const response = await axios.post("http://localhost:8080/flight/complexSearch", {
+                        ...input,
+                        departureTime: date
+                    });
 
-        fetchPrices();
-    }, [input.departureTime]);
+                    // 응답 구조를 로그로 출력하여 확인
+                    console.log("Fetched response:", response.data);
+                    const flightList = response.data.flightList;
+
+                    // 가격 추출
+                    let flightPrices = [];
+
+                    if (typeof flightList === 'object' && flightList !== null) {
+                        // flightList가 객체인 경우
+                        flightPrices = Object.values(flightList).map(flight => flight.flightPrice).filter(price => typeof price === 'number');
+                    }
+
+                    // 가격이 제대로 추출되었는지 확인
+                    console.log("Extracted flight prices:", flightPrices);
+
+                    // 각 날짜의 최저 가격을 계산하여 반환
+                    return flightPrices.length ? Math.min(...flightPrices) : null;
+                })
+            );
+
+            setPricesList(pricesData);
+        } catch (error) {
+            console.error("가격 데이터를 불러오는 중 오류가 발생했습니다:", error);
+        }
+    };
+
+    fetchPrices();
+}, [input.departureTime]);
+
+
+    useEffect(() => {
+        console.log("Updated pricesList:", pricesList);
+    }, [pricesList]);
+
+    // dateList와 pricesList 상태 업데이트 확인
+    // useEffect(() => {
+    //     console.log("Updated dateList:", dateList);
+    // }, [dateList]);
 
     const [activeIndex, setActiveIndex] = useState(null); // 활성화된 버튼의 인덱스
 
@@ -601,72 +654,117 @@ const handleNextClick = () => {
         handleSearch(); // 검색 실행
     };
 
-    // 각 날짜별 최저 가격을 반환하는 함수
-    const getLowestPrice = (priceArray) => {
-        return priceArray.length > 0 ? Math.min(...priceArray) : "가격 없음";
+    // 포맷팅 함수(세자리마다 , 표시)
+    const formatPrice = (value) => {
+        return new Intl.NumberFormat().format(value);
     };
+
+
+    const [isFixed, setIsFixed] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            // 특정 스크롤 위치에서 position: "fixed"를 적용
+            setIsFixed(window.scrollY > 200); // 원하는 스크롤 위치 설정 (예: 200px 이상일 때)
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+        // 입력창 클릭 시 최상단으로 스크롤 이동
+        const handleScrollToTop = () => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth" // 스크롤을 부드럽게 이동
+            });
+        };
 
     return (
         <>
-        <div className="container">
-            <div className="row mt-4">
-                {/* 상단바에 대한 처리 구현 */}
-                <div className="d-flex" style={{justifyContent:"center", border:"1px solid black"}}>
-                    <div className="col-sm-3">
-                        <input
-                            type="text"
-                            name="departureAirport"
-                            className="form-control"
-                            placeholder="출발지"
-                            value={input.departureAirport}
-                            onChange={changeInput}
-                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                            onClick={DepartureClick}
-                            autoComplete="off"
-                            readOnly
-                        />
-                    </div>
+                <div className="row"                 
+                        style={{
+                            backgroundColor: "#eee",
+                            padding: "0.5em",
+                            boxShadow: "4rem 1rem 2rem #0019482e",
+                            borderRadius: "0.5em",
+                            position: isFixed ? "fixed" : "static", // 스크롤 위치에 따라 동적 위치 설정
+                            top: isFixed ? "0" : "auto", // fixed일 때 상단 위치
+                            marginLeft:"0.05%",
+                            width: "100%", // 화면 폭 맞춤
+                            zIndex: 1000 // 다른 요소들보다 위에 위치하도록 설정
+                        }}>
+                        {/* 상단바에 대한 처리 구현 */}
+                        <div className="d-flex" style={{justifyContent:"center", border:"1px solid #eee"}}>
+                            <div className="col-sm-3">
+                                <input
+                                    type="text"
+                                    name="departureAirport"
+                                    className="form-control me-2" style={{ height: "5em"}}
+                                    placeholder="출발지"
+                                    value={input.departureAirport}
+                                    onChange={changeInput}
+                                    onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                                    onClick={() => {
+                                        DepartureClick();
+                                        handleScrollToTop(); // 클릭 시 최상단으로 스크롤 이동
+                                    }}
+                                    autoComplete="off"
+                                    readOnly
+                                />
+                            </div>
 
-                    <div className="col-sm-3">
-                        <input
-                            type="text"
-                            name="arrivalAirport"
-                            className="form-control"
-                            placeholder="도착지"
-                            value={input.arrivalAirport} 
-                            onChange={changeInput}
-                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                            onClick={destinationClick}
-                            autoComplete="off"
-                            readOnly
-                        />
-                    </div>
+                            <div className="col-sm-3 ms-2">
+                                <input
+                                    type="text"
+                                    name="arrivalAirport"
+                                    className="form-control" style={{ height: "5em"}}
+                                    placeholder="도착지"
+                                    value={input.arrivalAirport} 
+                                    onChange={changeInput}
+                                    onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                                    onClick={() => {
+                                        destinationClick();
+                                        handleScrollToTop(); // 클릭 시 최상단으로 스크롤 이동
+                                    }}
+                                    autoComplete="off"
+                                    readOnly
+                                />
+                            </div>
 
-                    <div className="col-sm-3">
-                        <input
-                            type="text"
-                            name="departureTime"
-                            className="form-control"
-                            placeholder="출발일"
-                            value={input.departureTime} 
-                            onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
-                            onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
-                            ref={datePickerRef} // ref 추가
-                            readOnly
-                        />
-                    </div>
+                            <div className="col-sm-3 ms-2 me-2">
+                                <input
+                                    type="text"
+                                    name="departureTime"
+                                    className="form-control" style={{ height: "5em"}}
+                                    placeholder="출발일"
+                                    value={input.departureTime} 
+                                    onClick={() => {
+                                        handleDateClick();
+                                        handleScrollToTop(); // 클릭 시 최상단으로 스크롤 이동
+                                    }}
+                                    onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
+                                    ref={datePickerRef} // ref 추가
+                                    readOnly
+                                />
+                            </div>
 
-                    <div className="row">
-                        <div className="col">
-                        <button className="btn btn-primary"  onClick={handleSearch} onFocus={handleInputFocus}><FaSearch />항공권 검색
-                        </button>
+                            <div className="row">
+                                <div className="col">
+                                    <button className="btn btn-primary"  style={{ height: "5em"}} 
+                                                onClick={handleSearch} onFocus={handleInputFocus}>
+                                                    <FaSearch />항공권 검색
+                                    </button>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
-                </div>
-
-                    {/*   ☆☆☆☆ 출발지 입력창 기능 구현 ☆☆☆☆ */}
-                    {departureInputClick && ( // 출발지 입력창 클릭 시에만 보여주기
-                        <>
+                
+                    <div className="container">
+                        {/*   ☆☆☆☆ 출발지 입력창 기능 구현 ☆☆☆☆ */}
+                        {departureInputClick && ( // 출발지 입력창 클릭 시에만 보여주기
+                            <>
                             <div className="row mt-3 mb-1 ms-1 me-1">
                                 <div className="col">
                                     <div className="form-group" style={{ position: "relative" }}>
@@ -763,7 +861,7 @@ const handleNextClick = () => {
                                 </div>
                             </div>
                         </>
-                    )}
+                        )}
 
                     {/*    ☆☆☆☆ 도착지 입력창 기능 구현 ☆☆☆☆   */}
                     {destinationInputClick && ( // 도착지 입력창 클릭 시에만 보여주기
@@ -831,14 +929,16 @@ const handleNextClick = () => {
                                             )}
                                         </div>
                                             <div className="row" style={{width:"100%"}}>
-                                                <button className="btn btn-success mt-3" onClick={handleNextClick}>다음</button>
+                                                <button className="btn btn-success mt-3" onClick={handleArrivalNextClick}>다음</button>
                                             </div>
                                     </div>
                             </div>
                         </div>
                     )}
+                    </div>
+                
 
-
+            <div className="container">
                 {/* 항공편 리스트에 대한 기능 */}
                 <div className="col mt-3">
                     <div>
@@ -858,8 +958,8 @@ const handleNextClick = () => {
                                     <button key={index} className="btn btn-outline-primary flight-date-box" onClick={() => dateButtonClick(index, date)}>
                                         <span style={{fontSize:"20px", fontWeight:"bolder", color:"black", display:"block"}}>{moment(date).format("MM.DD(dd)")}</span>
                                         <span style={{ color: "#767676", fontWeight: "bold" }}>
-                        {pricesList[index] ? `${pricesList[index]}원` : `${pricesList[index]}원`}
-                    </span>
+                                            {pricesList[index] !== null ? `${formatPrice(pricesList[index])}원` : "가격없음"}
+                                        </span>
                                     </button>
                                 ))}
                         </div>
@@ -906,7 +1006,7 @@ const handleNextClick = () => {
                                                                 {flight.flightPrice.toLocaleString()}원
                                                             </span>
                                                             <div className="col" style={{display:"flex"}}>
-                                                            <button className="btn btn-primary ms-5" style={{ width: "50%", height: "50%", marginTop:"1em"}}>선택하기</button>
+                                                            <button className="btn btn-primary ms-5" style={{ width: "50%", height: "50%",  marginTop:"1em", padding:"0.5em", display:"inline"}}>선택하기</button>
                                                                 {user.userType === "MEMBER" && (
                                                                     <button className="btn ms-1" style={{ width: "15%", height: "25%", fontSize:"1.5em"}} 
                                                                     onClick={async (event) => {
@@ -934,7 +1034,6 @@ const handleNextClick = () => {
                         </div>
                     </div>
                 </div>
-            </div>
                                         
 
             {/* 더보기 버튼 : result의 last가 false이면 ( 더 볼게 있다면) */}
@@ -950,7 +1049,6 @@ const handleNextClick = () => {
                     </div>
                 </div>
             )}
-
         </>
     );
 };
