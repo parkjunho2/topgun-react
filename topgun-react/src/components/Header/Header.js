@@ -29,11 +29,11 @@ const Header = () => {
                 <div className="container">
                     <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                         <span className="d-flex align-items-center mb-lg-0 text-white text-decoration-none fs-4">
-                        <NavLink to="/" className="nav-link px-2 text-white">
-                            <img src="https://i.ibb.co/82NtGDh/Black-and-Yellow-Illustrative-Travel-Agency-Logo-removebg-preview.png"   
-                            width={120}
-                            height={35}                        
-                            />
+                            <NavLink to="/" className="nav-link px-2 text-white">
+                                <img src="https://i.ibb.co/82NtGDh/Black-and-Yellow-Illustrative-Travel-Agency-Logo-removebg-preview.png"
+                                    width={120}
+                                    height={35}
+                                />
                             </NavLink>
                         </span>
                         <ul className="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
@@ -57,11 +57,19 @@ const Header = () => {
                                 </li>
                             )}
                             {login && user.userType === "AIRLINE" && ( //로그인 상태, AIRLINE만
+                            <>
                                 <li>
                                     <NavLink to="/flight" className="nav-link px-2 text-white">
                                         항공편
                                     </NavLink>
                                 </li>
+                                <li>
+                                <NavLink to="/graph" className="nav-link px-2 text-white">
+                                    데이터차트
+                                </NavLink>
+                                </li>
+                                </>
+
                             )}
                             {login && user.userType === "ADMIN" && ( //로그인 상태, ADMIN만
                                 <>
@@ -104,7 +112,7 @@ const Header = () => {
                                 login ? (
                                     <>
                                         <button type="button" onClick={() => navigate("/mypage")} className="btn text-light text-decoration-none">
-                                            <FaUserCircle className="mb-1"/> 마이페이지
+                                            <FaUserCircle className="mb-1" /> 마이페이지
                                         </button>
                                         <button type="button" onClick={logout} className="btn text-white me-2">
                                             로그아웃
@@ -112,7 +120,7 @@ const Header = () => {
                                     </>
                                 ) : (
                                     <button type="button" onClick={() => navigate("/login")} className="btn me-2 text-white">
-                                        <FaUserCircle className="mb-1"/> 로그인
+                                        <FaUserCircle className="mb-1" /> 로그인
                                     </button>
                                 )
                             )}

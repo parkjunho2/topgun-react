@@ -13,6 +13,8 @@ import './noticeButton.css';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 
+import { toast } from 'react-toastify';
+
 const NoticeBoard = () => {
 
     const [noticeList, setNoticeList] = useState([]);
@@ -67,9 +69,12 @@ const NoticeBoard = () => {
             try {
                 await axios.delete(`http://localhost:8080/notice/delete/${target.noticeId}`);
                 setNoticeList(prevNotices => prevNotices.filter(notice => notice.noticeId !== target.noticeId));
+                // 삭제 성공 시 토스트 메시지 표시
+                toast.success("공지사항이 성공적으로 삭제되었습니다.");
             } catch (error) {
                 console.error("Failed to delete notice:", error);
-                alert("공지사항 삭제에 실패했습니다.");
+                // 삭제 실패 시 토스트 메시지 표시
+                toast.error("공지사항 삭제에 실패했습니다.");
             }
         }
     }, []);
@@ -120,6 +125,8 @@ const NoticeBoard = () => {
             await axios.post("http://localhost:8080/notice/post", newNotice);
             clearInput();
             await loadList();
+            toast.success('공지사항이 성공적으로 등록되었습니다!'); // 성공 메시지
+
         } catch (error) {
             console.error("Failed to add notice:", error);
             alert("공란을 모두 채워 주세요!.");
@@ -255,7 +262,7 @@ const NoticeBoard = () => {
                                     {user.userType === 'ADMIN' && (
                                         <FaTrash
                                             className="text-danger trash-icon"
-                                            style={{ color: '#ec7393', fill: '#ec7393', fontSize: '1em' }}
+                                            style={{ color: '#ec7393', fill: '#ff0000', fontSize: '1em' }}
                                             onClick={() => deleteNotice(notice)}
                                         />
                                     )}
