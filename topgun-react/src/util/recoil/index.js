@@ -13,6 +13,7 @@ const userState = atom({
     default: {
         userId: '', // 사용자 ID
         userType: '', // 사용자 역할 (ex : MEMBER, ADMIN, AIRLINE)
+        airlineName: '', // 항공사 이름 (항공사 사용자 전용)
     }
 });
 
