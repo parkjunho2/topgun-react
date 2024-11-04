@@ -481,6 +481,16 @@ const MainPage = () => {
         }
     }, [open, selectedIndex, searchResult, selectKeyword]);
 
+    
+    // 최근 검색 기록에 대한 출발지와 도착지 값을 업데이트하는 함수
+    const applySearchToInput = (departure, arrival) => {
+        setInput(prev => ({
+            ...prev,
+            departureAirport: departure,
+            arrivalAirport: arrival
+        }));
+    };
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 환율 및 날씨에 대한 코드 정의
     const [exchangeRates, setExchangeRates] = useState({ jpy: null, vnd: null });
@@ -577,6 +587,7 @@ const MainPage = () => {
         setCurrWeather(null);
         setExchangeRates({}); // 환율 정보를 초기화
     };
+
 
     return (
         <>
@@ -718,8 +729,9 @@ const MainPage = () => {
                                                 recentSearches.map((search, index) => (
                                                     <div key={index}>
                                                         <div className="row mt-2" style={{border:"1px solid lightGray", width:"100%", borderRadius:"0.5em", fontSize:"15px"}}>
-                                                            <span style={{ display: "flex", alignItems: "center" }}>
-                                                                    {search.departureAirport} → {search.arrivalAirport} 
+                                                            <span style={{ display: "flex", alignItems: "center", cursor:"pointer" }} 
+                                                                        onClick={() => applySearchToInput(search.departureAirport, search.arrivalAirport)}>
+                                                                        {search.departureAirport} → {search.arrivalAirport} 
                                                                         <IoMdClose style={{ marginLeft: "auto", cursor: "pointer" }} onClick={() => recentSearchesDelete(index)}/>
                                                             </span>
                                                         </div>
