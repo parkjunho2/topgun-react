@@ -163,43 +163,47 @@ const UserList = () => {
 
                         {/* 사용자 목록 (항상 보이도록 설정) */}
                         <div className="col-12 col-lg-7 offset-lg-1 mb-4 bg-light shadow-sm border-0 rounded-3">
-                            <div className="main-box no-header clearfix"> {/* 배경색을 하얀색으로 설정 */}
-                                <div className="main-box-body clearfix">
-                                    <div className="user-list">
-                                        {/* 헤더 */}
-                                        <div className="row header border-bottom mb-3">
-                                            <div className="col py-2"><strong>ID / Name</strong></div>
-                                            <div className="col text-center py-2"><strong>Type</strong></div>
-                                            <div className="col py-2"><strong>Email</strong></div>
-                                            <div className="col py-2 text-right"><strong>Contact</strong></div>
-                                        </div>
-                                        {/* 사용자 목록 */}
-                                        {result.userList.map((user) => (
-                                            <div className="row user align-items-center mb-3 border-bottom " key={user.usersId}>
-                                                <div className="col py-2 px-3">
-                                                    <div className="col py-2 px-3">
-                                                        <div className="d-block">
-                                                            <big className="fw-bold">{user.usersId}</big>
-                                                            <small className="d-block text-muted">{user.usersName}</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col text-center py-2 px-3">
-                                                    <span className={`badge ${user.usersType === 'ADMIN' ? 'bg-danger' : user.usersType === 'MEMBER' ? 'bg-primary' : user.usersType === 'AIRLINE' ? 'bg-success' : 'bg-secondary'}`}>
-                                                        {user.usersType}
-                                                    </span>
-                                                </div>
-                                                <div className="col py-2 px-3">
-                                                    <span>{user.usersEmail}</span>
-                                                </div>
-                                                <div className="col py-2 px-3 text-right">
-                                                    <span>{user.usersContact}</span>
-                                                </div>
+
+
+                            {/* 헤더 */}
+                            <div className="row header border-bottom mb-3">
+                                <div className="col py-2"><strong>ID / Name</strong></div>
+                                <div className="col text-center py-2"><strong>Type</strong></div>
+                                <div className="col py-2"><strong>Email</strong></div>
+                                <div className="col py-2 text-right"><strong>Contact</strong></div>
+                            </div>
+                            {/* 사용자 목록 */}
+                            {result.userList.length > 0 ? (
+                                result.userList.map((user) => (
+                                    <div className="row user align-items-center mb-3 border-bottom" key={user.usersId}>
+                                        <div className="col py-2 px-3">
+                                            <div className="d-block">
+                                                <big className="fw-bold">{user.usersId}</big>
+                                                <small className="d-block text-muted">{user.usersName}</small>
                                             </div>
-                                        ))}
+                                        </div>
+                                        <div className="col text-center py-2 px-3">
+                                            <span className={`badge ${user.usersType === 'ADMIN' ? 'bg-danger' : user.usersType === 'MEMBER' ? 'bg-primary' : user.usersType === 'AIRLINE' ? 'bg-success' : 'bg-secondary'}`}>
+                                                {user.usersType}
+                                            </span>
+                                        </div>
+                                        <div className="col py-2 px-3">
+                                            <span>{user.usersEmail}</span>
+                                        </div>
+                                        <div className="col py-2 px-3 text-right">
+                                            <span>{user.usersContact}</span>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="row align-items-center mb-3">
+                                    <div className="col py-2 text-center">
+                                        <span className="text-muted">검색 결과가 없습니다.</span>
                                     </div>
                                 </div>
-                            </div>
+                            )}
+
+
 
                             {result.last === false && (
                                 <div className="row my-4">
@@ -213,7 +217,6 @@ const UserList = () => {
                                     </div>
                                 </div>
                             )}
-
                         </div>
 
                     </div>
