@@ -361,7 +361,7 @@ const Login = () => {
                                 />
                                 <label className="form-check-label" htmlFor="formRemember">로그인 유지</label>
                             </div>
-                            <NavLink to="/findPw" className="text-body">비밀번호 찾기</NavLink>
+                            <NavLink to="/findPw" className="text-body findPw">비밀번호 찾기</NavLink>
                         </div>
 
                         <div className="text-center text-lg-start mt-4 pt-2 mb-0">

@@ -22,3 +22,7 @@
   top: 0 !important; /* 필요에 따라 값 조정 */
   bottom: 100%; /* 인풋 필드 바로 아래에 위치하도록 */
 }
+
+.findPw:hover{
+  color: #007bff !important;
+}

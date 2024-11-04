@@ -32,9 +32,9 @@ const Footer = () => {
                     <div className="col mb-3">
                         <h5>파트너사</h5>
                         <ul className="nav flex-column">
-                            <li className="nav-item mb-2"><NavLink to="https://flyasiana.com/" className="nav-link p-0 text-body-secondary"><FaExternalLinkAlt /> 아시아나 항공</NavLink></li>
-                            <li className="nav-item mb-2"><NavLink to="https://www.koreanair.com/" className="nav-link p-0 text-body-secondary"><FaExternalLinkAlt /> 대한 항공</NavLink></li>
-                            <li className="nav-item mb-2"><NavLink to="https://www.jinair.com/" className="nav-link p-0 text-body-secondary"><FaExternalLinkAlt /> 진에어</NavLink></li>
+                            <li className="nav-item mb-2"><NavLink to="https://flyasiana.com/" className="nav-link p-0 text-body-secondary"><FaExternalLinkAlt /> 아시아나항공</NavLink></li>
+                            <li className="nav-item mb-2"><NavLink to="https://www.koreanair.com/" className="nav-link p-0 text-body-secondary"><FaExternalLinkAlt /> 대한항공</NavLink></li>
+                            <li className="nav-item mb-2"><NavLink to="https://www.jejuair.net/" className="nav-link p-0 text-body-secondary"><FaExternalLinkAlt /> 제주항공 </NavLink></li>
                         </ul>
                     </div>
                     {/* <div className="col mb-3">
