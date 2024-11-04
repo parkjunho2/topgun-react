@@ -243,6 +243,9 @@ const MainPage = () => {
 
     // '다음' 버튼 클릭 시 도착지 입력창으로 포커스 이동 및 값 반영
     const handleNextClick = () => {
+        if (input.departureAirport.length === 0) {
+            return toast.error("출발지를 입력해주세요.");
+        }
         // 자동완성된 키워드 값을 input.departure에 설정
         if (selectedDepCity) { // selectedDepCity가 존재하면
             setInput(prev => ({
@@ -618,7 +621,7 @@ const MainPage = () => {
                                     name="departureTime"
                                     className="form-control"  style={{ height: "5em"}}
                                     placeholder="출발일"
-                                    alue={input.departureTime}
+                                    value={input.departureTime}
                                     onClick={handleDateClick} // 클릭 시 날짜 선택기 표시
                                     onFocus={handleInputFocus} // 다른 입력 필드 클릭 시 숨기기
                                     ref={datePickerRef} // ref 추가
@@ -738,31 +741,6 @@ const MainPage = () => {
                     {/*    ☆☆☆☆ 도착지 입력창 기능 구현 ☆☆☆☆   */}
                     {destinationInputClick && ( // 도착지 입력창 클릭 시에만 보여주기
                         <>
-                            {/* 자동완성 기능에 대한 코드 */}
-                            <div className="row mb-1 me-1" style={{marginLeft:"-6.2%"}}>
-                                <div className="col">
-                                    <div className="form-group" style={{ position: "relative" }}>
-                                        <input type="text" className="form-control" placeholder="도착지를 검색하세요(구현중)" value={keyword}
-                                            onChange={changeKeyword} onKeyUp={handleKeyDown} // 키보드 이벤트 핸들러 추가
-                                            style={{ width: "26%"}}
-                                        />
-                                        {/* {open === true && 화면} 왼쪽만 쓰겠다
-                                            {open === true || 화면} 오르쪽만 쓰겠다 */}
-                                        {open === true && (
-                                            <ul className="auto-search list-group" style={{width:"26%"}}>
-                                                {/* 골라서 찍을 수 있도록 구현해야 함(자동완성이 동작할 수 있도록) */}
-                                                {searchResult.map((national, index) => (
-                                                    <li key={national.nationalNo}
-                                                            className={`list-group-item ${selectedIndex === index ? 'active' : ''}`} // 선택된 항목에 'active' 클래스 적용
-                                                            onClick={e => selectKeyword(national.nationalName)}>
-                                                            {national.nationalName}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>                        
                                 {/* 검색창 기능 */}
                                 <div className="flight-select-div mt-2 mb-3 bg-white" style={{marginLeft:"-3.9%"}}>
                                     <div className="d-flex ms-3 me-2" style={{ display: "flex", justifyContent: "space-between" }}>
