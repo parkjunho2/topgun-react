@@ -305,7 +305,7 @@ import { toast } from "react-toastify";
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailPassanger')}
                                                 onBlur={() => {
                                                     if (!passangerRegex.test(seats.paymentDetailPassanger)) {
-                                                        toast.error("한글로만 입력하세요");
+                                                        toast.error("한글만 입력하세요");
                                                     }
                                                 }}
                                             />
@@ -331,7 +331,7 @@ import { toast } from "react-toastify";
                                                 value={seats.paymentDetailPassport}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailPassport')}
                                                 onBlur={() => {
-                                                    if (!passangerRegex.test(seats.paymentDetailPassanger)) {
+                                                    if (!passangerRegex.test(seats.paymentDetailPassport)) {
                                                         toast.error("여권 번호는 영문자 1개 뒤에 숫자 8개로 이루어져야 합니다.");
                                                     }
                                                 }}
@@ -359,7 +359,7 @@ import { toast } from "react-toastify";
                                                 value={seats.paymentDetailEnglish}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailEnglish')}
                                                 onBlur={() => {
-                                                    if (!passangerRegex.test(seats.paymentDetailPassanger)) {
+                                                    if (!passangerRegex.test(seats.paymentDetailEnglish)) {
                                                         toast.error("영어만 입력하세요");
                                                     }
                                                 }}
