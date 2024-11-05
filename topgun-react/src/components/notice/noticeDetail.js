@@ -217,7 +217,8 @@ const styles = {
         padding: '20px',
         backgroundColor: 'transparent',
         position: 'relative',
-        border: "1px solid #eee"
+        border: "1px solid #ccc",
+        borderRadius: '10px', 
     },
     title: {
         textAlign: 'center',
@@ -235,8 +236,8 @@ const styles = {
         display: 'flex',
         justifyContent: 'flex-end',
         position: 'absolute',
-        top: '-15px',
-        right: '20px',
+        top: '-19px',
+        right: '10px',
         marginTop: '0',
         marginBottom: '0',
     },
@@ -255,8 +256,9 @@ const styles = {
         lineHeight: '13',
     },
     divider: {
-        border: '1px solid #080808',
-        margin: '20px 0',
+    background: 'linear-gradient(to right, transparent, #080808, transparent)',
+    height: '0.7px', // 선의 두께
+    margin: '20px 0',
     },
 };
 
