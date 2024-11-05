@@ -87,6 +87,50 @@ const Flight = () => {
             arrivalTime: new Date(input.arrivalTime).toISOString(),
             userId: user.userId, // 수정할 때도 사용자 ID 설정
         };
+        const departureTime = new Date(input.departureTime);
+        const arrivalTime = new Date(input.arrivalTime);
+
+        // 필드 검증
+            // if (!/^[A-Z0-9]+$/.test(input.flightNumber)) {
+            //     toast.error("항공편 번호는 알파벳과 숫자로 구성되어야 합니다.");
+            //     return;
+            // }
+
+            if (!input.flightNumber) {
+                toast.error("항공편 번호를 입력하세요.");
+                return;
+            }
+            if (!input.departureTime) {
+                toast.error("출발 시간을 입력하세요.");
+                return;
+            }
+            if (!input.arrivalTime) {
+                toast.error("도착 시간을 입력하세요.");
+                return;
+            }
+            if (input.flightPrice <= 0) {  // 가격이 0 이하일 때 경고
+                toast.error("가격은 0원 이상이여야합니다.");
+                return;
+            }
+            if (!input.departureAirport) {
+                toast.error("출발 공항을 선택하세요.");
+                return;
+            }
+            if (!input.arrivalAirport) {
+                toast.error("도착 공항을 선택하세요.");
+                return;
+            }
+
+            if (input.departureAirport === input.arrivalAirport) {
+                toast.error("출발 공항과 도착 공항이 동일할 수 없습니다.");
+                return;
+            }
+    
+            // 도착 시간이 출발 시간보다 빠른지 확인
+            if (arrivalTime <= departureTime) {
+                toast.error("도착 시간은 출발 시간보다 늦어야 합니다.");
+                return;
+            }
     
         await axios.put("http://localhost:8080/flight/", updatedInput);
         loadList();
@@ -143,14 +187,14 @@ const Flight = () => {
 
     const saveFlight = useCallback(async () => {
         if (input.departureTime && input.arrivalTime) {
-            const departure = new Date(input.departureTime);
-            const arrival = new Date(input.arrivalTime);
+            const departureTime = new Date(input.departureTime);
+            const arrivalTime = new Date(input.arrivalTime);
     
             // 필드 검증
-            // if (!/^[A-Z0-9]+$/.test(input.flightNumber)) {
-            //     toast.error("항공편 번호는 알파벳과 숫자로 구성되어야 합니다.");
-            //     return;
-            // }
+            if (/^[A-Za-z0-9]$/.test(input.flightNumber)) {
+                toast.error("항공편 번호는 알파벳과 숫자로 구성되어야 합니다.");
+                return;
+            }
 
             if (!input.flightNumber) {
                 toast.error("항공편 번호를 입력하세요.");
@@ -176,9 +220,14 @@ const Flight = () => {
                 toast.error("도착 공항을 선택하세요.");
                 return;
             }
+
+            if (input.departureAirport === input.arrivalAirport) {
+                toast.error("출발 공항과 도착 공항이 동일할 수 없습니다.");
+                return;
+            }
     
             // 도착 시간이 출발 시간보다 빠른지 확인
-            if (arrival <= departure) {
+            if (arrivalTime <= departureTime) {
                 toast.error("도착 시간은 출발 시간보다 늦어야 합니다.");
                 return;
             }
@@ -186,8 +235,8 @@ const Flight = () => {
             // 시간을 ISO 형식으로 변환하여 서버로 전송
             const flightData = {
                 ...input,
-                departureTime: departure.toISOString(),
-                arrivalTime: arrival.toISOString(),
+                departureTime: departureTime.toISOString(),
+                arrivalTime: arrivalTime.toISOString(),
                 userId: user.userId, // 현재 로그인된 사용자 ID 추가
             };
 
@@ -275,7 +324,7 @@ const Flight = () => {
 
             <div className="row mt-4">
                 <div className="col">
-                    <table className="table table-striped">
+                    <table className="table">
                         <thead>
                         <tr>
                         <div className="row mt-4">
@@ -380,13 +429,12 @@ const Flight = () => {
                                     <option>출발 공항 선택</option>
                                     <option>서울/인천(ICN)</option>
                                     <option>서울/김포(GMP)</option>
-                                    <option>광주(KWJ)</option>
-                                    <option>대구(TAE)</option>
                                     <option>제주(CJU)</option>
-                                    <option>여수(RSU)</option>
                                     <option>도쿄/나리타(NRT)</option>
                                     <option>오사카/간사이(KIX)</option>
+                                    <option>삿포로(CTS)</option>
                                     <option>나트랑(CXR)</option>
+                                    <option>다낭(DAD)</option>
                                 </select>
                             </div>
                             <div className="mb-3">
@@ -395,13 +443,12 @@ const Flight = () => {
                                     <option>도착 공항 선택</option>
                                     <option>서울/인천(ICN)</option>
                                     <option>서울/김포(GMP)</option>
-                                    <option>광주(KWJ)</option>
-                                    <option>대구(TAE)</option>
                                     <option>제주(CJU)</option>
-                                    <option>여수(RSU)</option>
                                     <option>도쿄/나리타(NRT)</option>
                                     <option>오사카/간사이(KIX)</option>
+                                    <option>삿포로(CTS)</option>
                                     <option>나트랑(CXR)</option>
+                                    <option>다낭(DAD)</option>
                                 </select>
                             </div>
                             <div className="mb-3">
