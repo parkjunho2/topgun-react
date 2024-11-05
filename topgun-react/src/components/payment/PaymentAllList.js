@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 import Flight from './../flight/Flight';
+import moment from "moment";
 
 const PaymentAllList=()=>{
      //state
@@ -91,46 +92,94 @@ const PaymentAllList=()=>{
             <div className="container">
                 <div className="row">
                     <div className="col">
-             <ul className="list-group">
+             {/* <ul className="list-group"> */}
                  {paymentList.map(payment=>(
-                     <li key={payment.paymentNo} className="list-group-item">
-                             <h3 className="text-end">총 결제금액: {payment.paymentDto.paymentTotal.toLocaleString()}원</h3>
-                         <h5 className="text-end">대표 주문번호:{payment.paymentDto.paymentNo}</h5>
-                         <h3 className="text-end mt-4">
-                         <h3 className="d-flex justify-content-between">
-                            <div>{payment.paymentDto.paymentName}</div>
-                        결제일: {new Date(payment.paymentDto.paymentTime).toLocaleString('ko-KR', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                        })}
-                        </h3>
-                        <h3 className="text-end">
-                        {new Date(payment.paymentDto.paymentTime).toLocaleString('ko-KR', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit',
-                            hour12: false
-                        })}
-                        </h3>
-                         </h3>
-                        <h4 className="text-start">
-                        <div className="mt-1">출발공항:{payment.flightVO.departureAirport}</div>
-                        <div className="mt-1">출발시간:{payment.flightVO.departureTime}</div>
-                        <div className="mt-3">도착공항:{payment.flightVO.arrivalAirport}</div>
-                        <div className="mt-1">도착시간:{payment.flightVO.arrivalTime}</div>
-                        </h4>
-                        <h4 className="d-flex justify-content-between">
-                        <div className="mt-2">운행시간:{payment.flightVO.flightTime}</div>
+                     <div key={payment.paymentNo} className="list-group-item mt-4 mb-3" style={{textAlign:"center"}}>
+                        {/* 운임정보에 대한 테이블 */}
+                            <div className="table">
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <td colSpan="100%" style={{ backgroundColor: "#e6f9ff", padding: "0.5em" }}>
+                                                <span style={{ display: "block", width: "100%", color: "#00256c", fontWeight:"bolder"}}>운임정보</span>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style={{fontWeight:"bolder", width:"10%"}}>항공편</td>
+                                            <td style={{color:"#ff7675"}}>
+                                                {payment.paymentDto.paymentName.substring(0, payment.paymentDto.paymentName.indexOf(")") + 1)}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{fontWeight:"bolder", width:"10%"}}>결제일</td>
+                                            <td style={{color:"#ff7675"}}>{new Date(payment.paymentDto.paymentTime).toLocaleString('ko-KR', {
+                                                        year: 'numeric',
+                                                        month: '2-digit',
+                                                        day: '2-digit',
+                                                    })}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{fontWeight:"bolder", width:"10%"}}>결제시간</td>
+                                            <td style={{color:"#ff7675"}}>
+                                                {new Date(payment.paymentDto.paymentTime).toLocaleString('ko-KR', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                    hour12: false
+                                                })}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{fontWeight:"bolder", width:"10%"}}>총 결제금액</td>
+                                            <td style={{color:"#ff7675"}}>{payment.paymentDto.paymentTotal.toLocaleString()}원</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        {/* 여정 정보에 대한 테이블 */}
+                        <div className="row mt-5">
+                            <div className="table" style={{textAlign:"center"}}>
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <td colSpan="100%" style={{ backgroundColor: "#e6f9ff", padding: "0.5em" }}>
+                                                <span style={{ display: "block", width: "100%", color: "#00256c", fontWeight:"bolder"}}>여정</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>출발</th>
+                                            <th>도착</th>
+                                            <th>출발일</th>
+                                            <th>출발시각</th>
+                                            <th>도착시각</th>
+                                            <th>비행시간</th>
+                                            <th>예약상태</th>
+                                        </tr>
+                                    </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style={{color:"#ff7675"}}>{payment.flightVO.departureAirport}</td>
+                                                <td style={{color:"#ff7675"}}>{payment.flightVO.arrivalAirport}</td>
+                                                <td style={{color:"#ff7675"}}>{moment(payment.flightVO.departureTime).format("YYYY-MM-DD")}</td>
+                                                <td style={{color:"#ff7675"}}>{moment(payment.flightVO.departureTime).format("HH:mm")}</td>
+                                                <td style={{color:"#ff7675"}}>{moment(payment.flightVO.arrivalTime).format("HH:mm")}</td>
+                                                <td style={{color:"#ff7675"}}>{(payment.flightVO.flightTime)}</td>
+                                                <td style={{color:"#ff7675"}}>OK</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                        </div>
+
                             <div className="text-end mt-1">
                                 <NavLink className="btn btn-warning" to={`/payment/detail/${payment.paymentDto.paymentNo}`}>결제상세내역</NavLink>
                               </div>
-                        </h4>
-                         <hr/>
 
-        {/* 상세 결제 내용 */}
-        {payment.paymentDetailList?.length > 0 && (
-            <ul className="list-group list-group-flush mt-4">
+                {/* 상세 결제 내용 */}
+                {payment.paymentDetailList?.length > 0 && (
+                    <ul className="list-group list-group-flush mt-4">
                             {payment.paymentDetailList.map(detail => ( 
                                 <li className="list-group-item" key={detail.paymentDetailNo}>
                                     {detail.flightId.airlineName}
@@ -293,31 +342,70 @@ const PaymentAllList=()=>{
                                                         <p>생년월일: {detail.paymentDetailBirth}</p>
                                                     </div>
                                                 ) : (
-                                                    <div>
-                                                        <p>여권번호: {detail.paymentDetailPassport}</p>
-                                                        <p>한글 이름: {detail.paymentDetailPassanger}</p>
-                                                        <p>영문 이름: {detail.paymentDetailEnglish}</p>
-                                                        <p>성별: {detail.paymentDetailSex}</p>
-                                                        <p>생년월일: {detail.paymentDetailBirth}</p>
-                                                        <p>국적: {detail.paymentDetailCountry}</p>
-                                                        <p>여권 발행국: {detail.paymentDetailVisa}</p>
-                                                        <p>여권 만료일: {detail.paymentDetailExpire}</p>
+                                                    <div className="row" style={{width:"60%"}}>
+                                                        <div className="table">
+                                                                <table className="table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <td colSpan="100%" style={{ backgroundColor: "#e6f9ff", padding: "0.5em" }}>
+                                                                                <span style={{ display: "block", width: "100%", color: "#00256c", fontWeight:"bolder"}}>여권 정보</span>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>여권번호</td>
+                                                                            <td > {detail.paymentDetailPassport}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>한글 이름</td>
+                                                                            <td>{detail.paymentDetailPassanger}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>영문 이름</td>
+                                                                            <td>{detail.paymentDetailEnglish}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>성별</td>
+                                                                            <td>{detail.paymentDetailSex}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>생년월일</td>
+                                                                            <td>{detail.paymentDetailBirth}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>국적</td>
+                                                                            <td>{detail.paymentDetailCountry}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>여권 발행국</td>
+                                                                            <td>{detail.paymentDetailVisa}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>여권 만료일</td>
+                                                                            <td>{detail.paymentDetailExpire}</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                        </div>
+                                                    </div>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>
-                                        )}
-                                    </div>
-                                    )}
-                                </li>
-                            ))}
-                         </ul>
-                         )}
-                     </li>
-                 ))}
-             </ul>
-         </div>
-     </div>
-</div>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                                )}
+                                    <hr style={{border:"1px solid black"}}/>
+                            </div>
+                        ))}
+                    {/* </ul> */}
+                </div>
+            </div>
+
+        </div>
         )};
      </>);
 };
