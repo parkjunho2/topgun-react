@@ -69,13 +69,10 @@ const Room = () => {
             toast.error("채팅방을 선택하세요.");
             return; // 입력이 없으면 요청을 보내지 않고 함수 종료
         }    
-        try {
+        else {
             const resp = await axios.post("http://localhost:8080/room/", input);
             loadRoomList();  // 채팅방 목록 갱신
             setInput({ roomName: "" });  // 입력 필드 초기화
-        } catch (error) {
-            console.error("채팅방 생성 실패:", error);
-            alert("채팅방 생성에 실패했습니다.");
         }
     }, [input]);
 
@@ -84,7 +81,7 @@ const Room = () => {
         if(remove){
             const resp = await axios.delete("http://localhost:8080/room/" + target.roomNo);
             loadRoomList();
-            toast.error("채팅방이 삭제되었습니다");
+            toast.success("채팅방이 삭제되었습니다");
         }
         else{
             return;

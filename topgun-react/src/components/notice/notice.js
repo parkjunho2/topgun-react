@@ -303,7 +303,7 @@ const NoticeBoard = () => {
                                         </td>
                                         <td></td>
                                         <td style={{ textAlign: 'center', padding: '15px' }}>
-                                            <div style={{ marginBottom: '52px' }}>
+                                            <div style={{ marginBottom: '51px' }}>
                                                 <a className="frame-btn" href="#" onClick={addInput}>
                                                     <span className="frame-btn__outline frame-btn__outline--tall">
                                                         <span className="frame-btn__line frame-btn__line--tall"></span>
