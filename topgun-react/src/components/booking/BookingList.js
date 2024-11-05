@@ -584,56 +584,58 @@ const BookingList = () => {
     // 날짜 배열을 저장할 상태
     const [dateList, setDateList] = useState([]);
     const [pricesList, setPricesList] = useState([]); // 각 날짜별 가격 목록
+    const [overallLowestPrice, setOverallLowestPrice] = useState(null); // 전체 최저가 상태 추가
 
     // 날짜 목록 생성 및 가격 데이터 불러오기
     useEffect(() => {
+        setFirstPage();
         const initialDate = new Date(input.departureTime);
         const dates = [];
-
+    
+        // 7일치 날짜 목록 생성
         for (let i = 0; i < 7; i++) {
             const newDate = new Date(initialDate);
             newDate.setDate(initialDate.getDate() + i);
             dates.push(newDate.toISOString().split('T')[0]);
         }
+    
+        setDateList(dates);
+    
+        // 각 날짜에 대한 최저 가격 데이터 가져오기
+        const fetchPrices = async () => {
+            try {
+                const pricesData = await Promise.all(
+                    dates.map(async (date) => {
+                        const response = await axios.post("http://localhost:8080/flight/complexSearch", {
+                            ...input,
+                            departureTime: date
+                        });
+    
+                        // 서버 응답의 flightList를 가져옴
+                        const flightList = response.data.flightList;
+                        let flightPrices = [];
+    
+                        // flightList에서 가격을 추출하여 flightPrices 배열에 저장
+                        if (typeof flightList === 'object' && flightList !== null) {
+                            flightPrices = Object.values(flightList).map(flight => flight.flightPrice).filter(price => typeof price === 'number');
+                        }
+    
+                        // flightPrices 배열에서 최저 가격을 반환
+                        return flightPrices.length ? Math.min(...flightPrices) : null;
+                    })
+                );
+    
+                setPricesList(pricesData); // 날짜별 최저 가격 리스트 저장
+            } catch (error) {
+                console.error("가격 데이터를 불러오는 중 오류가 발생했습니다:", error);
+            }
+        };
+    
+        fetchPrices();
+    }, [input.departureTime]);
 
-    setDateList(dates);
-    const fetchPrices = async () => {
-        try {
-            const pricesData = await Promise.all(
-                dates.map(async (date) => {
-                    const response = await axios.post("http://localhost:8080/flight/complexSearch", {
-                        ...input,
-                        departureTime: date
-                    });
-
-                    // 응답 구조를 로그로 출력하여 확인
-                    console.log("Fetched response:", response.data);
-                    const flightList = response.data.flightList;
-
-                    // 가격 추출
-                    let flightPrices = [];
-
-                    if (typeof flightList === 'object' && flightList !== null) {
-                        // flightList가 객체인 경우
-                        flightPrices = Object.values(flightList).map(flight => flight.flightPrice).filter(price => typeof price === 'number');
-                    }
-
-                    // 가격이 제대로 추출되었는지 확인
-                    console.log("Extracted flight prices:", flightPrices);
-
-                    // 각 날짜의 최저 가격을 계산하여 반환
-                    return flightPrices.length ? Math.min(...flightPrices) : null;
-                })
-            );
-
-            setPricesList(pricesData);
-        } catch (error) {
-            console.error("가격 데이터를 불러오는 중 오류가 발생했습니다:", error);
-        }
-    };
-
-    fetchPrices();
-}, [input.departureTime]);
+    // 전체 최저가 계산 (가격 데이터가 있는 날짜들만 필터링)
+    const lowestPrice = Math.min(...pricesList.filter(price => price !== null)); 
 
 
     useEffect(() => {
@@ -782,7 +784,6 @@ const BookingList = () => {
                                                         className={`list-group-item ${selectedIndex === index ? 'active' : ''}`} // 선택된 항목에 'active' 클래스 적용
                                                         onClick={e => selectKeyword(national.nationalName)}>
                                                         {national.nationalName}
-                                                        {/* <span className="text-muted ms-1">({poketmon.poketmonType})</span> */}
                                                     </li>
                                                 ))}
                                             </ul>
@@ -955,9 +956,9 @@ const BookingList = () => {
                         {/* 날짜와 가격을 표시 */}
                         <div className="d-flex mt-4 mb-4">
                             {dateList.map((date, index) => (
-                                    <button key={index} className="btn btn-outline-primary flight-date-box" onClick={() => dateButtonClick(index, date)}>
+                                    <button key={index} className="btn btn-outline-primary flight-date-box" onClick={() => dateButtonClick(index, date)} >
                                         <span style={{fontSize:"20px", fontWeight:"bolder", color:"black", display:"block"}}>{moment(date).format("MM.DD(dd)")}</span>
-                                        <span style={{ color: "#767676", fontWeight: "bold" }}>
+                                        <span style={{ color: setActiveIndex === index ? "blue" : "#767676", fontWeight: "bold" }}>
                                             {pricesList[index] !== null ? `${formatPrice(pricesList[index])}원` : "가격없음"}
                                         </span>
                                     </button>
@@ -968,13 +969,16 @@ const BookingList = () => {
                         <div className="row" style={{width:"60%" , marginLeft:"20%"}}>
                             {/* 항공권 리스트를 출력 */}
                                 {result.flightList.length > 0 ? (
-                                    result.flightList
-                                        .map((flight) => (
+                                    result.flightList.map((flight) => (
                                             <NavLink to={`/flight/booking/${flight.flightId}`} style={{ textDecoration: "none"}} key={flight.flightId}>
                                                 <div className="col">
                                                     <div className="d-flex mt-3" style={{ border: "1px solid lightgray", borderRadius: "1.5em", width: "100%" }}>
                                                         <div className="row mt-3 mb-3 ms-1" style={{ width: "70%" }}>
-                                                            <h3 style={{ color: "black" }}>{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}<GiCommercialAirplane/></h3>
+                                                            <h3 style={{ color: "black" }}>{flight.airlineDto ? flight.airlineDto.airlineName : '정보 없음'}<GiCommercialAirplane/>
+                                                                <span className="badge bg-primary ms-2" style={{fontSize:"15px", padding:"0.5em"}}>
+                                                                    {flight.flightPrice === lowestPrice ? "최저가" : ""}
+                                                                </span>
+                                                            </h3>
                                                             <div className="d-flex mb-2" style={{ justifyContent: "space-between" }}>
                                                                 <div className="d-flex mt-3" style={{ width: "200px", justifyContent: "space-between" }}>
                                                                     <span style={{ width: "100%", textAlign: "center" , color:"#626971", fontWeight:"bolder" }}>
