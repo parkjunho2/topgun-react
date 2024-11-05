@@ -799,13 +799,14 @@ const MainPage = () => {
                                             </div>
                                             {/* 최근 검색 목록에 대한 코드 */}
                                             <div className="col-4 ms-5">
-                                                <h5 style={{ fontWeight: "bold" }}>최근 검색 목록(최대5개)</h5>
+                                                <h5 style={{ fontWeight: "bold" }}>최근 검색 목록(최대 5개)</h5>
                                                 <div className="row flight-add-text">
                                                     {recentSearches.length > 0 ? (
                                                         recentSearches.map((search, index) => (
                                                             <div key={index}>
                                                                 <div className="row mt-2" style={{ border: "1px solid lightGray", width: "100%", borderRadius: "0.5em", fontSize: "15px" }}>
-                                                                    <span style={{ display: "flex", alignItems: "center" }}>
+                                                                    <span style={{ display: "flex", alignItems: "center" }}
+                                                                            onClick={() => applySearchToInput(search.departureAirport, search.arrivalAirport)}>
                                                                         {search.departureAirport} → {search.arrivalAirport}
                                                                         <IoMdClose style={{ marginLeft: "auto", cursor: "pointer" }} onClick={() => recentSearchesDelete(index)} />
                                                                     </span>
@@ -959,18 +960,16 @@ const MainPage = () => {
                                     <div className="col">
                                         <img
                                             className="img-fluid" // 이미지가 화면에 꽉 차도록 설정
-                                            src="/image/도쿄.jfif"
+                                            src="/image/도쿄후지산.jpg"
                                             alt="도쿄"
                                             style={{ objectFit: "cover", width: "100%", height: "400px" }} // 이미지를 꽉 차게, 비율 유지하면서 잘라냄
                                         />
                                         <h2 className="fw-normal mt-3">도쿄</h2>
-                                        <p className="mb-0">
+                                        <span className="mb-0">
                                             다채로운 모습을 가진 도쿄.
-                                            넓은 면적만큼이나 매력적인 지역들이
-                                            여행자를 기다린다. <br />
-                                            어느 곳을 가더라도 멋진 시간을 선물하는
-                                            도쿄를 추천합니다.
-                                        </p>
+                                            넓은 면적만큼이나 매력적인 지역들이 여행자를 기다린다. <br />
+                                            어느 곳을 가더라도 멋진 시간을 선물하는 도쿄를 추천합니다.
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -987,9 +986,8 @@ const MainPage = () => {
                                         />
                                         <h2 className="fw-normal mt-3">제주도</h2>
                                         <span className="mb-0">
-                                            서울에서 비행기로 1시간 거리에 있는 한국에서 가장 큰 섬인 제주도<br/>
-                                            4계절 각각의 모습이 너무나 아름다운 섬입니다.<br/>
-                                            특산물과 특산물로 만든 먹거리도 다양한 제주도를 추천합니다.
+                                            서울에서 비행기로 1시간 거리에 있는 한국에서 가장 큰 섬인 제주도.<br/>
+                                            특산물로 만든 다양한 먹거리와 4계절의 모습이 아름다운 제주도를 추천합니다.
                                         </span>
                                     </div>
                                 </div>
@@ -1005,13 +1003,10 @@ const MainPage = () => {
                                             style={{ objectFit: "cover", width: "100%", height: "400px" }}
                                         />
                                         <h2 className="fw-normal mt-3">나트랑</h2>
-                                        <p>
-                                            맑고 푸른 바다와
-                                            황금빛 모래가 만나는 곳, 나트랑. 
-                                            이 해안 도시는 휴식과 모험을 모두 즐길 수 있는
-                                            이상적인 장소입니다.<br />
-                                            현지 음식을 맛보며, 다양한 수상 활동을 즐길 수 있는 나트랑을 추천합니다.
-                                        </p>
+                                        <span>
+                                            맑고 푸른 바다와 황금빛 모래가 만나는 곳, 나트랑. <br />
+                                            이 해안 도시는 휴식과 모험을 모두 즐길 수 있는 이상적인 나트랑을 추천합니다.<br />
+                                        </span>
                                     </div>
                                 </div>
                             </div>
