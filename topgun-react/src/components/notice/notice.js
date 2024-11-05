@@ -204,9 +204,9 @@ const NoticeBoard = () => {
             <div className="row mt-4">
                 <div className="col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <h1 style={{ textAlign: 'center', marginBottom: '10px' }}>NOTICE</h1>
-
+    
                     <hr style={{ width: '80%', border: '1px solid #080808', marginBottom: '18px' }} />
-
+    
                     <table className="table" style={{ width: '80%', tableLayout: 'fixed' }}>
                         <thead>
                             <tr>
@@ -227,137 +227,105 @@ const NoticeBoard = () => {
                                         textAlign: 'center',
                                     }}
                                 >
+                                    <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeId}</td>
                                     <td style={{ padding: '15px', textAlign: 'center' }}>
-                                        {notice.noticeId}
-                                        {/* <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                            {notice.noticeId}
-                                        </Link>
                                         {notice.urgentNotice === 1 && (
-                                            <span style={{ marginBottom: '15px', marginLeft: '5px', color: '#e63946' }}>
-                                                <FaDizzy title="긴급 공지" style={{ fontSize: '1em' }} />
-                                                <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                                    [긴급공지]
-                                                </Link>
-                                            </span>
+                                            <span className="badge bg-danger me-2">공지</span>
                                         )}
-                                        메인 공지인 경우 아이콘과 텍스트 추가
-                                        {notice.mainNotice === 1 && (
-                                            <span style={{ marginLeft: '10px', color: '#ec7393' }}>
-                                                <FaMeteor style={{ fontSize: '1em' }} title="주요 공지" />
-                                                <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                                    [main]
-                                                </Link>
-                                            </span>
-
-                                        )} */}
-                                    </td>
-                                    <td style={{ padding: '15px', textAlign: 'center' }}>
-                                        {notice.urgentNotice === 1 && (
-                                               <span className="badge bg-danger me-2">공지</span>
-                                            )}
                                         <Link to={`/notice/${notice.noticeId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                                             {notice.noticeTitle}
                                         </Link>
-                                        {/* 어드민이면서 modifiedNotice가 1인 경우 아이콘 추가 */}
-                                        {/* {user.userType === 'ADMIN' && notice.modifiedNotice === 1 && (
-                                            <HiDocumentAdd style={{ marginLeft: '5px', color: '#007bff', fontSize: '1em' }} title="수정됨" />
-                                        )} */}
                                     </td>
                                     <td style={{ padding: '15px', textAlign: 'center' }}>{maskUserId(notice.noticeAuthor)}</td>
                                     <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeCreatedAt}</td>
                                     <td style={{ padding: '15px', textAlign: 'center' }}>
                                         {user.userType === 'ADMIN' && (
                                             <FaTrash
-                                                className="text-danger trash-icon" style={{fontSize: '1em' }} onClick={() => deleteNotice(notice)}
+                                                className="text-danger trash-icon" style={{ fontSize: '1em' }} onClick={() => deleteNotice(notice)}
                                             />
                                         )}
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
-
-                        {/* 페이지네이션 추가 */}
-                        <div style={{ display: 'flex', justifyContent: 'center', width: '500%', marginTop: '5px' }}>
-                            <Stack spacing={2}>
-                                <Pagination
-                                    count={Math.ceil(noticeList.length / noticesPerPage)}
-                                    page={currentPage}
-                                    onChange={(event, page) => paginate(page)}
-                                    variant=""
-                                    color="primary"
-                                />
-                            </Stack>
-                        </div>
-
-                        <tfoot>
-                            {user.userType === 'ADMIN' && (
-                                <>
-                                    <tr>
-                                        <td style={{ textAlign: 'center' }}></td>
-                                        <td>
-                                            <input type="text" className="form-control"
-                                                placeholder="제목"
-                                                name="noticeTitle"
-                                                value={input.noticeTitle}
-                                                onChange={changeInput} />
-                                        </td>
-                                        <td></td>
-                                        <td style={{ textAlign: 'center', padding: '15px' }}>
-                                            <div style={{ marginBottom: '51px' }}>
-                                                <a className="frame-btn" href="#" onClick={addInput}>
-                                                    <span className="frame-btn__outline frame-btn__outline--tall">
-                                                        <span className="frame-btn__line frame-btn__line--tall"></span>
-                                                        <span className="frame-btn__line frame-btn__line--flat"></span>
-                                                    </span>
-                                                    <span className="frame-btn__outline frame-btn__outline--flat">
-                                                        <span className="frame-btn__line frame-btn__line--tall"></span>
-                                                        <span className="frame-btn__line frame-btn__line--flat"></span>
-                                                    </span>
-                                                    <span className="frame-btn__solid"></span>
-                                                    <span className="frame-btn__text">POST NOTICE</span>
-                                                </a>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td colSpan="5">
-                                            <ReactQuill
-                                                ref={quillRef}
-                                                value={input.noticeContent}
-                                                onChange={handleContentChange}
-                                                modules={modules}
-                                                placeholder="오른쪽 아래 선택자로 에디터 크기를 자유롭게 조절하세요!"
-                                                style={{ height: '290px', width: '110%', resize: 'vertical', overflowY: 'auto' }}
-                                            />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colSpan="5" style={{ textAlign: 'left', marginTop: '10px' }}>
-                                            <label style={{ marginRight: '10px' }}>
-                                                {/* <input
-                                                    type="checkbox" style={{ marginRight: '5px' }}
-                                                    checked={input.mainNotice === 1}
-                                                    onChange={() => toggleCheckbox('mainNotice')}
-                                                /> Main */}
-                                            </label>
-                                            <label style={{ marginRight: '10px' }}>
-                                                <input
-                                                    type="checkbox" style={{ marginRight: '5px' }}
-                                                    checked={input.urgentNotice === 1}
-                                                    onChange={() => toggleCheckbox('urgentNotice')}
-                                                /> 공지
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </>
-                            )}
-                        </tfoot>
                     </table>
+    
+                    {/* 페이지네이션 추가 */}
+                    <div style={{ display: 'flex', justifyContent: 'center', width: '80%', marginTop: '5px' }}>
+                        <Stack spacing={2}>
+                            <Pagination
+                                count={Math.ceil(noticeList.length / noticesPerPage)}
+                                page={currentPage}
+                                onChange={(event, page) => paginate(page)}
+                                variant=""
+                                color="primary"
+                            />
+                        </Stack>
+                    </div>
+    
+                    {/* 어드민 전용 입력란 */}
+                    {user.userType === 'ADMIN' && (
+                        <table style={{ width: '80%', tableLayout: 'fixed' }}>
+                            <tfoot>
+                                <tr>
+                                    <td style={{ textAlign: 'center' }}></td>
+                                    <td>
+                                        <input type="text" className="form-control"
+                                            placeholder="제목"
+                                            name="noticeTitle"
+                                            value={input.noticeTitle}
+                                            onChange={changeInput} />
+                                    </td>
+                                    <td></td>
+                                    <td style={{ textAlign: 'center', padding: '15px' }}>
+                                        <div style={{ marginBottom: '51px' }}>
+                                            <a className="frame-btn" href="#" onClick={addInput}>
+                                                <span className="frame-btn__outline frame-btn__outline--tall">
+                                                    <span className="frame-btn__line frame-btn__line--tall"></span>
+                                                    <span className="frame-btn__line frame-btn__line--flat"></span>
+                                                </span>
+                                                <span className="frame-btn__outline frame-btn__outline--flat">
+                                                    <span className="frame-btn__line frame-btn__line--tall"></span>
+                                                    <span className="frame-btn__line frame-btn__line--flat"></span>
+                                                </span>
+                                                <span className="frame-btn__solid"></span>
+                                                <span className="frame-btn__text">POST NOTICE</span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colSpan="5">
+                                        <ReactQuill
+                                            ref={quillRef}
+                                            value={input.noticeContent}
+                                            onChange={handleContentChange}
+                                            modules={modules}
+                                            placeholder="오른쪽 아래 선택자로 에디터 크기를 자유롭게 조절하세요!"
+                                            style={{ height: '290px', width: '110%', resize: 'vertical', overflowY: 'auto' }}
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colSpan="5" style={{ textAlign: 'left', marginTop: '10px' }}>
+                                        <label style={{ marginRight: '10px' }}>
+                                            <input
+                                                type="checkbox" style={{ marginRight: '5px' }}
+                                                checked={input.urgentNotice === 1}
+                                                onChange={() => toggleCheckbox('urgentNotice')}
+                                            /> 공지
+                                        </label>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    )}
                 </div>
             </div>
         </div>
     );
+    
 };
 
 export default NoticeBoard;
