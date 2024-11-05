@@ -1293,7 +1293,7 @@ const Login = () => {
                                         </div>
 
                                         <big>이메일</big>
-                                        <div className="input-group mb-4" style={{ width: '90%' }}>
+                                        <div className="input-group mb-4" style={{ width: '80%' }}>
                                             <div className="form-floating">
                                                 <input
                                                     type="text"
