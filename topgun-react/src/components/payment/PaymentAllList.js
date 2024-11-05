@@ -179,9 +179,9 @@ const PaymentAllList=()=>{
 
                 {/* 상세 결제 내용 */}
                 {payment.paymentDetailList?.length > 0 && (
-                    <ul className="list-group list-group-flush mt-4">
+                    <div className="list-group list-group-flush mt-4">
                             {payment.paymentDetailList.map(detail => ( 
-                                <li className="list-group-item" key={detail.paymentDetailNo}>
+                                <div className="list-group-item" key={detail.paymentDetailNo}>
                                     {detail.flightId.airlineName}
                                     <div className={`text-end ${detail.paymentDetailStatus === '승인' ? 'text-primary' : detail.paymentDetailStatus === '취소' ? 'text-danger' : ''}`}>
                                         결제상태: {detail.paymentDetailStatus}완료
@@ -201,56 +201,59 @@ const PaymentAllList=()=>{
                                         <div className="row">
                                         {detail.paymentDetailPassanger === null ? ( // passport가 null인 경우 입력 필드 표시
                                             <>
-                                            <h5>여권정보 입력</h5>
-                                            <div>
+                                            <h5 style={{textAlign:"left" , fontWeight:"bold"}}>여권정보 입력</h5>
+                                                    <div className="mt-3">
                                                             {(["서울/김포(GMP)", "서울/인천(ICN)", "제주(CJU)"].includes(payment.flightVO.departureAirport) &&
                                                                 ["서울/김포(GMP)", "서울/인천(ICN)", "제주(CJU)"].includes(payment.flightVO.arrivalAirport)) ? (
                                                                 <>
-                                                                    <div className="mb-2">
-                                                                        <label>한글이름</label>
+                                                                    <div className="mb-2" style={{textAlign:"left"}}>
+                                                                        <span>한글이름</span>
                                                                         <input
                                                                             type="text"
                                                                             style={{ width: '25%' }}
                                                                             className="form-control"
                                                                             onChange={e => setSelectedDetail(prev => ({ ...prev, paymentDetailPassanger: e.target.value }))}
                                                                         />
-                                                                    </div>
-                                                                        <label>생년월일</label>
-                                                                    <div className="d-flex justify-content-between">
-                                                                        <input
-                                                                            type="date"
-                                                                            style={{ width: '25%' }}
-                                                                            className="form-control"
-                                                                            onChange={e => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
-                                                                        />
-                                                                    <div className="text-end">
-                                                                        <button
-                                                                            className="btn btn-primary"
-                                                                            onClick={() => updatePaymentDetail(detail.paymentDetailNo)}>
-                                                                            등록
-                                                                        </button>
+                                                                    </div >
+
+                                                                    <div style={{textAlign:"left"}}>
+                                                                        <span>생년월일</span>
+                                                                            <div className="d-flex justify-content-between">
+                                                                                <input className="form-control"
+                                                                                    style={{ width: '25%' }}
+                                                                                    type="date"
+                                                                                    onChange={e => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
+                                                                                />
+                                                                                <div className="text-end">
+                                                                                    <button
+                                                                                        className="btn btn-primary"
+                                                                                        onClick={() => updatePaymentDetail(detail.paymentDetailNo)}>
+                                                                                        등록
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
+
                                                                 </>
                                                             ) : (
                                                                 <>
-                                                                    <div>
-                                                                        여권번호
+                                                                    <div  style={{textAlign:"left"}}>
+                                                                        <span>여권번호</span>
                                                                         <input className="form-control"
                                                                             type="text"
                                                                             style={{ width: '25%' }}
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassport: e.target.value }))}
                                                                         />
                                                                     </div>
-                                                                    <div>
-                                                                        <span>한글이름</span>
+                                                                    <div style={{textAlign:"left"}}>
+                                                                        <span >한글이름</span>
                                                                         <input className="form-control"
                                                                             type="text"
                                                                             style={{ width: '25%' }}
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassanger: e.target.value }))}
                                                                         />
                                                                     </div>
-                                                                    <div>
+                                                                    <div style={{textAlign:"left"}}>
                                                                         <span>영문이름</span>
                                                                         <input className="form-control"
                                                                             type="text"
@@ -258,7 +261,7 @@ const PaymentAllList=()=>{
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailEnglish: e.target.value }))}
                                                                         />
                                                                     </div>
-                                                                    <div>
+                                                                    <div style={{textAlign:"left"}}>
                                                                         <span style={{ marginRight: '21px' }}>성별</span>
                                                                         <select className="form-control"
                                                                             style={{ width: '25%' }}
@@ -268,7 +271,7 @@ const PaymentAllList=()=>{
                                                                             <option value="W">여성</option>
                                                                         </select>
                                                                     </div>
-                                                                    <div>
+                                                                    <div style={{textAlign:"left"}}>
                                                                         생년월일
                                                                         <input className="form-control"
                                                                             style={{ width: '25%' }}
@@ -394,9 +397,10 @@ const PaymentAllList=()=>{
                                                 )}
                                             </div>
                                             )}
-                                        </li>
+                                        </div>
                                     ))}
-                                </ul>
+                                {/* </ul> */}
+                                </div>
                                 )}
                                     <hr style={{border:"1px solid black"}}/>
                             </div>
