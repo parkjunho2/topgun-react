@@ -9,7 +9,6 @@ import moment from "moment";
 import { useNavigate } from 'react-router';
 import { IoClose } from "react-icons/io5";
 import * as hangul from 'hangul-js';
-import { FaStar } from "react-icons/fa";
 import { wmoCode } from '../../util/wmoCode/wmoCode';
 import { toast } from "react-toastify";
 import { IoMdClose } from "react-icons/io";
@@ -949,7 +948,7 @@ const MainPage = () => {
 
                     <div className="row">
                         <div className="col">
-                            <h3 className="mb-3"> <FaStar className="mb-2 me-2" />TopGun에서 추천하는 여행지<FaStar className="mb-2 ms-2" />
+                            <h3 className="mb-3">✈TopGun에서 추천하는 여행지
                             </h3>
                         </div>
                     </div>
