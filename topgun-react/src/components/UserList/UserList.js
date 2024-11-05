@@ -99,8 +99,6 @@ const UserList = () => {
 
     const loading = useRef(false);
 
-    console.log()
-
     return (
         <>
             <section>

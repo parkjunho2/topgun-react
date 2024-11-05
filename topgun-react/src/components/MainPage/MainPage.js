@@ -532,7 +532,7 @@ const MainPage = () => {
         try {
             const response = await axios.get(url);
             const data = response.data;
-            console.log(data);
+            // console.log(data);
             if (data.current_weather) {
                 setCurrWeather(data.current_weather);
             } else {
@@ -543,7 +543,7 @@ const MainPage = () => {
 
                 // weekWeather 상태 업데이트
                 setWeekWeather(data.daily);
-                console.log(weekWeather);
+                // console.log(weekWeather);
             } else {
                 console.error("주간 날씨 데이터가 없습니다.");
             }

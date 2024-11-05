@@ -90,12 +90,12 @@ const Login = () => {
 
     const CheckDuplicateUserId = useCallback(
         debounce(async (userId) => {
-            console.log(userId); // userId 확인
+            // console.log(userId); // userId 확인
             try {
                 const response = await axios.post('http://localhost:8080/users/checkId', null, {
                     params: { userId: userId } // 쿼리 파라미터로 전달
                 });
-                console.log(response.data); // 서버 응답 확인
+                // console.log(response.data); // 서버 응답 확인
                 setIsDuplicate(response.data); // 중복 여부 상태 업데이트
             } catch (error) {
                 console.error("Error checking user ID:", error); // 에러 처리
@@ -199,10 +199,10 @@ const Login = () => {
                 window.sessionStorage.setItem("refreshToken", resp.data.refreshToken);
             }
 
-            console.log('로그인 성공:', resp.data);
+            // console.log('로그인 성공:', resp.data);
             navigate('/');
         } catch (error) {
-            console.error('로그인 오류:', error);
+            // console.error('로그인 오류:', error);
             setErrorMessage('로그인에 실패했습니다. 아이디와 비밀번호를 확인하세요.'); // 오류 메시지 설정
         }
     }, [loginData, navigate, setUser]);
@@ -276,7 +276,7 @@ const Login = () => {
         };
         try {
             const response = await axios.post("http://localhost:8080/users/join", dataToSend);
-            console.log(response.data); // 서버로부터 받은 응답 데이터 출력
+            // console.log(response.data); // 서버로부터 받은 응답 데이터 출력
         } catch (error) {
             console.error("Error occurred while joining:", error); // 에러 처리
         }

@@ -71,7 +71,7 @@ const ResetPw = () => {
 
         try {
             const response = await axios.post(`http://localhost:8080/users/resetPw?userId=${userId}`, certDto);
-            console.log('Response:', response.data);
+            // console.log('Response:', response.data);
         } catch (error) {
             console.error('Error during password reset:', error);
             navigate("/");
