@@ -205,6 +205,12 @@ const PaymentDetail=()=>{
                                 <div className="col-9">{action.amount.toLocaleString()}원</div>
                             </div>
                             )}
+                             {action.amount !== 0 &&(
+                            <div className="row">
+                                 <div className="col-3">취소좌석</div>
+                                <div className="col-9">{action.paymentDetail_name}</div>
+                            </div>
+                            )}
                             <div className="row">
                                 <div className="col-3">요청승인일시</div>
                                 <div className="col-9">{formatDate(action.approved_at)}</div>
