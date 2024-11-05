@@ -73,12 +73,31 @@ const loadFlight = useCallback(async () => {
             arrivalTime: new Date(input.arrivalTime).toISOString(),
             
         };
-            // 필드 검증
-            if (!input.flightNumber) {
-            toast.error("항공편 번호를 입력하세요.");
-            return;
-            }
+        const departureTime = new Date(input.departureTime);
+        const arrivalTime = new Date(input.arrivalTime);
 
+        // 필드 검증
+            // if (!/^[A-Z0-9]+$/.test(input.flightNumber)) {
+            //     toast.error("항공편 번호는 알파벳과 숫자로 구성되어야 합니다.");
+            //     return;
+            // }
+
+            if (!input.flightNumber) {
+                toast.error("항공편 번호를 입력하세요.");
+                return;
+            }
+            if (!input.departureTime) {
+                toast.error("출발 시간을 입력하세요.");
+                return;
+            }
+            if (!input.arrivalTime) {
+                toast.error("도착 시간을 입력하세요.");
+                return;
+            }
+            if (input.flightPrice <= 0) {  // 가격이 0 이하일 때 경고
+                toast.error("가격은 0원 이상이여야합니다.");
+                return;
+            }
             if (!input.departureAirport) {
                 toast.error("출발 공항을 선택하세요.");
                 return;
@@ -87,12 +106,17 @@ const loadFlight = useCallback(async () => {
                 toast.error("도착 공항을 선택하세요.");
                 return;
             }
-    
 
-        if (input.flightPrice <= 0) {  // 가격이 0 이하일 때 경고
-            toast.error("가격은 0원 이상이어야 합니다.");
-            return;
-        }
+            if (input.departureAirport === input.arrivalAirport) {
+                toast.error("출발 공항과 도착 공항이 동일할 수 없습니다.");
+                return;
+            }
+    
+            // 도착 시간이 출발 시간보다 빠른지 확인
+            if (arrivalTime <= departureTime) {
+                toast.error("도착 시간은 출발 시간보다 늦어야 합니다.");
+                return;
+            }
 
         await axios.put("http://localhost:8080/flight/", updatedInput);
         loadFlight();
@@ -199,31 +223,29 @@ const loadFlight = useCallback(async () => {
                                 <div className="mb-3">
                                     <label>출발 공항</label>
                                     <select name="departureAirport" className="form-control" value={input.departureAirport} onChange={e => setInput({ ...input, departureAirport: e.target.value })}>
-                                        <option>출발 공항 선택</option>
+                                        <option disabled>출발 공항 선택</option>
                                         <option>서울/인천(ICN)</option>
                                         <option>서울/김포(GMP)</option>
-                                        <option>광주(KWJ)</option>
-                                        <option>대구(TAE)</option>
                                         <option>제주(CJU)</option>
-                                        <option>여수(RSU)</option>
                                         <option>도쿄/나리타(NRT)</option>
-                                        <option>오사카/간사이(KIX)</option>
-                                        <option>나트랑(CXR)</option>
+                                    <option>오사카/간사이(KIX)</option>
+                                    <option>삿포로(CTS)</option>
+                                    <option>나트랑(CXR)</option>
+                                    <option>다낭(DAD)</option>
                                     </select>
                                 </div>
                                 <div className="mb-3">
                                     <label>도착 공항</label>
                                     <select name="arrivalAirport" className="form-control" value={input.arrivalAirport} onChange={e => setInput({ ...input, arrivalAirport: e.target.value })}>
-                                        <option>도착 공항 선택</option>
+                                        <option disabled>도착 공항 선택</option>
                                         <option>서울/인천(ICN)</option>
                                         <option>서울/김포(GMP)</option>
-                                        <option>광주(KWJ)</option>
-                                        <option>대구(TAE)</option>
                                         <option>제주(CJU)</option>
-                                        <option>여수(RSU)</option>
                                         <option>도쿄/나리타(NRT)</option>
-                                        <option>오사카/간사이(KIX)</option>
-                                        <option>나트랑(CXR)</option>
+                                    <option>오사카/간사이(KIX)</option>
+                                    <option>삿포로(CTS)</option>
+                                    <option>나트랑(CXR)</option>
+                                    <option>다낭(DAD)</option>
                                     </select>
                                 </div>
                                 <div className="mb-3">
@@ -244,7 +266,32 @@ const loadFlight = useCallback(async () => {
                     </div>
                 </div>
             </div>
+            <div className="card p-4 shadow">
+            <div className="row mt-4">
+                <div className="col">
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th>사용자 정보</th>
+                                <th>?</th>
+                                <th>?</th>
+                                <th>?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>?</th>
+                                <th>?</th>
+                                <th>?</th>
+                                <th>?</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
         </div>
+
     );
 };
 
