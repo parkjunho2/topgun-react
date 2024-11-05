@@ -80,6 +80,15 @@ const Flight = () => {
     }, [loadList]);
 
     const updateFlight = useCallback(async () => {
+        // 서버에서 현재 항공편 상태 확인
+    const currentFlight = await axios.get(`http://localhost:8080/flight/${input.flightId}`);
+    
+    // 최신 상태가 승인 상태인지 확인
+    if (currentFlight.data.flightStatus === "승인") {
+        toast.error("해당 항공편은 이미 승인되었습니다.");
+        closeModal();
+        return;
+    }
         const updatedInput = {
             ...input,
             flightStatus: input.flightStatus === "거절" ? "대기" : input.flightStatus,
@@ -91,10 +100,10 @@ const Flight = () => {
         const arrivalTime = new Date(input.arrivalTime);
 
         // 필드 검증
-            // if (!/^[A-Z0-9]+$/.test(input.flightNumber)) {
-            //     toast.error("항공편 번호는 알파벳과 숫자로 구성되어야 합니다.");
-            //     return;
-            // }
+        if (!/^[A-Z]{2}[0-9]{4}$/.test(input.flightNumber)) {
+            toast.error("항공편 번호는 대문자 2개와 숫자 4개로 구성되어야 합니다.");
+            return;
+        }
 
             if (!input.flightNumber) {
                 toast.error("항공편 번호를 입력하세요.");
@@ -191,8 +200,8 @@ const Flight = () => {
             const arrivalTime = new Date(input.arrivalTime);
     
             // 필드 검증
-            if (/^[A-Za-z0-9]$/.test(input.flightNumber)) {
-                toast.error("항공편 번호는 알파벳과 숫자로 구성되어야 합니다.");
+            if (!/^[A-Z]{2}[0-9]{4}$/.test(input.flightNumber)) {
+                toast.error("항공편 번호는 대문자 2개와 숫자 4개로 구성되어야 합니다.");
                 return;
             }
 
@@ -409,7 +418,7 @@ const Flight = () => {
                             {/* 입력 필드들 */}
                             <div className="mb-3">
                                 <label>항공편 번호</label>
-                                <input type="text" name="flightNumber" className="form-control" value={input.flightNumber} onChange={changeInput} />
+                                <input type="text" name="flightNumber" className="form-control" value={input.flightNumber} onChange={changeInput} placeholder="AA1234"/>
                             </div>
                             <div className="mb-3">
                                 <label>출발 시간</label>
