@@ -1,4 +1,8 @@
+import { Navigate, useNavigate } from "react-router";
+
 const NotFound = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="container text-center mt-5">
       <h1 className="display-1">404</h1>
