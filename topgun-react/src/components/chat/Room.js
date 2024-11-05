@@ -10,6 +10,7 @@ import { IoLogoWechat } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import moment from "moment";
+import { toast } from "react-toastify";
 
 const Room = () => {
     //navigator
@@ -57,16 +58,37 @@ const Room = () => {
         setInput({ roomName: e.target.value });
     }, [input]);
 
+    // const saveInput = useCallback(async () => {
+    //     const resp = await axios.post("http://localhost:8080/room/", input);
+    //     loadRoomList();
+    //     setInput({ roomName: "" });
+    // }, [input]);
+
     const saveInput = useCallback(async () => {
-        const resp = await axios.post("http://localhost:8080/room/", input);
-        loadRoomList();
-        setInput({ roomName: "" });
+        if (!input.roomName) {
+            toast.error("채팅방을 선택하세요.");
+            return; // 입력이 없으면 요청을 보내지 않고 함수 종료
+        }    
+        try {
+            const resp = await axios.post("http://localhost:8080/room/", input);
+            loadRoomList();  // 채팅방 목록 갱신
+            setInput({ roomName: "" });  // 입력 필드 초기화
+        } catch (error) {
+            console.error("채팅방 생성 실패:", error);
+            alert("채팅방 생성에 실패했습니다.");
+        }
     }, [input]);
 
     const deleteRoom = useCallback(async (target) => {
-        const resp = await axios.delete("http://localhost:8080/room/" + target.roomNo);
-        window.alert("채팅방을 삭제하시겠습니까?");
-        loadRoomList();
+        const remove = window.confirm("채팅방을 삭제하시겠습니까?");
+        if(remove){
+            const resp = await axios.delete("http://localhost:8080/room/" + target.roomNo);
+            loadRoomList();
+            toast.error("채팅방이 삭제되었습니다");
+        }
+        else{
+            return;
+        }
     }, [roomList]);
 
     const enterRoom = useCallback(async (target) => {
