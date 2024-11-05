@@ -111,7 +111,7 @@ const filteredFlights = resp.data.filter(flight => {
 
             <div className="row mt-4">
                 <div className="col">
-                    <table className="table table-striped">
+                    <table className="table">
                         <thead className="table-dark">
                             <tr>
                                 <th>항공편 번호</th>
