@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios'; // Axios import
 import { MdAirlines, MdEmail, MdLock } from 'react-icons/md';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
@@ -282,28 +282,27 @@ const Login = () => {
         }
     }, [emailId, domain, joinData, userType]); // 의존성 배열
 
+    // 상태 선언
+    const [excludedKeys, setExcludedKeys] = useState([]);
+
+    // userType에 따라 excludedKeys 업데이트
+    useEffect(() => {
+        if (userType === 'MEMBER') {
+            setExcludedKeys(['airlineIdValid', 'airlineNameValid']);  // MEMBER일 경우 제외할 키들
+        } else if (userType === 'AIRLINE') {
+            setExcludedKeys(['memberGenderValid', 'memberBirthValid', 'memberEngNameValid', 'airlineIdValid', 'airlineNameValid']);  // AIRLINE일 경우 제외할 키들
+        } else {
+            setExcludedKeys([]);  // 기본값, 다른 경우는 빈 배열
+        }
+    }, [userType]);  // userType이 바뀔 때마다 실행
+
     // 버튼의 data-bs-dismiss 값 계산
-    const [dismissModal, setDismissModal] = useState(undefined); // dismissModal 상태
+    const dismissModal = isAllValid(validation, excludedKeys) ? "modal" : undefined;
 
-    // 회원가입
-    const Signup = () => {
-        // let
-        let excludedKeys = []; // 제외할 키들 상태
-
+    const Signup = useCallback(() => {
         try {
-            // userType에 따라 excludedKeys 업데이트
-            if (userType === 'MEMBER') {
-                excludedKeys = ['airlineIdValid', 'airlineNameValid']; // MEMBER일 경우 제외할 키들
-            } else if (userType === 'AIRLINE') {
-                excludedKeys = ['memberGenderValid', 'memberBirthValid', 'memberEngNameValid', 'airlineIdValid', 'airlineNameValid']; // AIRLINE일 경우 제외할 키들
-            }
-
             // 유효성 검사
             const allValid = isAllValid(validation, excludedKeys);
-            const modalDismissValue = allValid ? "modal" : undefined;
-
-            // dismissModal 상태 업데이트
-            setDismissModal(modalDismissValue);
 
             if (allValid) {
                 // 데이터 전송(내부에서 비동기 처리 선행되어있음.)
@@ -343,13 +342,13 @@ const Login = () => {
 
                 toast.success('가입완료!', {
                     onClose: () => {
-                        setTimeout(() => { }, 500); // 500ms (0.5초) 대기
+                        setTimeout(() => { }, 500); // 500ms 대기
                     },
                 });
             } else {
                 toast.error('유효하지 않은 필드가 있습니다. 확인해 주세요.', {
                     onClose: () => {
-                        setTimeout(() => { }, 500); // 500ms (0.5초) 대기
+                        setTimeout(() => { }, 500); // 500ms 대기
                     },
                 });
             }
@@ -360,9 +359,7 @@ const Login = () => {
                 },
             });
         }
-    };
-
-
+    }, [userType, validation, excludedKeys]); // userType과 validation 상태가 바뀔 때마다 handleSignup이 새로 정의되도록 의존성 배열에 추가
 
     // JSX
     return (
