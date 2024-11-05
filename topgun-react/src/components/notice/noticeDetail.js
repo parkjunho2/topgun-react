@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, NavLink } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useRecoilValue } from "recoil";
 import { loginState, userState } from "../../util/recoil";
+import moment from "moment";
 
 const NoticeDetail = () => {
     const { id } = useParams();
@@ -56,7 +57,7 @@ const NoticeDetail = () => {
         try {
             // 공지사항이 수정되었으므로 modifiedNotice를 1로 설정
             const updatedData = { ...updatedNotice, noticeContent: content, modifiedNotice: 1 };
-    
+
             await axios.put(`http://localhost:8080/notice/edit/${id}`, updatedData);
             alert('공지사항이 수정되었습니다!');
             setIsEditing(false);
@@ -107,6 +108,13 @@ const NoticeDetail = () => {
         }
     }), []);
 
+    // 사용자 ID 앞 3글자 외 * 처리
+    const maskUserId = (userId) => {
+        if (userId.length <= 3) return userId;
+        const maskedPart = '*'.repeat(userId.length - 3);
+        return userId.slice(0, 3) + maskedPart;
+    };
+
     if (!notice) return <div>Loading...</div>;
     return (
         <div style={styles.container}>
@@ -127,37 +135,43 @@ const NoticeDetail = () => {
                         modules={modules}
                         style={styles.quillEditor}
                     />
-             
-                    <div style={{ display: 'flex', alignItems: 'center', marginTop: '30px' }}>
-                    <div style={{ marginRight: '20px' ,marginTop: '10px'}}>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={updatedNotice.mainNotice === 1}
-                                onChange={(e) => setUpdatedNotice({ ...updatedNotice, mainNotice: e.target.checked ? 1 : 0 })}
-                            />
-                            Main
-                        </label>
-                    </div>
 
-                    <div style={{ marginRight: '20px' ,marginTop: '10px'}}>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={updatedNotice.urgentNotice === 1}
-                                onChange={(e) => setUpdatedNotice({ ...updatedNotice, urgentNotice: e.target.checked ? 1 : 0 })}
-                            />
-                            Emergency
-                        </label>
+                    <div style={{ display: 'flex', alignItems: 'center', marginTop: '30px' }}>
+                        <div style={{ marginRight: '0px', marginTop: '10px' }}>
+                            {/* <label>
+                                <input
+                                    type="checkbox"
+                                    checked={updatedNotice.mainNotice === 1}
+                                    onChange={(e) => setUpdatedNotice({ ...updatedNotice, mainNotice: e.target.checked ? 1 : 0 })}
+                                />
+                                Main
+                            </label> */}
+                        </div>
+
+                        <div style={{ marginRight: '20px', marginTop: '10px' }}>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={updatedNotice.urgentNotice === 1}
+                                    onChange={(e) => setUpdatedNotice({ ...updatedNotice, urgentNotice: e.target.checked ? 1 : 0 })}
+                                />
+                                Emergency
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
             ) : (
                 <div style={styles.viewMode}>
-                    <h1 style={styles.title}>{notice.noticeTitle}</h1>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    </div>
+
+                    <h1 style={{ ...styles.title, maxWidth: '600px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginLeft: "75px" }}> {/*제목이 범위를 초과할 경우 ... 으로 대체 후 숨김*/}
+                        {notice.noticeTitle}
+                    </h1>
                     <hr style={styles.divider} />
-                    <h4>작성자: {notice.noticeAuthor}</h4>
-                    <p>작성일: {notice.noticeCreatedAt}</p>
+                    <h4>작성자: {maskUserId(notice.noticeAuthor)}</h4>
+                    <p>작성일: {moment(notice.noticeCreatedAt).format("YYYY-MM-DD HH:mm")}</p>
+                    <hr style={styles.divider} />
                     <div style={styles.noticeContent}>
                         <ReactQuill
                             value={notice.noticeContent}
@@ -170,18 +184,24 @@ const NoticeDetail = () => {
             <div style={styles.buttonContainer}>
                 {isEditing ? (
                     <>
-                        <a className="arrow-btn" href="#" onClick={handleUpdate} style={{ marginRight: '19px', color: '#ec7393' }}>
+                        <a className="arrow-btn" onClick={handleUpdate} style={{ marginRight: '19px', color: '#ec7393' }}>
                             confirm
                         </a>
-                        <a className="arrow-btn" href="#" onClick={() => navigate('/notice')} style={{ color: '#ccc' }}>
+                        <a className="arrow-btn" onClick={() => navigate('/notice')} style={{ color: '#ccc' }}>
                             exit
                         </a>
                     </>
                 ) : (
                     login && user.userType === 'ADMIN' && (
-                        <a className="arrow-btn" href="#" onClick={() => setIsEditing(true)} style={{ marginRight: '19px', color: '#ec7393' }}>
-                            EDIT
-                        </a>
+                        <>
+                            <a className="arrow-btn" onClick={() => navigate('/notice')} style={{ marginRight: '19px', color: '#ccc' }}>
+                                notice
+                            </a>
+                            <a className="arrow-btn" onClick={() => setIsEditing(true)} style={{ marginRight: '19px', color: '#ec7393' }}>
+                                edit
+                            </a>
+
+                        </>
                     )
                 )}
             </div>
@@ -197,6 +217,7 @@ const styles = {
         padding: '20px',
         backgroundColor: 'transparent',
         position: 'relative',
+        border: "1px solid #eee"
     },
     title: {
         textAlign: 'center',
@@ -214,7 +235,7 @@ const styles = {
         display: 'flex',
         justifyContent: 'flex-end',
         position: 'absolute',
-        top: '20px',
+        top: '-15px',
         right: '20px',
         marginTop: '0',
         marginBottom: '0',

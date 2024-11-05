@@ -259,9 +259,9 @@ const NoticeBoard = () => {
                                             {notice.noticeTitle}
                                         </Link>
                                         {/* 어드민이면서 modifiedNotice가 1인 경우 아이콘 추가 */}
-                                        {user.userType === 'ADMIN' && notice.modifiedNotice === 1 && (
+                                        {/* {user.userType === 'ADMIN' && notice.modifiedNotice === 1 && (
                                             <HiDocumentAdd style={{ marginLeft: '5px', color: '#007bff', fontSize: '1em' }} title="수정됨" />
-                                        )}
+                                        )} */}
                                     </td>
                                     <td style={{ padding: '15px', textAlign: 'center' }}>{maskUserId(notice.noticeAuthor)}</td>
                                     <td style={{ padding: '15px', textAlign: 'center' }}>{notice.noticeCreatedAt}</td>
@@ -303,7 +303,7 @@ const NoticeBoard = () => {
                                         </td>
                                         <td></td>
                                         <td style={{ textAlign: 'center', padding: '15px' }}>
-                                            <div style={{ marginBottom: '52px' }}>
+                                            <div style={{ marginBottom: '51px' }}>
                                                 <a className="frame-btn" href="#" onClick={addInput}>
                                                     <span className="frame-btn__outline frame-btn__outline--tall">
                                                         <span className="frame-btn__line frame-btn__line--tall"></span>
