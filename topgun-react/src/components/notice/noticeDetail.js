@@ -151,11 +151,11 @@ const NoticeDetail = () => {
                         <div style={{ marginRight: '20px', marginTop: '10px' }}>
                             <label>
                                 <input
-                                    type="checkbox"
+                                    type="checkbox" style={{ marginRight: '4px' }}
                                     checked={updatedNotice.urgentNotice === 1}
                                     onChange={(e) => setUpdatedNotice({ ...updatedNotice, urgentNotice: e.target.checked ? 1 : 0 })}
                                 />
-                                Emergency
+                                메인 공지사항
                             </label>
                         </div>
                     </div>
