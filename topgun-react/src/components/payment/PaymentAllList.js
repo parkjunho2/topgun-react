@@ -10,6 +10,9 @@ const PaymentAllList=()=>{
      const [paymentList, setPaymentList] = useState([]); 
      const [selectedDetail, setSelectedDetail] = useState({});
      const [submittedDetails, setSubmittedDetails] = useState({}); // 등록된 정보를 저장
+     const passangerRegex = /^[가-힣]+$/;
+    const englishRegex = /^[a-zA-Z]+$/;
+    const passportRegex = /^[A-Za-z][0-9]{8}$/;
      //effect
      useEffect(()=>{
         loadPaymentList();
@@ -114,11 +117,14 @@ const PaymentAllList=()=>{
                                         </tr>
                                         <tr>
                                             <td style={{fontWeight:"bolder", width:"10%"}}>결제일</td>
-                                            <td style={{color:"#ff7675", fontWeight:"bolder"}}>{new Date(payment.paymentDto.paymentTime).toLocaleString('ko-KR', {
-                                                        year: 'numeric',
-                                                        month: '2-digit',
-                                                        day: '2-digit',
-                                                    })}
+                                            <td style={{ color: "#ff7675", fontWeight: "bolder" }}>
+                                            {new Date(payment.paymentDto.paymentTime)
+                                                .toLocaleString("ko-KR", {
+                                                year: "numeric",
+                                                month: "2-digit",
+                                                day: "2-digit",
+                                                })
+                                                .replace(/.$/, "")}
                                             </td>
                                         </tr>
                                         <tr>
@@ -223,11 +229,14 @@ const PaymentAllList=()=>{
                                                                                     onChange={e => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
                                                                                 />
                                                                                 <div className="text-end">
-                                                                                    <button
-                                                                                        className="btn btn-primary"
-                                                                                        onClick={() => updatePaymentDetail(detail.paymentDetailNo)}>
-                                                                                        등록
-                                                                                    </button>
+                                                                                <button
+                                                                                    className="btn btn-primary"
+                                                                                    onClick={() => updatePaymentDetail(detail.paymentDetailNo)}
+                                                                                    disabled={
+                                                                                        selectedDetail.paymentDetailPassanger && !passangerRegex.test(selectedDetail.paymentDetailPassanger)
+                                                                                    }>
+                                                                                    등록
+                                                                                </button>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -275,6 +284,7 @@ const PaymentAllList=()=>{
                                                                             style={{ width: '25%' }}
                                                                             type="date"
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
+                                                                            max={new Date().toISOString().split("T")[0]} 
                                                                         />
                                                                         <div>
                                                                             <span style={{ marginRight: '21px' }}>국적</span>
@@ -316,15 +326,21 @@ const PaymentAllList=()=>{
                                                                         </div>
                                                                         <span>여권 만료일</span>
                                                                         <div className="d-flex justify-content-between">
-                                                                            <input className="form-control"
-                                                                                style={{ width: '25%' }}
-                                                                                type="date"
-                                                                                onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailExpire: e.target.value }))}
-                                                                            />
+                                                                                    <input className="form-control"
+                                                                                        style={{ width: '25%' }}
+                                                                                        type="date"
+                                                                                        onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailExpire: e.target.value }))}
+                                                                                        min={new Date().toISOString().split("T")[0]} // 오늘 날짜를 최소 날짜로 설정
+                                                                                    />
                                                                         <div className="text-end">
                                                                         <button
                                                                             className="btn btn-primary"
-                                                                            onClick={() => updatePaymentDetail(detail.paymentDetailNo)}>
+                                                                            onClick={() => updatePaymentDetail(detail.paymentDetailNo)}
+                                                                            disabled={
+                                                                                (selectedDetail.paymentDetailPassanger && !passangerRegex.test(selectedDetail.paymentDetailPassanger)) ||
+                                                                                (selectedDetail.paymentDetailPassport && !passportRegex.test(selectedDetail.paymentDetailPassport)) ||
+                                                                                (selectedDetail.paymentDetailEnglish && !englishRegex.test(selectedDetail.paymentDetailEnglish))
+                                                                            }>
                                                                             등록
                                                                         </button>
                                                                         </div>

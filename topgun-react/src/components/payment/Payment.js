@@ -12,6 +12,9 @@ import { toast } from "react-toastify";
     const[seatsList, setSeatsList] =useState([]);
     const [flightInfo, setFlightInfo] = useState({});
     const [seatsDisplayList, setSeatsDisplayList] = useState([]);
+    const passangerRegex = /^[가-힣]+$/;
+    const englishRegex = /^[a-zA-Z]+$/;
+    const passportRegex = /^[A-Za-z][0-9]{8}$$/;
 
     //좌석UI
     useEffect(()=>{
@@ -98,7 +101,7 @@ import { toast } from "react-toastify";
         // 조건에 맞춰 모든 입력 필드가 채워져 있거나 모두 비어있는지 확인
         const allFilled = checkedSeatsList.every(seat =>
             isBasicInfoOnly
-                ? seat.paymentDetailPassanger && seat.paymentDetailBirth // 기본 정보만 입력 체크
+                ? seat.paymentDetailPassanger && seat.paymentDetailBirth// 기본 정보만 입력 체크
                 : seat.paymentDetailPassport && // 모든 정보 입력 체크
                   seat.paymentDetailPassanger &&
                   seat.paymentDetailEnglish &&
@@ -269,10 +272,19 @@ import { toast } from "react-toastify";
                             </tr>
                         </tbody>
                          </table>
-                        <button className="btn btn-success w-100 my-3" onClick={sendPurchaseRequest}>
-                            구매하기
-                        </button>
-                            
+                         <button
+                                className="btn btn-success w-100 my-3"
+                                onClick={sendPurchaseRequest}
+                                disabled={
+                                    checkedSeatsList.some(seat => 
+                                        (seat.paymentDetailPassanger && !passangerRegex.test(seat.paymentDetailPassanger)) ||
+                                        (seat.paymentDetailEnglish && !englishRegex.test(seat.paymentDetailEnglish)) || 
+                                        (seat.paymentDetailPassport && passportRegex.test(seat.paymentDetailPassport))
+                                    ) || checkedSeatsList.length === 0
+                                }
+                            >
+                                구매하기
+                            </button>
                         <div className="text-center text-primary"><strong>여권 정보는 결제 완료 후에도 입력하실 수 있습니다</strong></div>
 
                         {seatsList.map(seats => (
@@ -285,12 +297,17 @@ import { toast } from "react-toastify";
                                 ["서울/김포(GMP)", "서울/인천(ICN)", "제주(CJU)"].includes(flightInfo.arrivalAirport)) ? (
                                     <>
                                         <div className="mb-2">
-                                            <label>한글이름</label>
+                                            <label>이름</label>
                                             <input
                                                 type="text"
                                                 className="form-control"
                                                 value={seats.paymentDetailPassanger}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailPassanger')}
+                                                onBlur={() => {
+                                                    if (!passangerRegex.test(seats.paymentDetailPassanger)) {
+                                                        toast.error("한글로만 입력하세요");
+                                                    }
+                                                }}
                                             />
                                         </div>
                                         <div className="mb-2">
@@ -300,6 +317,7 @@ import { toast } from "react-toastify";
                                                 className="form-control"
                                                 value={seats.paymentDetailBirth}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailBirth')}
+                                                max={new Date().toISOString().split("T")[0]} 
                                             />
                                         </div>
                                     </>
@@ -312,6 +330,11 @@ import { toast } from "react-toastify";
                                                 className="form-control"
                                                 value={seats.paymentDetailPassport}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailPassport')}
+                                                onBlur={() => {
+                                                    if (!passangerRegex.test(seats.paymentDetailPassanger)) {
+                                                        toast.error("여권 번호는 영문자 1개 뒤에 숫자 8개로 이루어져야 합니다.");
+                                                    }
+                                                }}
                                             />
                                         </div>
                                         <div className="mb-2">
@@ -321,6 +344,11 @@ import { toast } from "react-toastify";
                                                 className="form-control"
                                                 value={seats.paymentDetailPassanger}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailPassanger')}
+                                                onBlur={() => {
+                                                    if (!passangerRegex.test(seats.paymentDetailPassanger)) {
+                                                        toast.error("한글만 입력하세요");
+                                                    }
+                                                }}
                                             />
                                         </div>
                                         <div className="mb-2">
@@ -330,6 +358,11 @@ import { toast } from "react-toastify";
                                                 className="form-control"
                                                 value={seats.paymentDetailEnglish}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailEnglish')}
+                                                onBlur={() => {
+                                                    if (!passangerRegex.test(seats.paymentDetailPassanger)) {
+                                                        toast.error("영어만 입력하세요");
+                                                    }
+                                                }}
                                             />
                                         </div>
                                         <div className="mb-2">
@@ -351,6 +384,7 @@ import { toast } from "react-toastify";
                                                 className="form-control"
                                                 value={seats.paymentDetailBirth}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailBirth')}
+                                                max={new Date().toISOString().split("T")[0]} 
                                             />
                                         </div>
                                         <div className="mb-2">
@@ -400,6 +434,7 @@ import { toast } from "react-toastify";
                                                 className="form-control"
                                                 value={seats.paymentDetailExpire}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailExpire')}
+                                                min={new Date().toISOString().split("T")[0]}
                                             />
                                         </div>
                                     </>
