@@ -4,7 +4,7 @@ import { Chart, registerables } from 'chart.js';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 import { userState } from "../../util/recoil";
-import './WorldMapWithGraphs.css'; // CSS 파일 임포트
+
 
 // Chart.js의 모든 차트 유형을 등록합니다.
 Chart.register(...registerables);
@@ -47,14 +47,13 @@ const WorldMapWithGraphs = () => {
                     ]
                 });
 
-                // 파이 차트 데이터 설정
                 setFlightPieChartData({
                     labels: labels,
                     datasets: [
                         {
                             label: 'Payment Distribution',
                             data: payments,
-                            backgroundColor: payments.map((_, index) => `rgba(${index * 30 % 255}, ${100 + index * 30 % 155}, ${200}, 0.6)`), // 다채로운 색상
+                            backgroundColor: payments.map((_, index) => `rgba(${index * 30 % 255}, ${100 + index * 30 % 155}, ${200}, 0.6)`),
                             hoverBackgroundColor: payments.map((_, index) => `rgba(${index * 30 % 255}, ${100 + index * 30 % 155}, ${200}, 1)`),
                         }
                     ]
@@ -95,7 +94,6 @@ const WorldMapWithGraphs = () => {
                     ]
                 });
 
-                // 파이 차트 데이터 설정
                 setAirlinePieChartData({
                     labels: airlineLabels,
                     datasets: [
@@ -119,115 +117,117 @@ const WorldMapWithGraphs = () => {
     const flightOptions = {
         responsive: true,
         plugins: {
-            legend: {
-                position: 'top',
-            },
+            legend: { position: 'top' },
             title: {
                 display: true,
                 text: `Total Payment by Flight ID for ${airlineName} (${user.userType})`,
             },
             tooltip: {
                 callbacks: {
-                    label: (tooltipItem) => {
-                        return `${tooltipItem.dataset.label}: $${tooltipItem.raw.toLocaleString()}`;
-                    }
+                    label: (tooltipItem) => `${tooltipItem.dataset.label}: ${tooltipItem.raw.toLocaleString()} 원`
                 }
             }
         },
-        animation: {
-            duration: 1000,
-        },
+        animation: { duration: 1000 },
         scales: {
             y: {
                 beginAtZero: true,
-                title: {
-                    display: true,
-                    text: 'Total Payment ($)',
-                }
+                title: { display: true, text: 'Total Payment (원)' }
             },
-            x: {
-                title: {
-                    display: true,
-                    text: 'Flight ID',
-                }
-            }
+            x: { title: { display: true, text: 'Flight ID' } }
         }
     };
 
     const airlineOptions = {
         responsive: true,
         plugins: {
-            legend: {
-                position: 'top',
-            },
+            legend: { position: 'top' },
             title: {
                 display: true,
                 text: `Total Revenue by Airline (${user.userType})`,
             },
             tooltip: {
                 callbacks: {
-                    label: (tooltipItem) => {
-                        return `${tooltipItem.dataset.label}: $${tooltipItem.raw.toLocaleString()}`;
-                    }
+                    label: (tooltipItem) => `${tooltipItem.dataset.label}: ${tooltipItem.raw.toLocaleString()}원`
                 }
             }
         },
-        animation: {
-            duration: 1000,
-        },
+        animation: { duration: 1000 },
         scales: {
             y: {
                 beginAtZero: true,
-                title: {
-                    display: true,
-                    text: 'Total Revenue ($)',
-                }
+                title: { display: true, text: 'Total Revenue (원)' }
             },
-            x: {
-                title: {
-                    display: true,
-                    text: 'Airlines',
-                }
-            }
+            x: { title: { display: true, text: 'Airlines' } }
         }
     };
 
     return (
-        <div className="charts-container">
-            <div className="charts-row">
-                {user.userType === 'AIRLINE' && flightChartData ? (
-                    <div className="chart-wrapper">
-                        <Bar data={flightChartData} options={flightOptions} />
-                        {flightPieChartData && (
-                            <div className="pie-chart-wrapper">
-                                <Doughnut data={flightPieChartData} options={{ responsive: true }} />
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    user.userType === 'AIRLINE' ? (
-                        <p>Loading flight payment chart data...</p>
-                    ) : null
-                )}
-            </div>
-            <div className="charts-row">
-                {user.userType === 'ADMIN' && airlineChartData ? (
-                    <div className="chart-wrapper">
-                        <Bar data={airlineChartData} options={airlineOptions} />
-                        {airlinePieChartData && (
-                            <div className="pie-chart-wrapper">
-                                <Doughnut data={airlinePieChartData} options={{ responsive: true }} />
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    user.userType === 'ADMIN' ? (
-                        <p>Loading airline revenue chart data...</p>
-                    ) : null
-                )}
-            </div>
-        </div>
-    );
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', }}>
+              {user.userType === 'AIRLINE' && flightChartData ? (
+                  <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop:"30px",boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',borderRadius: '10px',padding: '20px', }}>
+                      <div style={{ width: '600px', textAlign: 'center' }}>
+                          <Bar data={flightChartData} options={flightOptions} />
+                      </div>
+                      {flightPieChartData && (
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                              <div style={{ width: '300px', marginTop: '20px' }}>
+                                  <Doughnut data={flightPieChartData} options={{ responsive: true }} />
+                              </div>
+                              <div style={{ textAlign: 'left', marginTop: '20px' }}>
+                                  <h3>Flight Payment Details</h3>
+                                  <ul>
+                                      {flightChartData.labels.map((label, index) => (
+                                          <li key={index}>
+                                              <strong>{label}</strong>: {flightChartData.datasets[0].data[index].toLocaleString()} 원
+                                          </li>
+                                      ))}
+                                  </ul>
+                              </div>
+                          </div>
+                      )}
+                  </div>
+              ) : user.userType === 'AIRLINE' ? (
+                  <p>Loading flight payment chart data...</p>
+              ) : null}
+          </div>
+  
+          <div style={{
+             display: 'flex', gap: '20px', alignItems: 'flex-start',
+ 
+              }}>
+              {user.userType === 'ADMIN' && airlineChartData ? (
+                  <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop:"30px",boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',borderRadius: '10px',padding: '20px', }}>
+                      <div style={{ width: '600px', textAlign: 'center' }}>
+                          <Bar data={airlineChartData} options={airlineOptions} />
+                      </div>
+                      {airlinePieChartData && (
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                              <div style={{ width: '300px', marginTop: '20px' }}>
+                                  <Doughnut data={airlinePieChartData} options={{ responsive: true }} />
+                              </div>
+                              <div style={{ textAlign: 'left', marginTop: '20px' }}>
+                                  <h3>Airline Revenue Details</h3>
+                                  <ul>
+                                      {airlineChartData.labels.map((label, index) => (
+                                          <li key={index}>
+                                              <strong>{label}</strong>: {airlineChartData.datasets[0].data[index].toLocaleString()} 원
+                                          </li>
+                                      ))}
+                                  </ul>
+                              </div>
+                          </div>
+                      )}
+                  </div>
+              ) : user.userType === 'ADMIN' ? (
+                  <p>Loading airline revenue chart data...</p>
+              ) : null}
+          </div>
+      </div>
+  );
+  
+  
 };
 
 export default WorldMapWithGraphs;
