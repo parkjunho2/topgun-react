@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, NavLink } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useRecoilValue } from "recoil";
 import { loginState, userState } from "../../util/recoil";
+import moment from "moment";
 
 const NoticeDetail = () => {
     const { id } = useParams();
@@ -107,6 +108,13 @@ const NoticeDetail = () => {
         }
     }), []);
 
+    // 사용자 ID 앞 3글자 외 * 처리
+    const maskUserId = (userId) => {
+        if (userId.length <= 3) return userId;
+        const maskedPart = '*'.repeat(userId.length - 3);
+        return userId.slice(0, 3) + maskedPart;
+    };
+
     if (!notice) return <div>Loading...</div>;
     return (
         <div style={styles.container}>
@@ -155,9 +163,10 @@ const NoticeDetail = () => {
             ) : (
                 <div style={styles.viewMode}>
                     <h1 style={styles.title}>{notice.noticeTitle}</h1>
-                    <hr style={styles.divider} />
-                    <h4>작성자: {notice.noticeAuthor}</h4>
-                    <p>작성일: {notice.noticeCreatedAt}</p>
+                        <hr style={styles.divider} />
+                    <h4>작성자: {maskUserId(notice.noticeAuthor)}</h4>
+                    <p>작성일: {moment(notice.noticeCreatedAt).format("YYYY-MM-DD HH:mm")}</p>
+                        <hr style={styles.divider} />
                     <div style={styles.noticeContent}>
                         <ReactQuill
                             value={notice.noticeContent}
@@ -197,6 +206,7 @@ const styles = {
         padding: '20px',
         backgroundColor: 'transparent',
         position: 'relative',
+        border : "1px solid #eee"
     },
     title: {
         textAlign: 'center',
