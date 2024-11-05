@@ -14,8 +14,6 @@ import { toast } from 'react-toastify';
 
 const Login = () => {
 
-    let excludedKeys = [];
-
     // 정규식: 숫자와 특수 문자, 대문자 한개 이상이 포함된 패턴
     const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$])(?=.*[A-Z]).{8,}$/;
 
@@ -41,6 +39,8 @@ const Login = () => {
     const [, setUser] = useRecoilState(userState);
 
     // State
+    const [excludedKeys, setExcludedKeys] = useState([]); // 제외할 키들 상태
+
     // 비밀번호 재검증시 사용할 state
     const [pwCheck, setPwCheck] = useState('');
 
@@ -146,7 +146,7 @@ const Login = () => {
         validation.usersPasswordValid &&
         validation.passwordMatch;
 
-
+    // 조건부로 data-bs-dismiss 값 계산
     const isAllValid = (validation, excludedKeys) => {
         return Object.entries(validation)
             .filter(([key]) => !excludedKeys.includes(key)) // 제외할 변수
@@ -283,6 +283,80 @@ const Login = () => {
             console.error("Error occurred while joining:", error); // 에러 처리
         }
     }, [emailId, domain, joinData, userType]); // 의존성 배열
+
+    // 버튼의 data-bs-dismiss 값 계산
+    const dismissModal = isAllValid(validation, excludedKeys) ? "modal" : undefined;
+
+    // 회원가입
+    const Signup = useCallback(() => {
+        try {
+            // userType에 따라 excludedKeys 업데이트
+            if (userType === 'MEMBER') {
+                setExcludedKeys(['airlineIdValid', 'airlineNameValid']); // MEMBER일 경우 제외할 키들
+            } else if (userType === 'AIRLINE') {
+                setExcludedKeys(['memberGenderValid', 'memberBirthValid', 'memberEngNameValid', 'airlineIdValid', 'airlineNameValid']); // AIRLINE일 경우 제외할 키들
+            }
+
+            // 유효성 검사
+            const allValid = isAllValid(validation, excludedKeys);
+ 
+
+            if (allValid) {
+                // 데이터 전송(내부에서 비동기 처리 선행되어있음.)
+                sendData(); 
+
+                // 상태 초기화
+                setJoinData({
+                    usersId: '',
+                    usersPassword: '',
+                    usersName: '',
+                    usersEmail: '',
+                    usersContact: '',
+                    usersType: '',
+                    memberEngName: '',
+                    memberBirth: '',
+                    memberGender: '',
+                    airlineName: '',
+                    airlineNo: '',
+                });
+                setValidation({
+                    usersIdValid: null,
+                    usersPasswordValid: null,
+                    passwordMatch: null,
+                    memberNameValid: null,
+                    memberEngNameValid: null,
+                    usersContactValid: null,
+                    usersEmailValid: null,
+                    memberGenderValid: null,
+                    memberBirthValid: null,
+                    airlineIdValid: null,
+                    airlineNameValid: null,
+                });
+                setCurrentPage(0);
+                setPwCheck('');
+                setEmailId('');
+                setDomain('');
+
+                toast.success('가입완료!', {
+                    onClose: () => {
+                        setTimeout(() => { }, 500); // 500ms (0.5초) 대기
+                    },
+                });
+            } else {
+                toast.error('유효하지 않은 필드가 있습니다. 확인해 주세요.', {
+                    onClose: () => {
+                        setTimeout(() => { }, 500); // 500ms (0.5초) 대기
+                    },
+                });
+            }
+        } catch (error) {
+            toast.error('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.', {
+                onClose: () => {
+                    setTimeout(() => { }, 500); // 500ms 대기
+                },
+            });
+        }
+    }, [userType, validation, excludedKeys]); // userType과 validation 상태가 바뀔 때마다 handleSignup이 새로 정의되도록 의존성 배열에 추가
 
     // JSX
     return (
@@ -1279,100 +1353,11 @@ const Login = () => {
                             )}
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-primary" data-bs-dismiss={isAllValid(validation, excludedKeys) ? "modal" : undefined} // 조건부로 data-bs-dismiss 추가
-                                aria-label="Close" onClick={() => {
-                                    if (userType === 'MEMBER') {
-                                        // 제외할 변수들
-                                        excludedKeys = ['airlineIdValid', 'airlineNameValid'];
-
-                                        // 모든 유효성 검사 상태가 true인지 확인 (제외할 변수 포함)
-                                        const isAllValid = Object.entries(validation)
-                                            .filter(([key]) => !excludedKeys.includes(key)) // 제외할 변수
-                                            .every(([, value]) => value === true);
-
-                                        if (isAllValid) {
-                                            sendData(); // 모든 필드가 유효할 경우 데이터 전송
-                                            // 상태 초기화 작업 (필요시)
-                                            setJoinData({
-                                                usersId: '',
-                                                usersPassword: '',
-                                                usersName: '',
-                                                usersEmail: '',
-                                                usersContact: '',
-                                                usersType: '',
-                                                memberEngName: '',
-                                                memberBirth: '',
-                                                memberGender: '',
-                                                airlineName: '',
-                                                airlineNo: '',
-                                            });
-                                            setValidation({
-                                                usersIdValid: null,
-                                                usersPasswordValid: null,
-                                                passwordMatch: null,
-                                                memberNameValid: null,
-                                                memberEngNameValid: null,
-                                                usersContactValid: null,
-                                                usersEmailValid: null,
-                                                memberGenderValid: null,
-                                                memberBirthValid: null,
-                                                airlineIdValid: null,
-                                                airlineNameValid: null,
-                                            });
-                                            setCurrentPage(0);
-                                            setPwCheck('');
-                                            setEmailId('');
-                                            setDomain('');
-                                            toast.success('가입완료!', {
-                                                onClose: () => {
-                                                    setTimeout(() => {
-                                                    }, 500); // 500ms (0.5초) 대기
-                                                },
-                                            });
-                                        } else {
-                                            toast.error('유효하지 않은 필드가 있습니다. 확인해 주세요.', {
-                                                onClose: () => {
-                                                    setTimeout(() => {
-                                                    }, 500); // 500ms (0.5초) 대기
-
-                                                },
-                                            });
-                                        }
-                                    }
-                                    else if (userType === 'AIRLINE') {
-                                        // 제외할 변수들
-                                        excludedKeys = ['memberGenderValid', 'memberBirthValid', 'memberNameValid', 'memberEngNameValid', 'airlineIdValid', 'airlineNameValid'];
-
-                                        // 모든 유효성 검사 상태가 true인지 확인 (제외할 변수 포함)
-                                        const isAllValid = isAllValid();
-
-                                        if (isAllValid) {
-                                            sendData(); // 모든 필드가 유효할 경우 데이터 전송
-                                            toast.success('가입완료!', {
-                                                onClose: () => {
-                                                    setTimeout(() => {
-                                                        // 여기서 모달을꺼야한다
-
-                                                    }, 500); // 500ms (0.5초) 대기
-                                                },
-                                            });
-                                        } else {
-                                            toast.error('유효하지 않은 필드가 있습니다. 확인해 주세요.', {
-                                                onClose: () => {
-                                                    setTimeout(() => {
-                                                    }, 500); // 500ms (0.5초) 대기
-                                                },
-                                            });
-                                        }
-                                    } else {
-                                        toast.error('전송이 유효하지 않습니다 다시 확인해 주세요', {
-                                            onClose: () => {
-                                                setTimeout(() => {
-                                                }, 500); // 500ms (0.5초) 대기
-                                            },
-                                        });
-                                    }
-                                }}>가입하기</button>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                data-bs-dismiss={dismissModal} // 조건부로 data-bs-dismiss 추가
+                                aria-label="Close" onClick={Signup}>가입하기</button>
                         </div>
                     </div>
                 </div>
