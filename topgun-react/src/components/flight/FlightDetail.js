@@ -77,10 +77,10 @@ const loadFlight = useCallback(async () => {
         const arrivalTime = new Date(input.arrivalTime);
 
         // 필드 검증
-            // if (!/^[A-Z0-9]+$/.test(input.flightNumber)) {
-            //     toast.error("항공편 번호는 알파벳과 숫자로 구성되어야 합니다.");
-            //     return;
-            // }
+        if (!/^[A-Z]{2}[0-9]{4}$/.test(input.flightNumber)) {
+            toast.error("항공편 번호는 대문자 2개와 숫자 4개로 구성되어야 합니다.");
+            return;
+        }
 
             if (!input.flightNumber) {
                 toast.error("항공편 번호를 입력하세요.");
@@ -206,7 +206,7 @@ const loadFlight = useCallback(async () => {
                             <form>
                                 <div className="mb-3">
                                     <label>항공편 번호</label>
-                                    <input type="text" name="flightNumber" className="form-control" value={input.flightNumber} onChange={e => setInput({ ...input, flightNumber: e.target.value })} />
+                                    <input type="text" name="flightNumber" className="form-control" value={input.flightNumber} onChange={e => setInput({ ...input, flightNumber: e.target.value })} placeholder="AA1234"/>
                                 </div>
                                 <div className="mb-3">
                                     <label>출발 시간</label>
@@ -265,30 +265,6 @@ const loadFlight = useCallback(async () => {
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="card p-4 shadow">
-            <div className="row mt-4">
-                <div className="col">
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>사용자 정보</th>
-                                <th>?</th>
-                                <th>?</th>
-                                <th>?</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th>?</th>
-                                <th>?</th>
-                                <th>?</th>
-                                <th>?</th>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
             </div>
         </div>
 
