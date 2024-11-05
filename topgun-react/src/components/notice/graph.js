@@ -5,7 +5,6 @@ import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 import { userState } from "../../util/recoil";
 
-
 // Chart.js의 모든 차트 유형을 등록합니다.
 Chart.register(...registerables);
 
@@ -25,7 +24,7 @@ const WorldMapWithGraphs = () => {
                 });
                 const data = response.data;
 
-                const labels = data.map(item => `Flight ${item.flightId}`);
+                const labels = data.map(item => `비행편 ${item.flightId}`);
                 const payments = data.map(item => item.totalPayment);
 
                 if (data.length > 0) {
@@ -36,7 +35,7 @@ const WorldMapWithGraphs = () => {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Total Payment',
+                            label: '총 결제액',
                             data: payments,
                             backgroundColor: 'rgba(54, 162, 235, 0.8)',
                             borderColor: 'rgba(54, 162, 235, 1)',
@@ -51,7 +50,7 @@ const WorldMapWithGraphs = () => {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Payment Distribution',
+                            label: '결제 분포',
                             data: payments,
                             backgroundColor: payments.map((_, index) => `rgba(${index * 30 % 255}, ${100 + index * 30 % 155}, ${200}, 0.6)`),
                             hoverBackgroundColor: payments.map((_, index) => `rgba(${index * 30 % 255}, ${100 + index * 30 % 155}, ${200}, 1)`),
@@ -83,7 +82,7 @@ const WorldMapWithGraphs = () => {
                     labels: airlineLabels,
                     datasets: [
                         {
-                            label: 'Total Revenue by Airline',
+                            label: '항공사별 총 매출',
                             data: airlineTotalPayments,
                             backgroundColor: 'rgba(255, 99, 132, 0.8)',
                             borderColor: 'rgba(255, 99, 132, 1)',
@@ -98,7 +97,7 @@ const WorldMapWithGraphs = () => {
                     labels: airlineLabels,
                     datasets: [
                         {
-                            label: 'Airline Revenue Distribution',
+                            label: '항공사 매출 분포',
                             data: airlineTotalPayments,
                             backgroundColor: airlineTotalPayments.map((_, index) => `rgba(${index * 60 % 255}, ${200 - index * 30 % 155}, ${100 + index * 30 % 155}, 0.6)`),
                             hoverBackgroundColor: airlineTotalPayments.map((_, index) => `rgba(${index * 60 % 255}, ${200 - index * 30 % 155}, ${100 + index * 30 % 155}, 1)`),
@@ -120,7 +119,7 @@ const WorldMapWithGraphs = () => {
             legend: { position: 'top' },
             title: {
                 display: true,
-                text: `Total Payment by Flight ID for ${airlineName} (${user.userType})`,
+                text: `비행편 ID별 총 결제액 (${airlineName} / ${user.userType})`,
             },
             tooltip: {
                 callbacks: {
@@ -132,9 +131,9 @@ const WorldMapWithGraphs = () => {
         scales: {
             y: {
                 beginAtZero: true,
-                title: { display: true, text: 'Total Payment (원)' }
+                title: { display: true, text: '총 결제액 (원)' }
             },
-            x: { title: { display: true, text: 'Flight ID' } }
+            x: { title: { display: true, text: '비행편 ID' } }
         }
     };
 
@@ -144,11 +143,11 @@ const WorldMapWithGraphs = () => {
             legend: { position: 'top' },
             title: {
                 display: true,
-                text: `Total Revenue by Airline (${user.userType})`,
+                text: `항공사별 총 매출 (${user.userType})`,
             },
             tooltip: {
                 callbacks: {
-                    label: (tooltipItem) => `${tooltipItem.dataset.label}: ${tooltipItem.raw.toLocaleString()}원`
+                    label: (tooltipItem) => `${tooltipItem.dataset.label}: ${tooltipItem.raw.toLocaleString()} 원`
                 }
             }
         },
@@ -156,9 +155,9 @@ const WorldMapWithGraphs = () => {
         scales: {
             y: {
                 beginAtZero: true,
-                title: { display: true, text: 'Total Revenue (원)' }
+                title: { display: true, text: '총액 (원)' }
             },
-            x: { title: { display: true, text: 'Airlines' } }
+            x: { title: { display: true, text: '항공사' } }
         }
     };
 
@@ -176,7 +175,7 @@ const WorldMapWithGraphs = () => {
                                   <Doughnut data={flightPieChartData} options={{ responsive: true }} />
                               </div>
                               <div style={{ textAlign: 'left', marginTop: '20px' }}>
-                                  <h3>Flight Payment Details</h3>
+                                  <h3>비행편 결제 상세 내역</h3>
                                   <ul>
                                       {flightChartData.labels.map((label, index) => (
                                           <li key={index}>
@@ -189,13 +188,12 @@ const WorldMapWithGraphs = () => {
                       )}
                   </div>
               ) : user.userType === 'AIRLINE' ? (
-                  <p>Loading flight payment chart data...</p>
+                  <p>비행편 결제 차트 데이터를 로딩 중입니다...</p>
               ) : null}
           </div>
   
           <div style={{
              display: 'flex', gap: '20px', alignItems: 'flex-start',
- 
               }}>
               {user.userType === 'ADMIN' && airlineChartData ? (
                   <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop:"30px",boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',borderRadius: '10px',padding: '20px', }}>
@@ -208,7 +206,7 @@ const WorldMapWithGraphs = () => {
                                   <Doughnut data={airlinePieChartData} options={{ responsive: true }} />
                               </div>
                               <div style={{ textAlign: 'left', marginTop: '20px' }}>
-                                  <h3>Airline Revenue Details</h3>
+                                  <h3>항공사 매출 상세 내역</h3>
                                   <ul>
                                       {airlineChartData.labels.map((label, index) => (
                                           <li key={index}>
@@ -221,13 +219,11 @@ const WorldMapWithGraphs = () => {
                       )}
                   </div>
               ) : user.userType === 'ADMIN' ? (
-                  <p>Loading airline revenue chart data...</p>
+                  <p>항공사 매출 차트 데이터를 로딩 중입니다...</p>
               ) : null}
           </div>
       </div>
-  );
-  
-  
+    );
 };
 
 export default WorldMapWithGraphs;
