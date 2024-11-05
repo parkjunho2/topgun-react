@@ -19,7 +19,7 @@ const UserList = () => {
     });
 
     //페이징 관련 state
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(null);
     const [size,] = useState(6);
 
     // [2] effect로 계산 (권장하는 방법!)
@@ -33,6 +33,10 @@ const UserList = () => {
 
     useEffect(() => {
         //console.log("beginRow, endRow 변경! ", input.beginRow, input.endRow);
+        if (page === null) {
+            setFirstPage();
+        }
+
         if (page === 1) {
             sendRequest();
         }
@@ -40,6 +44,13 @@ const UserList = () => {
             sendMoreRequest();
         }
     }, [input.beginRow, input.endRow]);
+
+    // useEffect(()=>{
+    //     if(page===null){
+    //         sendRequest();
+    //     }
+    // },[]);
+
 
     //callback
     const changeInputString = useCallback(e => {
@@ -87,6 +98,8 @@ const UserList = () => {
     }, [page]);
 
     const loading = useRef(false);
+
+    console.log()
 
     return (
         <>
