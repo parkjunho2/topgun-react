@@ -217,6 +217,11 @@ const PaymentAllList=()=>{
                                                                             style={{ width: '25%' }}
                                                                             className="form-control"
                                                                             onChange={e => setSelectedDetail(prev => ({ ...prev, paymentDetailPassanger: e.target.value }))}
+                                                                            onBlur={() => {
+                                                                                if (!passangerRegex.test(selectedDetail.paymentDetailPassanger)) {
+                                                                                    toast.error("한글만 입력하세요.");
+                                                                                }
+                                                                            }}
                                                                         />
                                                                     </div >
 
@@ -250,6 +255,11 @@ const PaymentAllList=()=>{
                                                                             type="text"
                                                                             style={{ width: '25%' }}
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassport: e.target.value }))}
+                                                                            onBlur={() => {
+                                                                                if (!passportRegex.test(selectedDetail.paymentDetailPassport)) {
+                                                                                    toast.error("여권 번호는 영문자 1개 뒤에 숫자 8개로 이루어져야 합니다.");
+                                                                                }
+                                                                            }}
                                                                         />
                                                                     </div>
                                                                     <div style={{textAlign:"left"}}>
@@ -258,14 +268,25 @@ const PaymentAllList=()=>{
                                                                             type="text"
                                                                             style={{ width: '25%' }}
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassanger: e.target.value }))}
+                                                                            onBlur={() => {
+                                                                                if (!passangerRegex.test(selectedDetail.paymentDetailPassanger)) {
+                                                                                    toast.error("한글만 입력하세요.");
+                                                                                }
+                                                                            }}
                                                                         />
                                                                     </div>
-                                                                    <div style={{textAlign:"left"}}>
+                                                                    <div style={{ textAlign: "left" }}>
                                                                         <span>영문이름</span>
-                                                                        <input className="form-control"
+                                                                        <input
+                                                                            className="form-control"
                                                                             type="text"
                                                                             style={{ width: '25%' }}
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailEnglish: e.target.value }))}
+                                                                            onBlur={() => {
+                                                                                if (!englishRegex.test(selectedDetail.paymentDetailEnglish)) {
+                                                                                    toast.error("영어만 입력하세요.");
+                                                                                }
+                                                                            }}
                                                                         />
                                                                     </div>
                                                                     <div style={{textAlign:"left"}}>
