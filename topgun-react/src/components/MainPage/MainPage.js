@@ -953,9 +953,9 @@ const MainPage = () => {
                             </h3>
                         </div>
                     </div>
-                    <div id="travelCarousel" className="carousel slide" data-bs-ride="false">
+                    <div id="travelCarousel" className="carousel slide" data-bs-ride="carousel">
                         <div className="carousel-inner">
-                            <div className="carousel-item active">
+                            <div className="carousel-item active" data-bs-interval="6000">
                                 <div className="row">
                                     <div className="col">
                                         <img
@@ -973,9 +973,8 @@ const MainPage = () => {
                                     </div>
                                 </div>
                             </div>
-
                             {/* 두 번째 여행지 */}
-                            <div className="carousel-item">
+                            <div className="carousel-item" data-bs-interval="6000">
                                 <div className="row">
                                     <div className="col">
                                         <img
@@ -993,7 +992,7 @@ const MainPage = () => {
                                 </div>
                             </div>
                             {/* 세 번째 여행지 */}
-                            <div className="carousel-item">
+                            <div className="carousel-item" data-bs-interval="6000">
                                 <div className="row">
                                     <div className="col">
                                         <img
