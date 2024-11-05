@@ -38,8 +38,6 @@ const Login = () => {
     //recoil state
     const [, setUser] = useRecoilState(userState);
 
-    // State
-    const [excludedKeys, setExcludedKeys] = useState([]); // 제외할 키들 상태
 
     // 비밀번호 재검증시 사용할 state
     const [pwCheck, setPwCheck] = useState('');
@@ -285,25 +283,31 @@ const Login = () => {
     }, [emailId, domain, joinData, userType]); // 의존성 배열
 
     // 버튼의 data-bs-dismiss 값 계산
-    const dismissModal = isAllValid(validation, excludedKeys) ? "modal" : undefined;
+    const [dismissModal, setDismissModal] = useState(undefined); // dismissModal 상태
 
     // 회원가입
-    const Signup = useCallback(() => {
+    const Signup = () => {
+        // let
+        let excludedKeys = []; // 제외할 키들 상태
+
         try {
             // userType에 따라 excludedKeys 업데이트
             if (userType === 'MEMBER') {
-                setExcludedKeys(['airlineIdValid', 'airlineNameValid']); // MEMBER일 경우 제외할 키들
+                excludedKeys = ['airlineIdValid', 'airlineNameValid']; // MEMBER일 경우 제외할 키들
             } else if (userType === 'AIRLINE') {
-                setExcludedKeys(['memberGenderValid', 'memberBirthValid', 'memberEngNameValid', 'airlineIdValid', 'airlineNameValid']); // AIRLINE일 경우 제외할 키들
+                excludedKeys = ['memberGenderValid', 'memberBirthValid', 'memberEngNameValid', 'airlineIdValid', 'airlineNameValid']; // AIRLINE일 경우 제외할 키들
             }
 
             // 유효성 검사
             const allValid = isAllValid(validation, excludedKeys);
- 
+            const modalDismissValue = allValid ? "modal" : undefined;
+
+            // dismissModal 상태 업데이트
+            setDismissModal(modalDismissValue);
 
             if (allValid) {
                 // 데이터 전송(내부에서 비동기 처리 선행되어있음.)
-                sendData(); 
+                sendData();
 
                 // 상태 초기화
                 setJoinData({
@@ -356,7 +360,9 @@ const Login = () => {
                 },
             });
         }
-    }, [userType, validation, excludedKeys]); // userType과 validation 상태가 바뀔 때마다 handleSignup이 새로 정의되도록 의존성 배열에 추가
+    };
+
+
 
     // JSX
     return (
@@ -1293,7 +1299,7 @@ const Login = () => {
                                         </div>
 
                                         <big>이메일</big>
-                                        <div className="input-group mb-4" style={{ width: '90%' }}>
+                                        <div className="input-group mb-4" style={{ width: '80%' }}>
                                             <div className="form-floating">
                                                 <input
                                                     type="text"
