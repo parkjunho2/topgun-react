@@ -43,11 +43,18 @@ const Header = () => {
                                 </NavLink>
                             </li> */}
                             {login && ( //로그인 회원
+                                <>
                                 <li>
                                     <NavLink to="/room" className="nav-link px-2 text-white">
                                         문의
                                     </NavLink>
                                 </li>
+                                <li>
+                                <NavLink to="/payment/alllist" className="nav-link px-2 text-white">
+                                    예약내역
+                                </NavLink>
+                            </li>
+                            </>
                             )}
                             {user.userType === 'ADMIN' && (
                                 <li>
@@ -68,8 +75,7 @@ const Header = () => {
                                     데이터차트
                                 </NavLink>
                                 </li>
-                                </>
-
+                            </>
                             )}
                             {login && user.userType === "ADMIN" && ( //로그인 상태, ADMIN만
                                 <>
@@ -90,13 +96,13 @@ const Header = () => {
                                     payment
                                 </NavLink>
                             </li> */}
-                            {login && user.userType === "MEMBER" && (
+                            {/* {login && user.userType === "MEMBER" && (
                                 <li>
                                     <NavLink to="/payment/alllist" className="nav-link px-2 text-white">
                                         예약내역
                                     </NavLink>
                                 </li>
-                            )}
+                            )} */}
                             <li>
                                 <NavLink to="/notice" className="nav-link px-2 text-white">
                                     공지사항
