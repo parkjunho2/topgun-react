@@ -348,11 +348,20 @@ const MyPage = () => {
                                     }} className="btn btn-primary w-100 shadow-sm">
                                         정보 수정 하기
                                     </button>
-                                    <button type="button" onClick={() => {
-                                        // deleteUser
-                                    }} className="btn btn-danger w-100 shadow-sm mt-3" data-bs-toggle="modal" data-bs-target="#DeleteForm">
-                                        회원탈퇴
-                                    </button>
+                                    {user.userType === "MEMBER" ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                // deleteUser
+                                            }}
+                                            className="btn btn-danger w-100 shadow-sm mt-3"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#DeleteForm">
+                                            회원탈퇴
+                                        </button>
+                                    ) : (
+                                        null
+                                    )}
                                 </>
                             )}
                         </div>
