@@ -4,6 +4,8 @@ import { NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 import Flight from './../flight/Flight';
 import moment from "moment";
+import { MdCardTravel } from "react-icons/md";
+import { MdOutlineAirlineSeatReclineNormal } from "react-icons/md";
 
 const PaymentAllList=()=>{
      //state
@@ -93,11 +95,12 @@ const PaymentAllList=()=>{
             <h1 className="text-center mt-5">결제한 목록이 없습니다.</h1>
         ) : (
             <div className="container" style={{width:"1100px"}}>
-                <div className="row">
+                <div className="row mt-4">
                     <div className="col">
              {/* <ul className="list-group"> */}
                  {paymentList.map(payment=>(
                      <div key={payment.paymentNo} className="list-group-item mt-4 mb-3" style={{textAlign:"center"}}>
+                         <h3 style={{textAlign:"left"}}>여정 안내서<MdCardTravel /></h3>
                         {/* 운임정보에 대한 테이블 */}
                             <div className="table">
                                 <table className="table">
@@ -183,30 +186,57 @@ const PaymentAllList=()=>{
                         <hr/>   {/* 좌석정보와 항공편 가격에 대해서 나눔 */}
                 {/* 상세 결제 내용 */}
                 {payment.paymentDetailList?.length > 0 && (
-                    <div className="list-group list-group-flush mt-4">
+                    <div className="row mt-4">
+                        <h3 style={{textAlign:"left"}}>탑승자 정보 및 좌석 정보<MdOutlineAirlineSeatReclineNormal /></h3>
                             {payment.paymentDetailList.map(detail => ( 
-                                <div className="list-group-item" key={detail.paymentDetailNo}>
-                                    {detail.flightId.airlineName}
-                                    <div className={`text-end ${detail.paymentDetailStatus === '승인' ? 'text-primary' : detail.paymentDetailStatus === '취소' ? 'text-danger' : ''}`}>
-                                        결제상태: {detail.paymentDetailStatus}완료
-                                    </div>
-                                    <h4 className="d-flex justify-content-between">
-                                        {detail.paymentDetailName}
-                                        <span />
-                                        금액: {detail.paymentDetailPrice.toLocaleString()}원
-                                    </h4>
-                                    <h5 className="text-end"><small>주문번호:{detail.paymentDetailNo}</small></h5>
+                                <>
+                                <div className="d-flex table" key={detail.paymentDetailNo}>
+                                        <div className="" style={{width:"55%"}}>
+                                            <table className="table">
+                                                <thead>
+                                                    <tr>
+                                                        <td colSpan="100%" style={{ backgroundColor: "#e6f9ff", padding: "0.5em" }}>
+                                                            <span style={{ display: "block", width: "100%", color: "#00256c", fontWeight:"bolder"}}>결제 좌석정보</span>
+                                                        </td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style={{fontWeight:"bolder", width:"35%"}}>예약번호</td>
+                                                        <td >{detail.paymentDetailNo}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{fontWeight:"bolder", width:"35%"}}>좌석정보</td>
+                                                        <td >{detail.paymentDetailName}</td>
+                                                    </tr>
+
+                                                    <tr className={`${detail.paymentDetailStatus === '승인' ? 'text-primary' : detail.paymentDetailStatus === '취소' ? 'text-danger' : ''}`}>
+                                                        <td style={{ fontWeight: "bolder", width: "35%" }}>결제상태</td>
+                                                        <td style={{ color: detail.paymentDetailStatus === '취소' ? 'red' : 'inherit', fontWeight: 'bolder' }}>
+                                                            {detail.paymentDetailStatus} 완료
+                                                        </td>
+                                                    </tr>
+
+
+
+                                                    <tr>
+                                                        <td style={{fontWeight:"bolder", width:"20%"}}>좌석 결제금액</td>
+                                                        <td>{detail.paymentDetailPrice.toLocaleString()}원</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+
                                   {detail.paymentDetailStatus === '취소' ? ( 
-                                <div>
-                                    <h3><strong>취소된 좌석입니다.</strong></h3>
-                                </div>
+                                <div></div>
                                     ) : ( // 등록된 정보가 없으면 입력 필드 표시
 
-                                        <div className="row">
+                                    <div className="row" style={{width:"60%"}}>
                                         {detail.paymentDetailPassanger === null ? ( // passport가 null인 경우 입력 필드 표시
                                             <>
-                                            <h5 style={{textAlign:"left" , fontWeight:"bold"}}>여권정보 입력</h5>
-                                                    <div className="mt-3">
+                                            <h5 className="ms-4" style={{textAlign:"left" , fontWeight:"bold"}}>여권정보 입력</h5>
+                                                    <div className="ms-4" style={{width:"100%"}}>
                                                             {(["서울/김포(GMP)", "서울/인천(ICN)", "제주(CJU)"].includes(payment.flightVO.departureAirport) &&
                                                                 ["서울/김포(GMP)", "서울/인천(ICN)", "제주(CJU)"].includes(payment.flightVO.arrivalAirport)) ? (
                                                                 <>
@@ -214,7 +244,7 @@ const PaymentAllList=()=>{
                                                                         <span>한글이름</span>
                                                                         <input
                                                                             type="text"
-                                                                            style={{ width: '25%' }}
+                                                                            style={{ width: '45%' }}
                                                                             className="form-control"
                                                                             onChange={e => setSelectedDetail(prev => ({ ...prev, paymentDetailPassanger: e.target.value }))}
                                                                             onBlur={() => {
@@ -229,7 +259,7 @@ const PaymentAllList=()=>{
                                                                         <span>생년월일</span>
                                                                             <div className="d-flex justify-content-between">
                                                                                 <input className="form-control"
-                                                                                    style={{ width: '25%' }}
+                                                                                    style={{ width: '45%' }}
                                                                                     type="date"
                                                                                     onChange={e => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
                                                                                 />
@@ -250,10 +280,10 @@ const PaymentAllList=()=>{
                                                             ) : (
                                                                 <>
                                                                     <div  style={{textAlign:"left"}}>
-                                                                        <span>여권번호</span>
+                                                                        <span style={{width:"30%"}}>여권번호</span>
                                                                         <input className="form-control"
                                                                             type="text"
-                                                                            style={{ width: '25%' }}
+                                                                            style={{ width: '45%' }}
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassport: e.target.value }))}
                                                                             onBlur={() => {
                                                                                 if (!passportRegex.test(selectedDetail.paymentDetailPassport)) {
@@ -263,10 +293,10 @@ const PaymentAllList=()=>{
                                                                         />
                                                                     </div>
                                                                     <div style={{textAlign:"left"}}>
-                                                                        <span >한글이름</span>
+                                                                        <span style={{width:"30%"}}>한글이름</span>
                                                                         <input className="form-control"
                                                                             type="text"
-                                                                            style={{ width: '25%' }}
+                                                                            style={{ width: '45%' }}
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassanger: e.target.value }))}
                                                                             onBlur={() => {
                                                                                 if (!passangerRegex.test(selectedDetail.paymentDetailPassanger)) {
@@ -276,11 +306,11 @@ const PaymentAllList=()=>{
                                                                         />
                                                                     </div>
                                                                     <div style={{ textAlign: "left" }}>
-                                                                        <span>영문이름</span>
+                                                                        <span style={{width:"30%"}}>영문이름</span>
                                                                         <input
                                                                             className="form-control"
                                                                             type="text"
-                                                                            style={{ width: '25%' }}
+                                                                            style={{ width: '45%' }}
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailEnglish: e.target.value }))}
                                                                             onBlur={() => {
                                                                                 if (!englishRegex.test(selectedDetail.paymentDetailEnglish)) {
@@ -290,27 +320,27 @@ const PaymentAllList=()=>{
                                                                         />
                                                                     </div>
                                                                     <div style={{textAlign:"left"}}>
-                                                                        <span style={{ marginRight: '21px' }}>성별</span>
+                                                                        <span style={{ marginRight: '21px' , width:"30%" }}>성별</span>
                                                                         <select className="form-control"
-                                                                            style={{ width: '25%' }}
+                                                                            style={{ width: '45%' }}
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailSex: e.target.value }))}>
                                                                             <option value="">선택하세요</option>
                                                                             <option value="M">남성</option>
                                                                             <option value="W">여성</option>
                                                                         </select>
                                                                     </div>
-                                                                    <div style={{textAlign:"left"}}>
+                                                                    <div style={{textAlign:"left", width:"30%"}}>
                                                                         생년월일
                                                                         <input className="form-control"
-                                                                            style={{ width: '25%' }}
+                                                                            style={{ width: '100%' }}
                                                                             type="date"
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
                                                                             max={new Date().toISOString().split("T")[0]} 
                                                                         />
                                                                         <div>
-                                                                            <span style={{ marginRight: '21px' }}>국적</span>
+                                                                            <span style={{ marginRight: '21px', width:"30%" }}>국적</span>
                                                                             <select className="form-control"
-                                                                                style={{ width: '25%' }}
+                                                                                style={{ width: '100%' }}
                                                                                 id="country"
                                                                                 onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailCountry: e.target.value }))}>
                                                                                 <option value="">국적을 선택하세요</option>
@@ -327,9 +357,9 @@ const PaymentAllList=()=>{
                                                                             </select>
                                                                         </div>
                                                                         <div>
-                                                                            <span>여권 발행국</span>
+                                                                            <span style={{ width: '30%' }}>여권 발행국</span>
                                                                             <select className="form-control"
-                                                                                style={{ width: '25%' }}
+                                                                                style={{ width: '100%' }}
                                                                                 id="visaType"
                                                                                 onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailVisa: e.target.value }))}>
                                                                                 <option value="">국적을 선택하세요</option>
@@ -345,10 +375,10 @@ const PaymentAllList=()=>{
                                                                                 <option value="AU">호주</option>
                                                                             </select>
                                                                         </div>
-                                                                        <span>여권 만료일</span>
+                                                                        <span style={{ width: '30%' }}>여권 만료일</span>
                                                                         <div className="d-flex justify-content-between">
                                                                                     <input className="form-control"
-                                                                                        style={{ width: '25%' }}
+                                                                                        style={{ width: '100%' }}
                                                                                         type="date"
                                                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailExpire: e.target.value }))}
                                                                                         min={new Date().toISOString().split("T")[0]} // 오늘 날짜를 최소 날짜로 설정
@@ -372,91 +402,99 @@ const PaymentAllList=()=>{
                                                         </div>
                                             </>
                                         ) : ( //조건 탑승객 이름 입력되면 출력됨
-                                            <div>
-                                                {(["서울/김포(GMP)", "서울/인천(ICN)", "제주(CJU)"].includes(payment.flightVO.departureAirport) &&
-                                                    ["서울/김포(GMP)", "서울/인천(ICN)", "제주(CJU)"].includes(payment.flightVO.arrivalAirport)) ? (
-                                                    <div className="row" style={{width:"60%"}}>
-                                                        <div className="table">
-                                                                <table className="table">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <td colSpan="100%" style={{ backgroundColor: "#e6f9ff", padding: "0.5em" }}>
-                                                                                <span style={{ display: "block", width: "100%", color: "#00256c", fontWeight:"bolder"}}>탑승자 정보</span>
-                                                                            </td>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>탑승객 이름</td>
-                                                                            <td > {detail.paymentDetailPassanger}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>생년월일</td>
-                                                                            <td> {detail.paymentDetailBirth}</td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                        </div>
-                                                    </div>
+                                                <div className="">
+                                                    {(["서울/김포(GMP)", "서울/인천(ICN)", "제주(CJU)"].includes(payment.flightVO.departureAirport) &&
+                                                        ["서울/김포(GMP)", "서울/인천(ICN)", "제주(CJU)"].includes(payment.flightVO.arrivalAirport)) ? (
+                                                            <>
+                                                            <div className="row" style={{width:"100%"}}>
+                                                                    <div className="table">
+                                                                            <table className="table">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <td colSpan="100%" style={{ backgroundColor: "#e6f9ff", padding: "0.5em" }}>
+                                                                                            <span style={{ display: "block", width: "100%", color: "#00256c", fontWeight:"bolder"}}>탑승자 정보</span>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td style={{fontWeight:"bolder", width:"35%"}}>탑승객 이름</td>
+                                                                                        <td > {detail.paymentDetailPassanger}</td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td style={{fontWeight:"bolder", width:"35%"}}>생년월일</td>
+                                                                                        <td> {detail.paymentDetailBirth}</td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                    </div>
+                                                            </div>
+
+                                                        </>
                                                 ) : (
-                                                    <div className="row" style={{width:"60%"}}>
-                                                        <div className="table">
-                                                                <table className="table">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <td colSpan="100%" style={{ backgroundColor: "#e6f9ff", padding: "0.5em" }}>
-                                                                                <span style={{ display: "block", width: "100%", color: "#00256c", fontWeight:"bolder"}}>여권 정보</span>
-                                                                            </td>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>여권번호</td>
-                                                                            <td > {detail.paymentDetailPassport}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>한글 이름</td>
-                                                                            <td>{detail.paymentDetailPassanger}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>영문 이름</td>
-                                                                            <td>{detail.paymentDetailEnglish}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>성별</td>
-                                                                            <td>{detail.paymentDetailSex}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>생년월일</td>
-                                                                            <td>{detail.paymentDetailBirth}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>국적</td>
-                                                                            <td>{detail.paymentDetailCountry}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>여권 발행국</td>
-                                                                            <td>{detail.paymentDetailVisa}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{fontWeight:"bolder", width:"20%"}}>여권 만료일</td>
-                                                                            <td>{detail.paymentDetailExpire}</td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
+                                                    
+                                                        <div className="" style={{width:"100%"}}>
+                                                            <div className="table">
+                                                                    <table className="table">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <td colSpan="100%" style={{ backgroundColor: "#e6f9ff", padding: "0.5em" }}>
+                                                                                    <span style={{ display: "block", width: "100%", color: "#00256c", fontWeight:"bolder"}}>여권 정보</span>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td style={{fontWeight:"bolder", width:"30%"}}>여권번호</td>
+                                                                                <td > {detail.paymentDetailPassport}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style={{fontWeight:"bolder", width:"30%"}}>한글 이름</td>
+                                                                                <td>{detail.paymentDetailPassanger}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style={{fontWeight:"bolder", width:"30%"}}>영문 이름</td>
+                                                                                <td>{detail.paymentDetailEnglish}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style={{fontWeight:"bolder", width:"30%"}}>성별</td>
+                                                                                <td>{detail.paymentDetailSex}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style={{fontWeight:"bolder", width:"30%"}}>생년월일</td>
+                                                                                <td>{detail.paymentDetailBirth}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style={{fontWeight:"bolder", width:"30%"}}>국적</td>
+                                                                                <td>{detail.paymentDetailCountry}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style={{fontWeight:"bolder", width:"30%"}}>여권 발행국</td>
+                                                                                <td>{detail.paymentDetailVisa}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style={{fontWeight:"bolder", width:"30%"}}>여권 만료일</td>
+                                                                                <td>{detail.paymentDetailExpire}</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                            </div>
                                                         </div>
-                                                    </div>
                                                         )}
                                                     </div>
                                                 )}
                                             </div>
                                             )}
                                         </div>
+                                        <hr/>   {/* 한 줄 테이블에 대한 줄 나누기 */}
+                                       </>
+                                        
                                     ))}
+
                                 {/* </ul> */}
                                 </div>
                                 )}
-                                    <hr style={{border:"1px solid black"}}/>
+                                    {/* <hr style={{border:"1px solid black"}}/> */}
                             </div>
                         ))}
                     {/* </ul> */}
