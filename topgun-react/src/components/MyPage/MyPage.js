@@ -53,7 +53,7 @@ const MyPage = () => {
     //     if (!user || !user.userId || !user.userType) return; // user가 유효한지 확인
 
     //     try {
-    //         const response = await axios.post('http://localhost:8080/users/myInfo', {
+    //         const response = await axios.post('/users/myInfo', {
     //             userId: user.userId,
     //             userType: user.userType
     //         });
@@ -70,7 +70,7 @@ const MyPage = () => {
         if (!user || !user.userId || !user.userType) return; // user가 유효한지 확인
 
         try {
-            const response = await axios.post('http://localhost:8080/users/myInfo', {
+            const response = await axios.post('/users/myInfo', {
                 userId: user.userId,
                 userType: user.userType
             });
@@ -84,7 +84,7 @@ const MyPage = () => {
     // 2. 이미지 다운로드 및 렌더링
     const fetchProfileImage = useCallback(async (attachmentNo) => {
         try {
-            const imageResponse = await axios.get(`http://localhost:8080/attach/download?attachmentNo=${attachmentNo}`, {
+            const imageResponse = await axios.get(`/attach/download?attachmentNo=${attachmentNo}`, {
                 responseType: 'blob' // 파일을 Blob 형태로 받아오기
             });
             if (imageResponse && imageResponse.data) {
@@ -103,7 +103,7 @@ const MyPage = () => {
     // 1. 이미지 번호 가져오기
     const fetchImageNumber = useCallback(async () => {
         try {
-            const response = await axios.post('http://localhost:8080/users/myImage', {});
+            const response = await axios.post('/users/myImage', {});
             const attachmentNo = response.data;
             if (attachmentNo !== -1) {
                 fetchProfileImage(attachmentNo);
@@ -122,7 +122,7 @@ const MyPage = () => {
             formData.append('attach', file);
 
             try {
-                await axios.post('http://localhost:8080/users/profile', formData, {
+                await axios.post('/users/profile', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     }
@@ -164,7 +164,7 @@ const MyPage = () => {
         if (!user || !user.userId || !user.userType) return; // user가 유효한지 확인
 
         try {
-            const resp = await axios.delete('http://localhost:8080/users/delete', {
+            const resp = await axios.delete('/users/delete', {
                 data: {
                     userId: user.userId,
                     delPw: delPw,
@@ -200,7 +200,7 @@ const MyPage = () => {
 
     const saveEdit = useCallback(async () => {
         try {
-            const response = await axios.put('http://localhost:8080/users/update', editedUserInfo, {
+            const response = await axios.put('/users/update', editedUserInfo, {
                 params: {
                     authPassword: checkPw // authPassword를 쿼리 파라미터로 전달
                 }

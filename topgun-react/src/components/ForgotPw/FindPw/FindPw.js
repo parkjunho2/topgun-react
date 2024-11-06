@@ -15,7 +15,7 @@ const FindPw = () => {
         setLoading(true); // 로딩 시작
         try {
             // certId와 certEmail을 함께 전송
-            await axios.post(`http://localhost:8080/cert/send?certEmail=${encodeURIComponent(email)}&certId=${encodeURIComponent(certId)}`);
+            await axios.post(`/cert/send?certEmail=${encodeURIComponent(email)}&certId=${encodeURIComponent(certId)}`);
             toast.success("인증 메일이 발송되었습니다.");
             setErrorMessage(""); // 성공적으로 전송되면 에러 메시지 초기화
         } catch (error) {

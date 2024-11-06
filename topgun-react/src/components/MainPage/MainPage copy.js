@@ -131,7 +131,7 @@ const MainPage = () => {
     //첫 목록을 불러올 때 사용
     const sendRequest = useCallback(async () => {
         loading.current = true; //시작지점
-        const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
+        const resp = await axios.post("/flight/complexSearch", input);
         // console.log(resp.data);
 
         setResult(resp.data);

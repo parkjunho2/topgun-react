@@ -32,7 +32,7 @@ const PaymentSuccess=()=>{
         //callback
         const sendApproveRequest = useCallback(async()=>{
             try{//approveRequestVO 에 전송
-                const resp = await axios.post("http://localhost:8080/seats/approve", {
+                const resp = await axios.post("/seats/approve", {
                     
                     //정보 전송 cid, userId, orderId, pg_token, tid
                     partnerOrderId: partnerOrderId,
@@ -54,7 +54,7 @@ const PaymentSuccess=()=>{
 
           // 항공편 정보 백엔드에 불러옴
      const loadFlightInfo = useCallback(async () => {
-        const resp = await axios.get(`http://localhost:8080/seats/info/${flightId}`);
+        const resp = await axios.get(`/seats/info/${flightId}`);
         setFlightInfo(resp.data[0]); // 첫 번째 항공편 정보만 가져오기
     }, [flightId]);
 

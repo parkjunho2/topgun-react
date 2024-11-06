@@ -37,7 +37,7 @@ const Room = () => {
 
     //callback
     const loadRoomList = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/room/");
+        const resp = await axios.get("/room/");
         let filteredRooms = resp.data;
 
         // 사용자의 타입에 따라 방 목록 필터링
@@ -59,7 +59,7 @@ const Room = () => {
     }, [input]);
 
     // const saveInput = useCallback(async () => {
-    //     const resp = await axios.post("http://localhost:8080/room/", input);
+    //     const resp = await axios.post("/room/", input);
     //     loadRoomList();
     //     setInput({ roomName: "" });
     // }, [input]);
@@ -70,7 +70,7 @@ const Room = () => {
             return; // 입력이 없으면 요청을 보내지 않고 함수 종료
         }    
         else {
-            const resp = await axios.post("http://localhost:8080/room/", input);
+            const resp = await axios.post("/room/", input);
             loadRoomList();  // 채팅방 목록 갱신
             setInput({ roomName: "" });  // 입력 필드 초기화
         }
@@ -79,7 +79,7 @@ const Room = () => {
     const deleteRoom = useCallback(async (target) => {
         const remove = window.confirm("채팅방을 삭제하시겠습니까?");
         if(remove){
-            const resp = await axios.delete("http://localhost:8080/room/" + target.roomNo);
+            const resp = await axios.delete("/room/" + target.roomNo);
             loadRoomList();
             toast.success("채팅방이 삭제되었습니다");
         }
@@ -93,14 +93,14 @@ const Room = () => {
             navigate("/chat/" + target.roomNo); //이미 참여중인 방으로 이동
         }
         else {
-            await axios.post("http://localhost:8080/room/enter", { roomNo: target.roomNo });
+            await axios.post("/room/enter", { roomNo: target.roomNo });
             loadRoomList();
             navigate("/chat/" + target.roomNo);
         }
     }, [roomList]);
 
     const leaveRoom = useCallback(async (target) => {
-        await axios.post("http://localhost:8080/room/leave", { roomNo: target.roomNo });
+        await axios.post("/room/leave", { roomNo: target.roomNo });
         loadRoomList();
     }, [roomList]);
 

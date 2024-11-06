@@ -16,17 +16,17 @@ const PaymentDetail=()=>{
 
     //callback
     const loadPaymentInfo= useCallback(async()=>{
-        const resp= await axios.get("http://localhost:8080/seats/detail/"+paymentNo);
+        const resp= await axios.get("/seats/detail/"+paymentNo);
         setInfo(resp.data);
     }, []);
     
     const cancelPaymentAll = useCallback(async()=>{
-        const resp= await axios.delete("http://localhost:8080/seats/cancelAll/"+paymentNo);
+        const resp= await axios.delete("/seats/cancelAll/"+paymentNo);
         loadPaymentInfo();//화면 갱신
     }, []);
 
     // const cancelPaymentItem = useCallback(async(detail)=>{
-    //     const resp= await axios.delete("http://localhost:8080/seats/cancelItem/"+detail.paymentDetailNo)
+    //     const resp= await axios.delete("/seats/cancelItem/"+detail.paymentDetailNo)
     //     loadPaymentInfo();//화면 갱신
     // }, [info]);
 
@@ -34,7 +34,7 @@ const PaymentDetail=()=>{
         setSelectedDetailName(prev => {
             return [...prev, detail.paymentDetailName];
         });
-        await axios.delete(`http://localhost:8080/seats/cancelItem/${detail.paymentDetailNo}`);
+        await axios.delete(`/seats/cancelItem/${detail.paymentDetailNo}`);
         toast.success(`${detail.paymentDetailName} 항목이 취소되었습니다.`);
         loadPaymentInfo();
     }, [loadPaymentInfo]);

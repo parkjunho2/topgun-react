@@ -41,7 +41,7 @@ const Booking = () => {
     },[]);
 
     const loadFlightList = async () => {
-        const response = await axios.get(`http://localhost:8080/flight/${flightId}`);
+        const response = await axios.get(`/flight/${flightId}`);
         // console.log(response.data); // 응답 데이터가 배열인지 확인
         setflightList(Array.isArray(response.data) ? response.data : [response.data]);  // 응답 데이터가 배열인지 확인. 배열이면 그대로 상태에 저장하고, 배열이 아니면 배열로 감싸서 상태에 저장
     };

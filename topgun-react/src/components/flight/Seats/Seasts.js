@@ -12,7 +12,7 @@ const Seats = () => {
 
     const loadSeats = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/seats/getSeats?flightId=${flightId}`);
+            const response = await axios.get(`/seats/getSeats?flightId=${flightId}`);
             setSeats(response.data);
         } catch (error) {
             console.error("Error fetching seats:", error);

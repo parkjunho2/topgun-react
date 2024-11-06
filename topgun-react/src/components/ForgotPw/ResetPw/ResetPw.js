@@ -70,7 +70,7 @@ const ResetPw = () => {
         };
 
         try {
-            const response = await axios.post(`http://localhost:8080/users/resetPw?userId=${userId}`, certDto);
+            const response = await axios.post(`/users/resetPw?userId=${userId}`, certDto);
             // console.log('Response:', response.data);
         } catch (error) {
             console.error('Error during password reset:', error);
@@ -87,7 +87,7 @@ const ResetPw = () => {
         if (validation.newPasswordValid && validation.passwordMatch && resetPw.userId && resetPw.certEmail) {
             try {
                 // 비밀번호 변경 요청
-                await axios.put(`http://localhost:8080/users/changePassword`, {
+                await axios.put(`/users/changePassword`, {
                     newPassword: resetPw.newPw,
                     userId: resetPw.userId, // userId 사용
                     certEmail: resetPw.certEmail, // certEmail 추가

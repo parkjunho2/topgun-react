@@ -114,14 +114,14 @@ const BookingList = () => {
     },[]);
 
     const loadFlightList = useCallback(async()=>{
-        const resp = await axios.get("http://localhost:8080/flight/");
+        const resp = await axios.get("/flight/");
         setFlightList(resp.data);
         // console.log(resp.data);
     },[flightList]);
 
     const createRoom = useCallback(async(target)=>{
         window.alert(target.airlineDto.airlineName+"에게 문의하시겠습니까?");
-        const resp = await axios.post("http://localhost:8080/room/createAndEnter",
+        const resp = await axios.post("/room/createAndEnter",
             {roomName : target.airlineDto.airlineName},
             {params : {userId : target.userId}})
             const newRoomNo = resp.data.roomNo;
@@ -196,7 +196,7 @@ const BookingList = () => {
         //첫 목록을 불러올 때 사용
         const sendRequest = useCallback(async ()=>{
             loading.current = true; //시작지점
-            const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
+            const resp = await axios.post("/flight/complexSearch", input);
             // console.log(resp.data);
 
             setResult(resp.data);
@@ -207,7 +207,7 @@ const BookingList = () => {
         //더보기 버튼을 눌렀을 때 사용
         const sendMoreRequest = useCallback(async ()=>{
             loading.current = true; //시작지점
-            const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
+            const resp = await axios.post("/flight/complexSearch", input);
             // console.log(resp.data);
             //setResult(resp.data);     //덮어쓰기라 안됨
             setResult({
@@ -606,7 +606,7 @@ const BookingList = () => {
             try {
                 const pricesData = await Promise.all(
                     dates.map(async (date) => {
-                        const response = await axios.post("http://localhost:8080/flight/complexSearch", {
+                        const response = await axios.post("/flight/complexSearch", {
                             ...input,
                             departureTime: date
                         });

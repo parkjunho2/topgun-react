@@ -59,7 +59,7 @@ const Chat = () => {
 
     //callback
     const connectToServer = useCallback(() => {
-        const socket = new SockJS("http://localhost:8080/ws");
+        const socket = new SockJS("/ws");
 
         const client = new Client({
             webSocketFactory: () => socket,
@@ -128,7 +128,7 @@ const Chat = () => {
     }, [input, client, connect]);
 
     const checkRoom = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/room/check/" + roomNo);
+        const resp = await axios.get("/room/check/" + roomNo);
         if (resp.data === false) {
             navigate("/room", { replace: true });
         }
@@ -173,7 +173,7 @@ const Chat = () => {
 
     // const loadMoreMessageList = useCallback(async () => {
     //     setShouldScroll(false); // 더보기 클릭 시 스크롤 방지
-    //     const resp = await axios.get("http://localhost:8080/room/" + roomNo + "/more/" + firstMessageNo);
+    //     const resp = await axios.get("/room/" + roomNo + "/more/" + firstMessageNo);
     //     setMessageList(prev => [...resp.data.messageList, ...prev]);
     //     setMore(resp.data.last === false); //더보기 여부 설정
     // }, [firstMessageNo, roomNo, messageList, more]);

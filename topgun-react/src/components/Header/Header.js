@@ -1,11 +1,9 @@
-import React from 'react';
 import { NavLink, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { loginState, memberLoadingState, userState } from "../../util/recoil";
 import axios from "axios";
 import { useCallback } from "react";
 import Oval from 'react-loading-icons/dist/esm/components/oval';
-import { AiFillHome } from "react-icons/ai";
 import { FaUserCircle } from "react-icons/fa";
 
 const Header = () => {

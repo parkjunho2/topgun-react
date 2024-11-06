@@ -13,7 +13,7 @@ const PaymentList=()=>{
 
     //callback
     const loadPaymentList = useCallback(async()=>{
-        const resp = await axios.get("http://localhost:8080/seats/paymentlist");
+        const resp = await axios.get("/seats/paymentlist");
         setPaymentList(resp.data);
     }, []);
 
@@ -31,7 +31,7 @@ const PaymentList=()=>{
             return payment;
         }));
     } else {
-        const resp = await axios.get("http://localhost:8080/seats/paymentlist/" + target.paymentNo);
+        const resp = await axios.get("/seats/paymentlist/" + target.paymentNo);
         setPaymentList(paymentList.map(payment => {
             if (payment.paymentNo === target.paymentNo) {
                 return {

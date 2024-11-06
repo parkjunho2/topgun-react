@@ -25,13 +25,13 @@ const FlightDetail = () => {
 };
 
 const flightPassangerList = useCallback(async () => {//탑승자명단 추가
-    const resp = await axios.get(`http://localhost:8080/seats/passanger/${flightId}`);
+    const resp = await axios.get(`/seats/passanger/${flightId}`);
     setFlightPassangerInfo(resp.data); 
 }, [flightId]);
 
 const loadFlight = useCallback(async () => {
     try {
-        const resp = await axios.get(`http://localhost:8080/flight/${flightId}`);
+        const resp = await axios.get(`/flight/${flightId}`);
 
         setFlight(resp.data);
         setInput({
@@ -46,7 +46,7 @@ const loadFlight = useCallback(async () => {
 }, [flightId]);
 
     const deleteFlight = useCallback(async () => {
-        await axios.delete(`http://localhost:8080/flight/${flightId}`);
+        await axios.delete(`/flight/${flightId}`);
         navigate("/flight");
     }, [flightId, navigate]);
 
@@ -125,7 +125,7 @@ const loadFlight = useCallback(async () => {
                 return;
             }
 
-        await axios.put("http://localhost:8080/flight/", updatedInput);
+        await axios.put("/flight/", updatedInput);
         loadFlight();
         closeModal();
     }, [input, loadFlight, closeModal]);

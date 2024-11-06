@@ -1,7 +1,26 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { loginState, userState } from "../../util/recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
+import axios from "axios";
+import { useCallback } from "react";
+
+
+
 
 const Footer = () => {
+    const navigate = useNavigate();
+    const login = useRecoilValue(loginState);
+    const [, setUser] = useRecoilState(userState);
+
+    const logout = useCallback(() => {
+        setUser({ userId: '', userType: '' });
+        delete axios.defaults.headers.common["Authorization"];
+        window.localStorage.removeItem("refreshToken");
+        window.sessionStorage.removeItem("refreshToken");
+        navigate("/");
+    }, [navigate, setUser]);
+
     return (
         <>
             {/* 푸터 */}
@@ -11,8 +30,8 @@ const Footer = () => {
                         <div className="d-flex flex-column align-items-start ms-5">
                             <p className="text-body-secondary  mb-0 ms-4">TopGun Travel Agency</p>
                             <NavLink to="/" className="nav-link px-2 text-white">
-                                <img src="/image/1-removebg-preview.png"  
-                                        style={{ width: "200px", height: "auto" }} alt="TopGun Logo"/>
+                                <img src="/image/1-removebg-preview.png"
+                                    style={{ width: "200px", height: "auto" }} alt="TopGun Logo" />
                             </NavLink>
                         </div>
                     </div>
@@ -22,7 +41,17 @@ const Footer = () => {
                         <h5>고객 서비스</h5>
                         <ul className="nav flex-column">
                             <li className="nav-item mb-2"><NavLink to="/" className="nav-link p-0 text-body-secondary">홈</NavLink></li>
-                            <li className="nav-item mb-2"><NavLink to="/login" className="nav-link p-0 text-body-secondary">로그인</NavLink></li>
+
+                            {login ? (
+                                <li className="nav-item mb-2" role="button" tabIndex={0} onClick={logout}>
+                                    <span className="nav-link p-0 text-body-secondary">로그아웃</span>
+                                </li>
+                            ) : (
+                                <li className="nav-item mb-2">
+                                    <NavLink to="/login" className="nav-link p-0 text-body-secondary">로그인</NavLink>
+                                </li>
+                            )}
+
                             <li className="nav-item mb-2"><NavLink to="/notice" className="nav-link p-0 text-body-secondary">공지사항</NavLink></li>
                         </ul>
                     </div>
