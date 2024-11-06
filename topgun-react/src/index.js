@@ -17,7 +17,7 @@ import axios from 'axios';
 //- process.env.항목이름
 axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;//기본요청 URL
 axios.defaults.timeout = 5000; // 5초동안 기다려본다
-console.log(process.env.REACT_APP_BASE_URL);  // 콘솔에 출력
+// console.log(process.env.REACT_APP_BASE_URL);  // 콘솔에 출력
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

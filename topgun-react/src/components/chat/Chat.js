@@ -59,7 +59,7 @@ const Chat = () => {
 
     //callback
     const connectToServer = useCallback(() => {
-        const socket = new SockJS("/ws");
+        const socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/ws`);
 
         const client = new Client({
             webSocketFactory: () => socket,
