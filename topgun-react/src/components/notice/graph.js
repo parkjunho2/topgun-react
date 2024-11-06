@@ -24,7 +24,8 @@ const WorldMapWithGraphs = () => {
                 });
                 const data = response.data;
 
-                const labels = data.map(item => `비행편 ${item.flightId}`);
+                // flight_number로 변경
+                const labels = data.map(item => `비행편 ${item.flightNumber}`);
                 const payments = data.map(item => item.totalPayment);
 
                 if (data.length > 0) {
@@ -119,7 +120,7 @@ const WorldMapWithGraphs = () => {
             legend: { position: 'top' },
             title: {
                 display: true,
-                text: `비행편 ID별 총 결제액 (${airlineName} / ${user.userType})`,
+                text: `비행편 번호별 총 결제액 (${airlineName} / ${user.userType})`,
             },
             tooltip: {
                 callbacks: {
@@ -133,7 +134,7 @@ const WorldMapWithGraphs = () => {
                 beginAtZero: true,
                 title: { display: true, text: '총 결제액 (원)' }
             },
-            x: { title: { display: true, text: '비행편 ID' } }
+            x: { title: { display: true, text: '비행편 번호' } }
         }
     };
 
@@ -165,7 +166,7 @@ const WorldMapWithGraphs = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', }}>
               {user.userType === 'AIRLINE' && flightChartData ? (
-                  <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop:"30px",boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',borderRadius: '10px',padding: '20px', }}>
+                  <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop:"30px", boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '10px', padding: '20px', }}>
                       <div style={{ width: '600px', textAlign: 'center' }}>
                           <Bar data={flightChartData} options={flightOptions} />
                       </div>
@@ -196,7 +197,7 @@ const WorldMapWithGraphs = () => {
              display: 'flex', gap: '20px', alignItems: 'flex-start',
               }}>
               {user.userType === 'ADMIN' && airlineChartData ? (
-                  <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop:"30px",boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',borderRadius: '10px',padding: '20px', }}>
+                  <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop:"30px", boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '10px', padding: '20px', }}>
                       <div style={{ width: '600px', textAlign: 'center' }}>
                           <Bar data={airlineChartData} options={airlineOptions} />
                       </div>
