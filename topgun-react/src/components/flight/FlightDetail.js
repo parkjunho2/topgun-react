@@ -11,9 +11,11 @@ const FlightDetail = () => {
     const [load, setLoad] = useState(false);
     const [input, setInput] = useState({});
     const modalRef = useRef();
+    const [flightPassangerInfo, setFlightPassangerInfo]= useState([]);//탑승자명단 추가
 
     useEffect(() => {
         loadFlight();
+        flightPassangerList();//탑승자명단 추가
     }, []);
 
  // `datetime-local` 형식으로 변환하는 함수
@@ -21,6 +23,11 @@ const FlightDetail = () => {
     const date = new Date(dateString);
     return date.toISOString().slice(0, 16); // "yyyy-MM-ddTHH:mm" 형식으로 자르기
 };
+
+const flightPassangerList = useCallback(async () => {//탑승자명단 추가
+    const resp = await axios.get(`http://localhost:8080/seats/passanger/${flightId}`);
+    setFlightPassangerInfo(resp.data); 
+}, [flightId]);
 
 const loadFlight = useCallback(async () => {
     try {
@@ -182,6 +189,26 @@ const loadFlight = useCallback(async () => {
                     </div>
                 </div>
             </div>
+            {/* 탑승자명단 추가 */}
+                <h3 className="text-center my-4">탑승자명단</h3>
+            <table className="container" style={{width:"1000px"}}>
+            <thead>
+                <tr>
+                    <th>좌석번호</th>
+                    <th>한글이름</th>
+                    <th>생년월일</th>
+                </tr>
+                </thead>
+                <tbody>
+                {flightPassangerInfo.map((passanger, index) => (
+            <tr key={index}>
+                <td>{passanger.paymentDetailName}</td>
+                <td>{passanger.paymentDetailPassanger}</td>
+                <td>{passanger.paymentDetailBirth}</td>
+            </tr>
+        ))}
+                </tbody>
+            </table>
 
             {/* 버튼들 */}
             <div className="text-center mt-4">
