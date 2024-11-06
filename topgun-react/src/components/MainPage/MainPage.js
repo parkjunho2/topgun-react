@@ -236,7 +236,7 @@ const MainPage = () => {
         } else if (nation === '동남아시아') {
             setCities(['다낭(DAD)', '나트랑(CXR)']); // 동남아시아 클릭 시 도시 목록 설정
         } else {
-            setCities(['서울/인천(ICN)', '서울/김포(GMP)', '제주(CJU)', '광주(KWJ)', '여수(RSU)', '청주(CJJ)', '대구(TAE)']); // 기본 도시 목록
+            setCities(['서울/인천(ICN)', '서울/김포(GMP)', '제주(CJU)']); // 기본 도시 목록
         }
     };
 
@@ -346,7 +346,7 @@ const MainPage = () => {
         } else if (nationDestination === '동남아시아') {
             setDestinationCities(['다낭(DAD)', '나트랑(CXR)']); // 동남아시아 클릭 시 도시 목록 설정
         } else {
-            setDestinationCities(['서울/인천(ICN)', '서울/김포(GMP)', '제주(CJU)', '광주(KWJ)', '여수(RSU)', '청주(CJJ)', '대구(TAE)']); // 기본 도시 목록
+            setDestinationCities(['서울/인천(ICN)', '서울/김포(GMP)', '제주(CJU)']); // 기본 도시 목록
         }
     };
 
@@ -411,13 +411,12 @@ const MainPage = () => {
     const [nationalList, setNationalList] = useState([
         { nationalNo: 1, nationalName: "서울/인천(ICN)" },
         { nationalNo: 2, nationalName: "서울/김포(GMP)" },
-        { nationalNo: 3, nationalName: "광주(KWJ)" },
-        { nationalNo: 4, nationalName: "대구(TAE)" },
-        { nationalNo: 5, nationalName: "제주(CJU)" },
-        { nationalNo: 6, nationalName: "여수(RSU)" },
-        { nationalNo: 7, nationalName: "도쿄/나리타(NRT)" },
-        { nationalNo: 8, nationalName: "오사카/간사이(KIX)" },
-        { nationalNo: 9, nationalName: "나트랑(CXR)" }
+        { nationalNo: 3, nationalName: "제주(CJU)" },
+        { nationalNo: 4, nationalName: "도쿄/나리타(NRT)" },
+        { nationalNo: 5, nationalName: "오사카/간사이(KIX)" },
+        { nationalNo: 6, nationalName: "나트랑(CXR)" },
+        { nationalNo: 7, nationalName: "다낭(DAD)" },
+        { nationalNo: 8, nationalName: "삿포로(CTS)" }
     ]);
 
     //========================자동완성 기능 사용 시 백엔드와 연결하기 위한 코드================
@@ -727,7 +726,7 @@ const MainPage = () => {
                                                     {recentSearches.length > 0 ? (
                                                         recentSearches.map((search, index) => (
                                                             <div key={index}>
-                                                                <div className="row mt-2" style={{ border: "1px solid lightGray", width: "100%", borderRadius: "0.5em", fontSize: "15px" }}>
+                                                                <div className="row mt-2" style={{ border: "1px solid lightGray", width: "100%", borderRadius: "0.5em", fontSize: "14px" }}>
                                                                     <span style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
                                                                         onClick={() => applySearchToInput(search.departureAirport, search.arrivalAirport)}>
                                                                         {search.departureAirport} → {search.arrivalAirport}
@@ -803,7 +802,7 @@ const MainPage = () => {
                                                     {recentSearches.length > 0 ? (
                                                         recentSearches.map((search, index) => (
                                                             <div key={index}>
-                                                                <div className="row mt-2" style={{ border: "1px solid lightGray", width: "100%", borderRadius: "0.5em", fontSize: "15px" }}>
+                                                                <div className="row mt-2" style={{ border: "1px solid lightGray", width: "100%", borderRadius: "0.5em", fontSize: "14px" }}>
                                                                     <span style={{ display: "flex", alignItems: "center" }}
                                                                             onClick={() => applySearchToInput(search.departureAirport, search.arrivalAirport)}>
                                                                         {search.departureAirport} → {search.arrivalAirport}

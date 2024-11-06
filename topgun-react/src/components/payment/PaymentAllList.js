@@ -13,8 +13,8 @@ const PaymentAllList=()=>{
      const [selectedDetail, setSelectedDetail] = useState({});
      const [submittedDetails, setSubmittedDetails] = useState({}); // 등록된 정보를 저장
      const passangerRegex = /^[가-힣]+$/;
-    const englishRegex = /^[a-zA-Z]+$/;
-    const passportRegex = /^[A-Za-z][0-9]{8}$/;
+     const englishRegex = /^[A-Z]+$/;
+     const passportRegex = /^[A-Z][0-9]{8}$/;
      //effect
      useEffect(()=>{
         loadPaymentList();
@@ -191,7 +191,7 @@ const PaymentAllList=()=>{
                             {payment.paymentDetailList.map(detail => ( 
                                 <>
                                 <div className="d-flex table" key={detail.paymentDetailNo}>
-                                        <div className="" style={{width:"55%"}}>
+                                        <div className="mt-2" style={{width:"55%"}}>
                                             <table className="table">
                                                 <thead>
                                                     <tr>
@@ -287,7 +287,7 @@ const PaymentAllList=()=>{
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailPassport: e.target.value }))}
                                                                             onBlur={() => {
                                                                                 if (!passportRegex.test(selectedDetail.paymentDetailPassport)) {
-                                                                                    toast.error("여권 번호는 영문자 1개 뒤에 숫자 8개로 이루어져야 합니다.");
+                                                                                    toast.error("여권 번호는 대문자 영문 1자 뒤에 숫자 8개로 이루어져야 합니다.");
                                                                                 }
                                                                             }}
                                                                         />
@@ -314,7 +314,7 @@ const PaymentAllList=()=>{
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailEnglish: e.target.value }))}
                                                                             onBlur={() => {
                                                                                 if (!englishRegex.test(selectedDetail.paymentDetailEnglish)) {
-                                                                                    toast.error("영어만 입력하세요.");
+                                                                                    toast.error("영문 대문자만 입력하세요.");
                                                                                 }
                                                                             }}
                                                                         />
@@ -329,10 +329,10 @@ const PaymentAllList=()=>{
                                                                             <option value="W">여성</option>
                                                                         </select>
                                                                     </div>
-                                                                    <div style={{textAlign:"left", width:"30%"}}>
+                                                                    <div style={{textAlign:"left"}}>
                                                                         생년월일
                                                                         <input className="form-control"
-                                                                            style={{ width: '100%' }}
+                                                                            style={{ width: '45%' }}
                                                                             type="date"
                                                                             onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailBirth: e.target.value }))}
                                                                             max={new Date().toISOString().split("T")[0]} 
@@ -340,7 +340,7 @@ const PaymentAllList=()=>{
                                                                         <div>
                                                                             <span style={{ marginRight: '21px', width:"30%" }}>국적</span>
                                                                             <select className="form-control"
-                                                                                style={{ width: '100%' }}
+                                                                                style={{ width: '45%' }}
                                                                                 id="country"
                                                                                 onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailCountry: e.target.value }))}>
                                                                                 <option value="">국적을 선택하세요</option>
@@ -359,7 +359,7 @@ const PaymentAllList=()=>{
                                                                         <div>
                                                                             <span style={{ width: '30%' }}>여권 발행국</span>
                                                                             <select className="form-control"
-                                                                                style={{ width: '100%' }}
+                                                                                style={{ width: '45%' }}
                                                                                 id="visaType"
                                                                                 onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailVisa: e.target.value }))}>
                                                                                 <option value="">국적을 선택하세요</option>
@@ -375,26 +375,28 @@ const PaymentAllList=()=>{
                                                                                 <option value="AU">호주</option>
                                                                             </select>
                                                                         </div>
-                                                                        <span style={{ width: '30%' }}>여권 만료일</span>
-                                                                        <div className="d-flex justify-content-between">
+                                                                        <div style={{textAlign:"left"}}>
+                                                                            <span style={{ width: '30%' }}>여권 만료일</span>
+                                                                                <div className="d-flex justify-content-between">
                                                                                     <input className="form-control"
-                                                                                        style={{ width: '100%' }}
+                                                                                        style={{ width: '46%' }}
                                                                                         type="date"
                                                                                         onChange={(e) => setSelectedDetail(prev => ({ ...prev, paymentDetailExpire: e.target.value }))}
                                                                                         min={new Date().toISOString().split("T")[0]} // 오늘 날짜를 최소 날짜로 설정
                                                                                     />
-                                                                        <div className="text-end">
-                                                                        <button
-                                                                            className="btn btn-primary"
-                                                                            onClick={() => updatePaymentDetail(detail.paymentDetailNo)}
-                                                                            disabled={
-                                                                                (selectedDetail.paymentDetailPassanger && !passangerRegex.test(selectedDetail.paymentDetailPassanger)) ||
-                                                                                (selectedDetail.paymentDetailPassport && !passportRegex.test(selectedDetail.paymentDetailPassport)) ||
-                                                                                (selectedDetail.paymentDetailEnglish && !englishRegex.test(selectedDetail.paymentDetailEnglish))
-                                                                            }>
-                                                                            등록
-                                                                        </button>
-                                                                        </div>
+                                                                                    <div className="text-end">
+                                                                                        <button
+                                                                                            className="btn btn-primary"
+                                                                                            onClick={() => updatePaymentDetail(detail.paymentDetailNo)}
+                                                                                            disabled={
+                                                                                                (selectedDetail.paymentDetailPassanger && !passangerRegex.test(selectedDetail.paymentDetailPassanger)) ||
+                                                                                                (selectedDetail.paymentDetailPassport && !passportRegex.test(selectedDetail.paymentDetailPassport)) ||
+                                                                                                (selectedDetail.paymentDetailEnglish && !englishRegex.test(selectedDetail.paymentDetailEnglish))
+                                                                                            }>
+                                                                                            등록
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
                                                                         </div>
                                                                     </div>
                                                                 </>
