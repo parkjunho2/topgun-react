@@ -69,7 +69,7 @@ const PaymentDetail=()=>{
     //view
     return(<>
             {info ? (  // info가 존재할 경우에만 렌더링
-            <div className="container"  style={{width:"1100px"}}>
+            <div className="container">
             <div className="row mb-4 mt-2">
                 <div className="col">
                     <h2>결제 내역</h2>
@@ -120,7 +120,7 @@ const PaymentDetail=()=>{
             )}
             
         {info ? (  // info가 존재할 경우에만 렌더링
-        <div className="container"  style={{width:"1100px"}}>
+        <div className="container">
             <div className="row mt-5">
                 <div className="col">
                         <h3>결제 정보</h3>
