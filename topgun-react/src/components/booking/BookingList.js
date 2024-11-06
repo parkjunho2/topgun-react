@@ -637,9 +637,9 @@ const BookingList = () => {
     const lowestPrice = Math.min(...pricesList.filter(price => price !== null)); 
 
 
-    useEffect(() => {
-        console.log("Updated pricesList:", pricesList);
-    }, [pricesList]);
+    // useEffect(() => {
+    //     // console.log("Updated pricesList:", pricesList);
+    // }, [pricesList]);
 
     // dateList와 pricesList 상태 업데이트 확인
     // useEffect(() => {

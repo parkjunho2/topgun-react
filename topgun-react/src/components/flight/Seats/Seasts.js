@@ -25,7 +25,7 @@ const Seats = () => {
 
     useEffect(() => {
         // 선택된 좌석이 변경될 때마다 콘솔에 출력
-        console.log("선택된 좌석:", Array.from(selectedSeats));
+        // console.log("선택된 좌석:", Array.from(selectedSeats));
     }, [selectedSeats]); // selectedSeats가 변경될 때마다 실행
 
     // 좌석 배열을 가공하여 2차원 배열로 변환
