@@ -37,7 +37,6 @@ import { ToastContainer } from 'react-toastify';
 import PaymentDetail from "./components/payment/PaymentDetail.js";
 import FindPw from './components/ForgotPw/FindPw/FindPw';
 import ResetPw from './components/ForgotPw/ResetPw/ResetPw.js';
-import ComplexTest from './components/booking/complexTest.js';
 import UserList from './components/UserList/UserList.js';
 import AirLineRoute from './components/Route/AirLineRoute.js';
 
@@ -122,9 +121,6 @@ const App = () => {
         {/* 예약페이지 */}
         <Route path="/flight/booking/:flightId" element={<Booking />} />
         <Route path="/flight/bookingList" element={<BookingList />} />
-
-        {/* 복합검색 테스트용 지울 예정 */}
-        <Route path="/complexTest" element={<ComplexTest />} />
 
         {/* 로그인 되어야지만 볼 수 있는 페이지 */}
         <Route element={<PrivateRoute />}>
