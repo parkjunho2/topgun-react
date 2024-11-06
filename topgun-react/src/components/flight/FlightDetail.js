@@ -189,8 +189,22 @@ const loadFlight = useCallback(async () => {
                     </div>
                 </div>
             </div>
+{/* 버튼들 */}
+<div className="text-center mt-4">
+            {flight.flightStatus !== "승인" && (
+        <>
+            <button className="btn btn-warning ms-2" onClick={openModal}>수정하기</button>
+            <button className="btn btn-danger ms-2" onClick={deleteFlight}>삭제하기</button>
+        </>
+    )}
+                <button className="btn btn-secondary ms-2" onClick={() => navigate("/flight")}>목록보기</button>
+            </div>
+
             {/* 탑승자명단 추가 */}
-                <h3 className="text-center my-4">탑승자명단</h3>
+                <h3 className="text-center my-4 mt-4">탑승자명단</h3>
+
+                <div className="card p-4 shadow">
+                <div className="row mb-3">
             <table className="container" style={{width:"1000px"}}>
             <thead>
                 <tr>
@@ -209,17 +223,10 @@ const loadFlight = useCallback(async () => {
         ))}
                 </tbody>
             </table>
-
-            {/* 버튼들 */}
-            <div className="text-center mt-4">
-            {flight.flightStatus !== "승인" && (
-        <>
-            <button className="btn btn-warning ms-2" onClick={openModal}>수정하기</button>
-            <button className="btn btn-danger ms-2" onClick={deleteFlight}>삭제하기</button>
-        </>
-    )}
-                <button className="btn btn-secondary ms-2" onClick={() => navigate("/flight")}>목록보기</button>
             </div>
+            </div>
+
+            
 
             {/* 수정 모달 */}
             <div className="modal fade" tabIndex="-1" ref={modalRef}>
