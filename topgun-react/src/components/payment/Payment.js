@@ -41,7 +41,7 @@ import { toast } from "react-toastify";
     //callback
     //좌석 리스트 백엔드에 불러옴
     const loadSeatsList= useCallback(async()=>{ 
-        const resp=await axios.get(`http://localhost:8080/seats/${flightId}`);
+        const resp=await axios.get(`/seats/${flightId}`);
             setSeatsList(resp.data.map(seats=>{
                 return{
                     ...seats,
@@ -61,7 +61,7 @@ import { toast } from "react-toastify";
 
      // 항공편 정보 백엔드에 불러옴
      const loadFlightInfo = useCallback(async () => {
-        const resp = await axios.get(`http://localhost:8080/seats/info/${flightId}`);
+        const resp = await axios.get(`/seats/info/${flightId}`);
         setFlightInfo(resp.data[0]); // 첫 번째 항공편 정보만 가져오기
     }, [flightId]);
 
@@ -159,7 +159,7 @@ import { toast } from "react-toastify";
             return;
     } 
         const resp = await axios.post(
-            "http://localhost:8080/seats/purchase", 
+            "/seats/purchase", 
             {//백엔드 puchaseReqeustVO 로 전송
                 seatsList: checkedSeatsList, //seatNo,qty,여권정보
                 approvalUrl: getCurrentUrl() + "/success",

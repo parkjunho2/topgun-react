@@ -48,7 +48,7 @@ const NoticeBoard = () => {
 
     const loadList = useCallback(async () => {
         try {
-            const response = await axios.get("http://localhost:8080/notice/");
+            const response = await axios.get("/notice/");
             // mainNotice가 1인 항목을 우선으로, 긴급 공지 항목을 그 다음으로 정렬
             const sortedList = response.data.sort((a, b) => {
                 if (a.mainNotice === b.mainNotice) {
@@ -67,7 +67,7 @@ const NoticeBoard = () => {
         const choice = window.confirm("정말 삭제하시겠습니까?");
         if (choice) {
             try {
-                await axios.delete(`http://localhost:8080/notice/delete/${target.noticeId}`);
+                await axios.delete(`/notice/delete/${target.noticeId}`);
                 setNoticeList(prevNotices => prevNotices.filter(notice => notice.noticeId !== target.noticeId));
                 // 삭제 성공 시 토스트 메시지 표시
                 toast.success("공지사항이 성공적으로 삭제되었습니다.");
@@ -122,7 +122,7 @@ const NoticeBoard = () => {
 
 
         try {
-            await axios.post("http://localhost:8080/notice/post", newNotice);
+            await axios.post("/notice/post", newNotice);
             clearInput();
             await loadList();
             toast.success('공지사항이 성공적으로 등록되었습니다!'); // 성공 메시지

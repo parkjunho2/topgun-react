@@ -17,7 +17,7 @@ const PaymentAllList=()=>{
 
      //callback
      const loadPaymentList = useCallback(async()=>{
-         const resp = await axios.get("http://localhost:8080/seats/paymentTotalList");
+         const resp = await axios.get("/seats/paymentTotalList");
          setPaymentList(resp.data);
      }, []);
 
@@ -54,7 +54,7 @@ const PaymentAllList=()=>{
             return; // 사용자가 취소하면 함수 종료
         }
         try {
-            const response = await axios.put("http://localhost:8080/seats/detailUpdate", {
+            const response = await axios.put("/seats/detailUpdate", {
                 ...selectedDetail,
                 paymentDetailNo
             });

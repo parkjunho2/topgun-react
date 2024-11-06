@@ -63,7 +63,7 @@ const UserList = () => {
     //첫 목록 불러올 때 사용
     const sendRequest = useCallback(async () => {
         loading.current = true;//시작지점
-        const resp = await axios.post("http://localhost:8080/users/search", input);
+        const resp = await axios.post("/users/search", input);
         setResult(resp.data);
         loading.current = false;//종료지점
     }, [input]);
@@ -71,7 +71,7 @@ const UserList = () => {
     //더보기 눌렀을 때 사용
     const sendMoreRequest = useCallback(async () => {
         loading.current = true;//시작지점
-        const resp = await axios.post("http://localhost:8080/users/search", input);
+        const resp = await axios.post("/users/search", input);
         setResult({
             ...result,
             last: resp.data.last,//서버에서 준 응답 데이터에 있는 last로 갱신

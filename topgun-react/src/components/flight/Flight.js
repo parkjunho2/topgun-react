@@ -51,7 +51,7 @@ const Flight = () => {
     const loadList = useCallback(async () => {
         setIsLoading(true);//로딩
         try {
-        const resp = await axios.get("http://localhost:8080/flight/");
+        const resp = await axios.get("/flight/");
         // 현재 시간 (오늘 날짜)
         const now = new Date();
         // 항공편 리스트에서 현재 로그인된 사용자 ID와 도착 시간이 현재 시간보다 이후인 항공편만 필터링
@@ -71,7 +71,7 @@ const Flight = () => {
         const choice = window.confirm("정말 삭제하시겠습니까?");
         if (!choice) return;
         try {
-            await axios.delete(`http://localhost:8080/flight/${flightId}`);
+            await axios.delete(`/flight/${flightId}`);
             toast.success("삭제 완료되었습니다."); // 삭제 성공 시 토스트 알림 표시
             loadList(); // 목록 새로고침
         } catch (error) {
@@ -81,7 +81,7 @@ const Flight = () => {
 
     const updateFlight = useCallback(async () => {
         // 서버에서 현재 항공편 상태 확인
-    const currentFlight = await axios.get(`http://localhost:8080/flight/${input.flightId}`);
+    const currentFlight = await axios.get(`/flight/${input.flightId}`);
     
     // 최신 상태가 승인 상태인지 확인
     if (currentFlight.data.flightStatus === "승인") {
@@ -141,7 +141,7 @@ const Flight = () => {
                 return;
             }
     
-        await axios.put("http://localhost:8080/flight/", updatedInput);
+        await axios.put("/flight/", updatedInput);
         loadList();
         closeModal();
     }, [input, user.userId, loadList]);
@@ -254,7 +254,7 @@ const Flight = () => {
             const copy = {...input};
             delete copy.flightId;
 
-            await axios.post("http://localhost:8080/flight/", flightData, copy);
+            await axios.post("/flight/", flightData, copy);
             loadList();
             closeModal();
         }
@@ -279,7 +279,7 @@ const Flight = () => {
          // 현재 시간
     const now = new Date();
         
-        const resp = await axios.get(`http://localhost:8080/flight/column/${column}/keyword/${encodeURIComponent(keyword)}`);
+        const resp = await axios.get(`/flight/column/${column}/keyword/${encodeURIComponent(keyword)}`);
      // 항공편 리스트에서 현재 로그인된 사용자 ID와 도착 시간이 현재 시간보다 이후인 항공편만 필터링
      const filteredFlights = resp.data.filter(flight => {
         const arrivalTime = new Date(flight.arrivalTime);

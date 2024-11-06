@@ -19,7 +19,7 @@ const WorldMapWithGraphs = () => {
     useEffect(() => {
         const fetchFlightChartData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/flight-payments`, {
+                const response = await axios.get(`/api/flight-payments`, {
                     params: { userId: user.userId }
                 });
                 const data = response.data;
@@ -65,7 +65,7 @@ const WorldMapWithGraphs = () => {
 
         const fetchAirlineChartData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/all-flight-payments`);
+                const response = await axios.get(`/api/all-flight-payments`);
                 const allData = response.data;
 
                 const airlinePayments = {};

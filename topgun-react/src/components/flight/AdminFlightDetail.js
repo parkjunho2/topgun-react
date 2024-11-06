@@ -14,7 +14,7 @@ const AdminFlightDetail = () => {
 
     const loadFlight = useCallback(async () => {
         try {
-            const resp = await axios.get(`http://localhost:8080/flight/${flightId}`);
+            const resp = await axios.get(`/flight/${flightId}`);
             setFlight(resp.data);
         } catch (e) {
             setFlight(null);
@@ -40,7 +40,7 @@ const AdminFlightDetail = () => {
         };
 
 
-        await axios.put("http://localhost:8080/admin/update", updatedFlight);
+        await axios.put("/admin/update", updatedFlight);
         navigate("/admin/list");
     }, [flight, navigate]);
 

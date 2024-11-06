@@ -16,7 +16,7 @@ const AdminFlight = () => {
     const loadList = useCallback(async () => {
         setIsLoading(true);//로딩
         try {
-            const resp = await axios.get("http://localhost:8080/admin/");
+            const resp = await axios.get("/admin/");
             // 현재 시간 (오늘 날짜)
        const now = new Date();
        const filteredFlights = resp.data.filter(flight => {
@@ -44,7 +44,7 @@ setIsLoading(false);  // 로딩 종료
             flightStatus: status,
         };
 
-        await axios.put("http://localhost:8080/admin/update", updatedFlight);
+        await axios.put("/admin/update", updatedFlight);
         loadList();
     }, [flightList, loadList]);
 
@@ -54,7 +54,7 @@ setIsLoading(false);  // 로딩 종료
 
     const searchFlightList = useCallback(async () => {
         if (keyword.length === 0) return;
-        const resp = await axios.get(`http://localhost:8080/flight/column/${column}/keyword/${encodeURIComponent(keyword)}`);
+        const resp = await axios.get(`/flight/column/${column}/keyword/${encodeURIComponent(keyword)}`);
 
           // 현재 시간 (오늘 날짜)
     const now = new Date();

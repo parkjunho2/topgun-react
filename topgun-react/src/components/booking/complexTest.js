@@ -85,7 +85,7 @@ const ComplexTest = () => {
         //첫 목록을 불러올 때 사용
         const sendRequest = useCallback(async ()=>{
             loading.current = true; //시작지점
-            const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
+            const resp = await axios.post("/flight/complexSearch", input);
             setResult(resp.data);
             console.log(resp.data);
             loading.current = false;    //종료지점
@@ -94,7 +94,7 @@ const ComplexTest = () => {
         //더보기 버튼을 눌렀을 때 사용
         const sendMoreRequest = useCallback(async ()=>{
             loading.current = true; //시작지점
-            const resp = await axios.post("http://localhost:8080/flight/complexSearch", input);
+            const resp = await axios.post("/flight/complexSearch", input);
             // console.log(resp.data);
             //setResult(resp.data);     //덮어쓰기라 안됨
             setResult({

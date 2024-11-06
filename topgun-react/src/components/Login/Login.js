@@ -92,7 +92,7 @@ const Login = () => {
         debounce(async (userId) => {
             // console.log(userId); // userId 확인
             try {
-                const response = await axios.post('http://localhost:8080/users/checkId', null, {
+                const response = await axios.post('/users/checkId', null, {
                     params: { userId: userId } // 쿼리 파라미터로 전달
                 });
                 // console.log(response.data); // 서버 응답 확인
@@ -181,7 +181,7 @@ const Login = () => {
     // 로그인 요청 함수
     const Login = useCallback(async () => {
         try {
-            const resp = await axios.post('http://localhost:8080/users/login', loginData);
+            const resp = await axios.post('/users/login', loginData);
 
             setUser({
                 userId: resp.data.usersId,
@@ -275,7 +275,7 @@ const Login = () => {
             usersEmail: fullEmail, // 합쳐진 이메일을 업데이트
         };
         try {
-            const response = await axios.post("http://localhost:8080/users/join", dataToSend);
+            const response = await axios.post("/users/join", dataToSend);
             // console.log(response.data); // 서버로부터 받은 응답 데이터 출력
         } catch (error) {
             console.error("Error occurred while joining:", error); // 에러 처리
