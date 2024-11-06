@@ -138,11 +138,20 @@ const NoticeBoard = () => {
             noticeTitle: "",
             noticeContent: "",
             noticeAuthor: "",
-            noticeCreatedAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+
+            noticeCreatedAt: new Date().toLocaleDateString('ko-KR', {
+                timeZone: 'Asia/Seoul',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            }),
+            
+            
             mainNotice: "",
             urgentNotice: "",
             modifiedNotice: ""
         });
+        
     }, []);
 
     const handleImageUpload = () => {
@@ -251,7 +260,7 @@ const NoticeBoard = () => {
                     </table>
     
                     {/* 페이지네이션 추가 */}
-                    <div style={{ display: 'flex', justifyContent: 'center', width: '80%', marginTop: '5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '5px' }}>
                         <Stack spacing={2}>
                             <Pagination
                                 count={Math.ceil(noticeList.length / noticesPerPage)}
@@ -278,7 +287,7 @@ const NoticeBoard = () => {
                                     </td>
                                     <td></td>
                                     <td style={{ textAlign: 'center', padding: '15px' }}>
-                                        <div style={{ marginBottom: '49px' }}>
+                                        <div style={{ marginBottom: '47px' }}>
                                             <a className="frame-btn" href="#" onClick={addInput}>
                                                 <span className="frame-btn__outline frame-btn__outline--tall">
                                                     <span className="frame-btn__line frame-btn__line--tall"></span>
