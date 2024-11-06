@@ -164,9 +164,9 @@ const WorldMapWithGraphs = () => {
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', }}>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
               {user.userType === 'AIRLINE' && flightChartData ? (
-                  <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop:"30px", boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '10px', padding: '20px', }}>
+                  <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop: "30px", boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '10px', padding: '20px' }}>
                       <div style={{ width: '600px', textAlign: 'center' }}>
                           <Bar data={flightChartData} options={flightOptions} />
                       </div>
@@ -193,11 +193,9 @@ const WorldMapWithGraphs = () => {
               ) : null}
           </div>
   
-          <div style={{
-             display: 'flex', gap: '20px', alignItems: 'flex-start',
-              }}>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
               {user.userType === 'ADMIN' && airlineChartData ? (
-                  <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop:"30px", boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '10px', padding: '20px', }}>
+                  <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop: "30px", boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '10px', padding: '20px' }}>
                       <div style={{ width: '600px', textAlign: 'center' }}>
                           <Bar data={airlineChartData} options={airlineOptions} />
                       </div>
