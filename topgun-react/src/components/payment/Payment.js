@@ -13,8 +13,8 @@ import { toast } from "react-toastify";
     const [flightInfo, setFlightInfo] = useState({});
     const [seatsDisplayList, setSeatsDisplayList] = useState([]);
     const passangerRegex = /^[가-힣]+$/;
-    const englishRegex = /^[a-zA-Z]+$/;
-    const passportRegex = /^[A-Za-z][0-9]{8}$$/;
+    const englishRegex = /^[A-Z]+$/;
+    const passportRegex = /^[A-Z][0-9]{8}$/;
 
     //좌석UI
     useEffect(()=>{
@@ -279,8 +279,8 @@ import { toast } from "react-toastify";
                                     checkedSeatsList.some(seat => 
                                         (seat.paymentDetailPassanger && !passangerRegex.test(seat.paymentDetailPassanger)) ||
                                         (seat.paymentDetailEnglish && !englishRegex.test(seat.paymentDetailEnglish)) || 
-                                        (seat.paymentDetailPassport && passportRegex.test(seat.paymentDetailPassport))
-                                    ) || checkedSeatsList.length === 0
+                                        (seat.paymentDetailPassport && !passportRegex.test(seat.paymentDetailPassport))
+                                    )
                                 }
                             >
                                 구매하기
@@ -331,8 +331,8 @@ import { toast } from "react-toastify";
                                                 value={seats.paymentDetailPassport}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailPassport')}
                                                 onBlur={() => {
-                                                    if (!passangerRegex.test(seats.paymentDetailPassport)) {
-                                                        toast.error("여권 번호는 영문자 1개 뒤에 숫자 8개로 이루어져야 합니다.");
+                                                    if (!passportRegex.test(seats.paymentDetailPassport)) {
+                                                        toast.error("여권 번호는 영문 대문자 1자 뒤에 숫자 8개로 이루어져야 합니다.");
                                                     }
                                                 }}
                                             />
@@ -359,8 +359,8 @@ import { toast } from "react-toastify";
                                                 value={seats.paymentDetailEnglish}
                                                 onChange={e => changeSeats(seats, e.target.value, 'paymentDetailEnglish')}
                                                 onBlur={() => {
-                                                    if (!passangerRegex.test(seats.paymentDetailEnglish)) {
-                                                        toast.error("영어만 입력하세요");
+                                                    if (!englishRegex.test(seats.paymentDetailEnglish)) {
+                                                        toast.error("영문 대문자만 입력하세요");
                                                     }
                                                 }}
                                             />
